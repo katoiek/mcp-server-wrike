@@ -181,14 +181,19 @@ Example:
    # Install dependencies
    npm install
 
-   # Build the project
+   # Configure the Server - IMPORTANT: Do this BEFORE building
+   # Copy the .env.sample file to .env in the project root:
+   cp .env.sample .env
+
+   # Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
+   # Then build the project
    npm run build
    ```
 
 #### 4. Configure the Server
-   - Copy the `.env.example` file to `.env` in the project root:
+   - Copy the `.env.sample` file to `.env` in the project root:
      ```bash
-     cp .env.example .env
+     cp .env.sample .env
      ```
    - Edit the `.env` file and update the `WRIKE_ACCESS_TOKEN` with your permanent token
 
@@ -225,7 +230,12 @@ cd mcp-server-wrike
 # Install dependencies
 npm install
 
-# Build the project
+# Configure the Server - IMPORTANT: Do this BEFORE building
+# Copy the .env.sample file to .env in the project root:
+cp .env.sample .env
+
+# Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
+# Then build the project
 npm run build
 ```
 
@@ -234,7 +244,7 @@ npm run build
 If you encounter permission errors:
 1. Ensure your Wrike plan allows API access
 2. Confirm the access token is correctly set in `claude_desktop_config.json`
-3. Verify that you've copied `.env.example` to `.env` and updated it with your permanent token
+3. Verify that you've copied `.env.sample` to `.env` and updated it with your permanent token
 4. Check the logs in `%APPDATA%\Claude\logs` on Windows
 
 If tools are not showing up in Claude Desktop:
@@ -257,6 +267,12 @@ This project is written in TypeScript. Clone this repo and start hacking:
 git clone https://github.com/katoiek/mcp-server-wrike.git
 cd mcp-server-wrike
 npm install
+
+# Configure the Server - IMPORTANT: Do this BEFORE building
+# Copy the .env.sample file to .env in the project root:
+cp .env.sample .env
+
+# Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
 ```
 
 #### Recent Improvements
@@ -464,14 +480,19 @@ MCPの詳細はこちら：
    # 依存関係をインストール
    npm install
 
-   # プロジェクトをビルド
+   # サーバーを構成 - 重要: ビルド前にこれを行ってください
+   # プロジェクトのルートにある.env.sampleファイルを.envにコピー：
+   cp .env.sample .env
+
+   # .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
+   # その後、プロジェクトをビルド
    npm run build
    ```
 
 #### 4. サーバーを構成
-   - プロジェクトのルートにある`.env.example`ファイルを`.env`にコピー：
+   - プロジェクトのルートにある`.env.sample`ファイルを`.env`にコピー：
      ```bash
-     cp .env.example .env
+     cp .env.sample .env
      ```
    - `.env`ファイルを編集し、`WRIKE_ACCESS_TOKEN`を永続トークンで更新
 
@@ -508,7 +529,12 @@ cd mcp-server-wrike
 # 依存関係をインストール
 npm install
 
-# プロジェクトをビルド
+# サーバーを構成 - 重要: ビルド前にこれを行ってください
+# プロジェクトのルートにある.env.sampleファイルを.envにコピー：
+cp .env.sample .env
+
+# .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
+# その後、プロジェクトをビルド
 npm run build
 ```
 
@@ -517,7 +543,7 @@ npm run build
 権限エラーが発生した場合：
 1. WrikeプランがAPIアクセスを許可していることを確認
 2. アクセストークンが`claude_desktop_config.json`で正しく設定されていることを確認
-3. `.env.example`を`.env`にコピーし、永続トークンを更新したことを確認
+3. `.env.sample`を`.env`にコピーし、永続トークンを更新したことを確認
 4. Windowsの場合は`%APPDATA%\Claude\logs`のログを確認
 
 ツールがClaude Desktopに表示されない場合：
@@ -540,6 +566,12 @@ npm run build
 git clone https://github.com/katoiek/mcp-server-wrike.git
 cd mcp-server-wrike
 npm install
+
+# サーバーを構成 - 重要: ビルド前にこれを行ってください
+# プロジェクトのルートにある.env.sampleファイルを.envにコピー：
+cp .env.sample .env
+
+# .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
 ```
 
 #### 最近の改善点
