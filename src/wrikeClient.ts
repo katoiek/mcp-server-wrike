@@ -13,6 +13,7 @@ import {
   WrikeTaskData,
   WrikeFolderData,
   WrikeCommentData,
+  WrikeTimelogData,
   WrikeIdConversion
 } from './types/wrike.js';
 
@@ -397,13 +398,78 @@ export class WrikeClient {
     }
   }
 
-  async getTimelogsById(timelogIds: string[] | string, params: WrikeRequestParams = {}): Promise<WrikeTimelog[]> {
+  async getTimelogsById(timelogIds: string | string[], params: WrikeRequestParams = {}): Promise<WrikeTimelog[]> {
     try {
-      // Convert array to comma-separated string if needed
       const ids = Array.isArray(timelogIds) ? timelogIds.join(',') : timelogIds;
       const response = await this.client.get(`/timelogs/${ids}`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  async createTimelog(taskId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
+    try {
+      // Ensure data is formatted correctly for the API
+      const requestData = {
+        comment: data.comment,
+        hours: data.hours,
+        trackedDate: data.trackedDate,
+        categoryId: data.categoryId
+      };
+
+      logger.debug(`Creating timelog for task ${taskId} with data:`, requestData);
+      const response = await this.client.post(`/tasks/${taskId}/timelogs`, requestData);
+      logger.debug(`Timelog creation response status: ${response.status}`);
+      const timelogs = this.handleResponse<WrikeTimelog[]>(response);
+      return timelogs[0];
+    } catch (error) {
+      logger.error(`Error creating timelog: ${(error as Error).message}`);
+      if ((error as AxiosError).response) {
+        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
+      }
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  async updateTimelog(timelogId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
+    try {
+      // Ensure data is formatted correctly for the API
+      const requestData = {
+        comment: data.comment,
+        hours: data.hours,
+        trackedDate: data.trackedDate,
+        categoryId: data.categoryId
+      };
+
+      logger.debug(`Updating timelog ${timelogId} with data:`, requestData);
+      const response = await this.client.put(`/timelogs/${timelogId}`, requestData);
+      logger.debug(`Timelog update response status: ${response.status}`);
+      const timelogs = this.handleResponse<WrikeTimelog[]>(response);
+      return timelogs[0];
+    } catch (error) {
+      logger.error(`Error updating timelog: ${(error as Error).message}`);
+      if ((error as AxiosError).response) {
+        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
+      }
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  async deleteTimelog(timelogId: string): Promise<boolean> {
+    try {
+      logger.debug(`Deleting timelog ${timelogId}`);
+      const response = await this.client.delete(`/timelogs/${timelogId}`);
+      logger.debug(`Timelog deletion response status: ${response.status}`);
+      return response.status === 200;
+    } catch (error) {
+      logger.error(`Error deleting timelog: ${(error as Error).message}`);
+      if ((error as AxiosError).response) {
+        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
+      }
       return this.handleError(error as AxiosError);
     }
   }

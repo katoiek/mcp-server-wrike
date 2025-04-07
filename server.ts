@@ -17,6 +17,7 @@ import {
   WrikeRequestParams,
   WrikeTaskData,
   WrikeFolderData,
+  WrikeTimelogData,
   WrikeSpace,
   WrikeFolder,
   WrikeTask,
@@ -567,6 +568,99 @@ async function handleGetTimelogsTool(wrikeClient: WrikeClient, args: any): Promi
   };
 }
 
+/**
+ * Handle wrike_create_timelog tool request
+ */
+async function handleCreateTimelogTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { task_id, hours, tracked_date, comment, category_id } = args as {
+    task_id: string;
+    hours: number;
+    tracked_date: string;
+    comment?: string;
+    category_id?: string;
+  };
+
+  if (!task_id) {
+    throw new Error('task_id is required');
+  }
+  if (hours === undefined || hours <= 0) {
+    throw new Error('hours must be a positive number');
+  }
+  if (!tracked_date) {
+    throw new Error('tracked_date is required (format: YYYY-MM-DD)');
+  }
+
+  // Convert task ID if needed
+  const apiTaskId = await convertTaskId(wrikeClient, task_id);
+
+  const data = {
+    hours,
+    trackedDate: tracked_date,
+    comment,
+    categoryId: category_id
+  };
+
+  // Remove undefined values
+  removeUndefinedValues(data);
+
+  const timelog = await wrikeClient.createTimelog(apiTaskId, data);
+
+  return {
+    content: [{ type: 'text', text: JSON.stringify(timelog, null, 2) }]
+  };
+}
+
+/**
+ * Handle wrike_update_timelog tool request
+ */
+async function handleUpdateTimelogTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { timelog_id, hours, tracked_date, comment, category_id } = args as {
+    timelog_id: string;
+    hours?: number;
+    tracked_date?: string;
+    comment?: string;
+    category_id?: string;
+  };
+
+  if (!timelog_id) {
+    throw new Error('timelog_id is required');
+  }
+  if (hours !== undefined && hours <= 0) {
+    throw new Error('hours must be a positive number');
+  }
+
+  const data: any = {};
+  if (hours !== undefined) data.hours = hours;
+  if (tracked_date) data.trackedDate = tracked_date;
+  if (comment !== undefined) data.comment = comment;
+  if (category_id !== undefined) data.categoryId = category_id;
+
+  const timelog = await wrikeClient.updateTimelog(timelog_id, data);
+
+  return {
+    content: [{ type: 'text', text: JSON.stringify(timelog, null, 2) }]
+  };
+}
+
+/**
+ * Handle wrike_delete_timelog tool request
+ */
+async function handleDeleteTimelogTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { timelog_id } = args as {
+    timelog_id: string;
+  };
+
+  if (!timelog_id) {
+    throw new Error('timelog_id is required');
+  }
+
+  const success = await wrikeClient.deleteTimelog(timelog_id);
+
+  return {
+    content: [{ type: 'text', text: JSON.stringify({ success }, null, 2) }]
+  };
+}
+
 // Type definitions for request handlers
 type ToolHandlerRequest = {
   params: {
@@ -625,7 +719,10 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_create_comment': handleCreateCommentTool,
             'wrike_get_project': handleGetProjectTool,
             'wrike_get_contacts': handleGetContactsTool,
-            'wrike_get_timelogs': handleGetTimelogsTool
+            'wrike_get_timelogs': handleGetTimelogsTool,
+            'wrike_create_timelog': handleCreateTimelogTool,
+            'wrike_update_timelog': handleUpdateTimelogTool,
+            'wrike_delete_timelog': handleDeleteTimelogTool
           };
 
           const handler = handlers[request.params.name];

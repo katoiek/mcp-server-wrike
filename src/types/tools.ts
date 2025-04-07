@@ -93,6 +93,26 @@ export const getTimelogsSchema = optionalFieldsSchema.extend({
   end_date: z.string().optional().describe('Filter timelogs by end date (YYYY-MM-DD)')
 });
 
+export const createTimelogSchema = z.object({
+  task_id: z.string().describe('ID of the task to add the timelog to'),
+  hours: z.number().positive().describe('Number of hours to log'),
+  tracked_date: z.string().describe('Date when the time was spent (YYYY-MM-DD)'),
+  comment: z.string().optional().describe('Comment for the timelog'),
+  category_id: z.string().optional().describe('ID of the timelog category')
+});
+
+export const updateTimelogSchema = z.object({
+  timelog_id: z.string().describe('ID of the timelog to update'),
+  hours: z.number().positive().optional().describe('New number of hours'),
+  tracked_date: z.string().optional().describe('New date when the time was spent (YYYY-MM-DD)'),
+  comment: z.string().optional().describe('New comment for the timelog'),
+  category_id: z.string().optional().describe('New ID of the timelog category')
+});
+
+export const deleteTimelogSchema = z.object({
+  timelog_id: z.string().describe('ID of the timelog to delete')
+});
+
 // Tool types
 export type EchoInput = z.infer<typeof echoSchema>;
 export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
@@ -107,6 +127,9 @@ export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type GetProjectInput = z.infer<typeof getProjectSchema>;
 export type GetContactsInput = z.infer<typeof getContactsSchema>;
 export type GetTimelogsInput = z.infer<typeof getTimelogsSchema>;
+export type CreateTimelogInput = z.infer<typeof createTimelogSchema>;
+export type UpdateTimelogInput = z.infer<typeof updateTimelogSchema>;
+export type DeleteTimelogInput = z.infer<typeof deleteTimelogSchema>;
 
 // Tool interface
 export interface Tool {
@@ -183,6 +206,21 @@ export const tools: Tool[] = [
     schema: getTaskSchema.extend({
       task_id: z.string().describe('ID of the task to get comments for')
     })
+  },
+  {
+    name: 'wrike_create_timelog',
+    description: 'Create a new timelog entry for a task in Wrike',
+    schema: createTimelogSchema
+  },
+  {
+    name: 'wrike_update_timelog',
+    description: 'Update an existing timelog entry in Wrike',
+    schema: updateTimelogSchema
+  },
+  {
+    name: 'wrike_delete_timelog',
+    description: 'Delete a timelog entry in Wrike',
+    schema: deleteTimelogSchema
   },
   {
     name: 'echo',

@@ -186,7 +186,41 @@ Examples:
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of timelogs
 
-12. `echo`
+12. `wrike_create_timelog`
+    - Create a new timelog entry for a task
+    - Required input:
+      - `task_id` (string): ID of the task to add the timelog to
+      - `hours` (number): Number of hours to log (positive number)
+      - `tracked_date` (string): Date when the time was spent (YYYY-MM-DD)
+    - Optional input:
+      - `comment` (string): Comment for the timelog
+      - `category_id` (string): ID of the timelog category
+    - Returns: Created timelog information
+
+13. `wrike_update_timelog`
+    - Update an existing timelog entry
+    - Required input:
+      - `timelog_id` (string): ID of the timelog to update
+    - Optional input:
+      - `hours` (number): New number of hours (positive number)
+      - `tracked_date` (string): New date when the time was spent (YYYY-MM-DD)
+      - `comment` (string): New comment for the timelog
+      - `category_id` (string): New ID of the timelog category
+    - Returns: Updated timelog information
+
+14. `wrike_delete_timelog`
+    - Delete a timelog entry
+    - Required input:
+      - `timelog_id` (string): ID of the timelog to delete
+    - Returns: Success status
+
+15. `echo`
+    - Simple echo function for testing
+    - Required input:
+      - `message` (string): Message to echo back
+    - Returns: The same message
+
+15. `echo`
     - Simple echo function for testing
     - Required input:
       - `message` (string): Message to echo back
@@ -312,6 +346,13 @@ cp .env.sample .env
 ```
 
 #### Recent Improvements
+
+##### v1.1.0 (2025-04-07)
+- Fixed timelog functionality
+  - Implemented proper API endpoints for creating, updating, and deleting timelogs
+  - Added missing type definitions and schemas
+  - Fixed issues with timelog data formatting
+  - Improved error handling and logging for timelog operations
 
 If you want to test your changes, you can use the MCP Inspector:
 
@@ -521,7 +562,35 @@ MCPの詳細はこちら：
       - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
     - 戻り値：タイムログのリスト
 
-12. `echo`
+12. `wrike_create_timelog`
+    - タスクに新しいタイムログエントリを作成
+    - 必須入力：
+      - `task_id`（文字列）：タイムログを追加するタスクのID
+      - `hours`（数値）：記録する時間数（正の数）
+      - `tracked_date`（文字列）：時間が費やされた日付（YYYY-MM-DD形式）
+    - オプション入力：
+      - `comment`（文字列）：タイムログのコメント
+      - `category_id`（文字列）：タイムログカテゴリのID
+    - 戻り値：作成されたタイムログ情報
+
+13. `wrike_update_timelog`
+    - 既存のタイムログエントリを更新
+    - 必須入力：
+      - `timelog_id`（文字列）：更新するタイムログのID
+    - オプション入力：
+      - `hours`（数値）：新しい時間数（正の数）
+      - `tracked_date`（文字列）：時間が費やされた新しい日付（YYYY-MM-DD形式）
+      - `comment`（文字列）：タイムログの新しいコメント
+      - `category_id`（文字列）：タイムログカテゴリの新しいID
+    - 戻り値：更新されたタイムログ情報
+
+14. `wrike_delete_timelog`
+    - タイムログエントリを削除
+    - 必須入力：
+      - `timelog_id`（文字列）：削除するタイムログのID
+    - 戻り値：成功ステータス
+
+15. `echo`
     - テスト用の単純なエコー機能
     - 必須入力：
       - `message`（文字列）：エコーバックするメッセージ
@@ -647,6 +716,13 @@ cp .env.sample .env
 ```
 
 #### 最近の改善点
+
+##### v1.1.0 (2025-04-07)
+- タイムログ機能の修正
+  - タイムログの作成、更新、削除のための適切なAPIエンドポイントを実装
+  - 不足していた型定義とスキーマを追加
+  - タイムログデータのフォーマットに関する問題を修正
+  - タイムログ操作のエラーハンドリングとログ記録を改善
 
 変更をテストしたい場合は、MCP Inspectorを使用できます：
 

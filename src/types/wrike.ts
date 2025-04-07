@@ -184,6 +184,14 @@ export interface WrikeCommentData {
   [key: string]: any;
 }
 
+export interface WrikeTimelogData {
+  comment?: string;
+  hours: number;
+  trackedDate: string;
+  categoryId?: string;
+  [key: string]: any;
+}
+
 // ID Conversion Types
 export interface WrikeIdConversion {
   id: string;
