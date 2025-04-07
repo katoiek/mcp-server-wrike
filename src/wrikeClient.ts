@@ -106,6 +106,55 @@ export class WrikeClient {
     }
   }
 
+  async getFoldersByParent(parentFolderId: string, params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
+    try {
+      const response = await this.client.get(`/folders/${parentFolderId}/folders`, { params });
+      return this.handleResponse<WrikeFolder[]>(response);
+    } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  async getFoldersByIds(folderIds: string[], params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
+    try {
+      if (!folderIds || folderIds.length === 0) {
+        throw new Error('Folder IDs are required');
+      }
+
+      if (folderIds.length > 100) {
+        throw new Error('Maximum of 100 folder IDs allowed');
+      }
+
+      const response = await this.client.get(`/folders/${folderIds.join(',')}`, { params });
+      return this.handleResponse<WrikeFolder[]>(response);
+    } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  async getFoldersHistory(folderIds: string[], params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
+    try {
+      if (!folderIds || folderIds.length === 0) {
+        throw new Error('Folder IDs are required');
+      }
+
+      if (folderIds.length > 100) {
+        throw new Error('Maximum of 100 folder IDs allowed');
+      }
+
+      // Add history=true parameter to get folder history
+      const historyParams = {
+        ...params,
+        history: true
+      };
+
+      const response = await this.client.get(`/folders/${folderIds.join(',')}`, { params: historyParams });
+      return this.handleResponse<WrikeFolder[]>(response);
+    } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
   async getFolder(folderId: string, params: WrikeRequestParams = {}): Promise<WrikeFolder> {
     try {
       const response = await this.client.get(`/folders/${folderId}`, { params });

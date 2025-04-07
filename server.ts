@@ -163,41 +163,83 @@ async function handleCreateFolderTool(wrikeClient: WrikeClient, args: any): Prom
 }
 
 /**
- * Handle wrike_search_projects tool request
+ * Handle wrike_search_folders_projects tool request
  */
-async function handleSearchProjectsTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const { space_id, name_pattern, archived = false, ...opts } = args as {
-    space_id: string;
-    name_pattern: string;
+async function handleSearchFoldersProjectsTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const {
+    space_id,
+    folder_id,
+    folder_ids,
+    name_pattern,
+    project_only = false,
+    archived = false,
+    include_history = false,
+    ...opts
+  } = args as {
+    space_id?: string;
+    folder_id?: string;
+    folder_ids?: string[];
+    name_pattern?: string;
+    project_only?: boolean;
     archived?: boolean;
+    include_history?: boolean;
     opt_fields?: string;
   };
-
-  if (!space_id) {
-    throw new Error('space_id is required');
-  }
-  if (!name_pattern) {
-    throw new Error('name_pattern is required');
-  }
 
   const params = {
     ...parseOptFields(opts.opt_fields)
   };
 
-  // Get all folders in the space
-  const folders = await wrikeClient.getFoldersBySpace(space_id, params);
+  let folders: WrikeFolder[] = [];
 
-  // Filter folders that are projects and match the name pattern
-  const regex = new RegExp(name_pattern, 'i');
-  const projects = folders.filter(folder => {
-    const isProject = folder.project !== undefined;
-    const nameMatches = regex.test(folder.title);
-    const archiveMatches = archived ? folder.archived : !folder.archived;
-    return isProject && nameMatches && archiveMatches;
-  });
+  // Determine which API endpoint to use based on provided parameters
+  if (space_id) {
+    // Get all folders in the space
+    folders = await wrikeClient.getFoldersBySpace(space_id, params);
+  } else if (folder_id) {
+    // Get all subfolders of a parent folder
+    folders = await wrikeClient.getFoldersByParent(folder_id, params);
+  } else if (folder_ids && folder_ids.length > 0) {
+    // Get specific folders by IDs
+    if (include_history) {
+      folders = await wrikeClient.getFoldersHistory(folder_ids, params);
+    } else {
+      folders = await wrikeClient.getFoldersByIds(folder_ids, params);
+    }
+  } else {
+    // Get all folders
+    folders = await wrikeClient.getFolders(params);
+  }
+
+  // Apply filters if provided
+  if (name_pattern || project_only || archived !== undefined) {
+    const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
+
+    folders = folders.filter(folder => {
+      // Filter by project status if requested
+      if (project_only && folder.project === undefined) {
+        return false;
+      }
+
+      // Filter by name pattern if provided
+      if (regex && !regex.test(folder.title)) {
+        return false;
+      }
+
+      // Filter by archive status
+      if (archived !== undefined) {
+        const archiveMatches = archived ? folder.archived : !folder.archived;
+        if (!archiveMatches) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
 
   return {
-    content: [{ type: 'text', text: JSON.stringify(projects, null, 2) }]
+    content: [{ type: 'text', text: JSON.stringify(folders, null, 2) }]
   };
 }
 
@@ -572,7 +614,8 @@ function toolHandler(wrikeClient: WrikeClient) {
             'echo': handleEchoTool,
             'wrike_list_spaces': handleListSpacesTool,
             'wrike_create_folder': handleCreateFolderTool,
-            'wrike_search_projects': handleSearchProjectsTool,
+            'wrike_search_folders_projects': handleSearchFoldersProjectsTool,
+            'wrike_search_projects': handleSearchFoldersProjectsTool, // For backward compatibility
             'wrike_search_tasks': handleSearchTasksTool,
             'wrike_get_task': handleGetTaskTool,
             'wrike_create_task': handleCreateTaskTool,

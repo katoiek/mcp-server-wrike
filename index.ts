@@ -4,7 +4,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { WrikeClient } from './src/wrikeClient.js';
 import { z } from 'zod';
 import { parseOptFields } from './src/utils/helpers.js';
-import { WrikeRequestParams, WrikeTaskData } from './src/types/wrike.js';
+import { WrikeRequestParams, WrikeTaskData, WrikeFolder } from './src/types/wrike.js';
 
 // Initialize environment variables
 import path from 'path';
@@ -73,7 +73,92 @@ server.tool(
   { description: 'List all spaces in Wrike' }
 );
 
-// Search projects
+// Search folders and projects
+server.tool(
+  'wrike_search_folders_projects',
+  z.object({
+    space_id: z.string().optional().describe('ID of the space to search in'),
+    folder_id: z.string().optional().describe('ID of the parent folder to search in'),
+    folder_ids: z.array(z.string()).optional().describe('Specific folder IDs to retrieve (up to 100)'),
+    name_pattern: z.string().optional().describe('Pattern to match folder/project names'),
+    project_only: z.boolean().optional().default(false).describe('Only return folders that are projects'),
+    archived: z.boolean().optional().default(false).describe('Include archived folders/projects'),
+    include_history: z.boolean().optional().default(false).describe('Include folder history when using folder_ids'),
+    opt_fields: z.string().optional().describe('Optional fields to include in the response')
+  }),
+  async ({ space_id, folder_id, folder_ids, name_pattern, project_only = false, archived = false, include_history = false, opt_fields }: {
+    space_id?: string;
+    folder_id?: string;
+    folder_ids?: string[];
+    name_pattern?: string;
+    project_only?: boolean;
+    archived?: boolean;
+    include_history?: boolean;
+    opt_fields?: string
+  }) => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    const params = {
+      ...parseOptFields(opt_fields)
+    };
+
+    let folders: WrikeFolder[] = [];
+
+    // Determine which API endpoint to use based on provided parameters
+    if (space_id) {
+      // Get all folders in the space
+      folders = await wrikeClient.getFoldersBySpace(space_id, params);
+    } else if (folder_id) {
+      // Get all subfolders of a parent folder
+      folders = await wrikeClient.getFoldersByParent(folder_id, params);
+    } else if (folder_ids && folder_ids.length > 0) {
+      // Get specific folders by IDs
+      if (include_history) {
+        folders = await wrikeClient.getFoldersHistory(folder_ids, params);
+      } else {
+        folders = await wrikeClient.getFoldersByIds(folder_ids, params);
+      }
+    } else {
+      // Get all folders
+      folders = await wrikeClient.getFolders(params);
+    }
+
+    // Apply filters if provided
+    if (name_pattern || project_only || archived !== undefined) {
+      const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
+
+      folders = folders.filter(folder => {
+        // Filter by project status if requested
+        if (project_only && folder.project === undefined) {
+          return false;
+        }
+
+        // Filter by name pattern if provided
+        if (regex && !regex.test(folder.title)) {
+          return false;
+        }
+
+        // Filter by archive status
+        if (archived !== undefined) {
+          const archiveMatches = archived ? folder.archived : !folder.archived;
+          if (!archiveMatches) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return folders;
+  },
+  { description: 'Search for folders and projects in Wrike with advanced filtering' }
+);
+
+// Search projects (for backward compatibility)
 server.tool(
   'wrike_search_projects',
   z.object({
@@ -118,7 +203,7 @@ server.tool(
 
     return projects;
   },
-  { description: 'Search for projects in a Wrike space' }
+  { description: 'Search for projects in a Wrike space (legacy version)' }
 );
 
 // Search tasks

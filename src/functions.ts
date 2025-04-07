@@ -24,7 +24,87 @@ export const functions = {
     return spaces;
   },
 
-  // Search projects
+  // Search folders and projects
+  wrike_search_folders_projects: async ({
+    space_id,
+    folder_id,
+    folder_ids,
+    name_pattern,
+    project_only = false,
+    archived = false,
+    include_history = false,
+    opt_fields
+  }: {
+    space_id?: string;
+    folder_id?: string;
+    folder_ids?: string[];
+    name_pattern?: string;
+    project_only?: boolean;
+    archived?: boolean;
+    include_history?: boolean;
+    opt_fields?: string
+  }): Promise<WrikeFolder[]> => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    const params = {
+      ...parseOptFields(opt_fields)
+    };
+
+    let folders: WrikeFolder[] = [];
+
+    // Determine which API endpoint to use based on provided parameters
+    if (space_id) {
+      // Get all folders in the space
+      folders = await wrikeClient.getFoldersBySpace(space_id, params);
+    } else if (folder_id) {
+      // Get all subfolders of a parent folder
+      folders = await wrikeClient.getFoldersByParent(folder_id, params);
+    } else if (folder_ids && folder_ids.length > 0) {
+      // Get specific folders by IDs
+      if (include_history) {
+        folders = await wrikeClient.getFoldersHistory(folder_ids, params);
+      } else {
+        folders = await wrikeClient.getFoldersByIds(folder_ids, params);
+      }
+    } else {
+      // Get all folders
+      folders = await wrikeClient.getFolders(params);
+    }
+
+    // Apply filters if provided
+    if (name_pattern || project_only || archived !== undefined) {
+      const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
+
+      folders = folders.filter(folder => {
+        // Filter by project status if requested
+        if (project_only && folder.project === undefined) {
+          return false;
+        }
+
+        // Filter by name pattern if provided
+        if (regex && !regex.test(folder.title)) {
+          return false;
+        }
+
+        // Filter by archive status
+        if (archived !== undefined) {
+          const archiveMatches = archived ? folder.archived : !folder.archived;
+          if (!archiveMatches) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return folders;
+  },
+
+  // Search projects (for backward compatibility)
   wrike_search_projects: async ({
     space_id,
     name_pattern,

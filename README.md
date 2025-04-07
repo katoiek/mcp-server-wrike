@@ -43,7 +43,21 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created folder information
 
-3. `wrike_search_projects`
+3. `wrike_search_folders_projects`
+   - Search for folders and projects in Wrike with advanced filtering
+   - Optional input (at least one is recommended):
+     - `space_id` (string): The space to search in
+     - `folder_id` (string): The parent folder to search in
+     - `folder_ids` (array of strings): Specific folder IDs to retrieve (up to 100)
+   - Optional input:
+     - `name_pattern` (string): Regular expression pattern to match folder/project names
+     - `project_only` (boolean): Only return folders that are projects (default: false)
+     - `archived` (boolean): Include archived folders/projects (default: false)
+     - `include_history` (boolean): Include folder history when using folder_ids (default: false)
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of matching folders/projects
+
+4. `wrike_search_projects` (Legacy - use `wrike_search_folders_projects` instead)
    - Search for projects in Wrike using name pattern matching
    - Required input:
      - `space_id` (string): The space to search in
@@ -53,7 +67,7 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of matching projects
 
-3. `wrike_search_tasks`
+5. `wrike_search_tasks`
    - Search tasks with advanced filtering options
    - Required input:
      - `folder_id` (string): The folder/project to search in
@@ -67,7 +81,7 @@ Example:
      - `custom_fields` (object): Object containing custom field filters
    - Returns: List of matching tasks
 
-4. `wrike_get_task`
+6. `wrike_get_task`
    - Get detailed information about a specific task
    - Required input:
      - `task_id` (string): The task ID to retrieve
@@ -75,7 +89,7 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Detailed task information
 
-5. `wrike_create_task`
+7. `wrike_create_task`
    - Create a new task in a project
    - Required input:
      - `folder_id` (string): The folder/project to create the task in
@@ -90,7 +104,7 @@ Example:
      - `parent_id` (string): The parent task ID to set this task under
    - Returns: Created task information
 
-6. `wrike_get_comments`
+8. `wrike_get_comments`
    - Get comments from Wrike with various filtering options
    - Optional input (at least one is required):
      - `task_id` (string): Get comments for a specific task ID
@@ -100,7 +114,7 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of comments
 
-7. `wrike_update_task`
+9. `wrike_update_task`
    - Update an existing task's details
    - Required input:
      - `task_id` (string): The task ID to update
@@ -113,7 +127,7 @@ Example:
      - `completed` (boolean): Mark task as completed or not
    - Returns: Updated task information
 
-8. `wrike_get_project`
+10. `wrike_get_project`
    - Get detailed information about a specific folder/project
    - Required input:
      - `project_id` (string): The project ID to retrieve
@@ -342,7 +356,21 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：作成されたフォルダの情報
 
-3. `wrike_search_projects`
+3. `wrike_search_folders_projects`
+   - 高度なフィルタリングでWrikeのフォルダとプロジェクトを検索
+   - オプション入力（少なくとも1つは推奨）：
+     - `space_id`（文字列）：検索対象のスペース
+     - `folder_id`（文字列）：検索対象の親フォルダ
+     - `folder_ids`（文字列の配列）：取得する特定のフォルダID（最大100件）
+   - オプション入力：
+     - `name_pattern`（文字列）：フォルダ/プロジェクト名に一致する正規表現パターン
+     - `project_only`（ブール値）：プロジェクトであるフォルダのみを返す（デフォルト：false）
+     - `archived`（ブール値）：アーカイブされたフォルダ/プロジェクトを含める（デフォルト：false）
+     - `include_history`（ブール値）：folder_ids使用時にフォルダ履歴を含める（デフォルト：false）
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：一致するフォルダ/プロジェクトのリスト
+
+4. `wrike_search_projects`（レガシー - 代わりに `wrike_search_folders_projects` を使用してください）
    - 名前パターンマッチングを使用してWrikeのプロジェクトを検索
    - 必須入力：
      - `space_id`（文字列）：検索対象のスペース
@@ -352,7 +380,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：一致するプロジェクトのリスト
 
-3. `wrike_search_tasks`
+5. `wrike_search_tasks`
    - 高度なフィルタリングオプションでタスクを検索
    - 必須入力：
      - `folder_id`（文字列）：検索対象のフォルダ/プロジェクト
@@ -366,7 +394,7 @@ MCPの詳細はこちら：
      - `custom_fields`（オブジェクト）：カスタムフィールドフィルタを含むオブジェクト
    - 戻り値：一致するタスクのリスト
 
-4. `wrike_get_task`
+6. `wrike_get_task`
    - 特定のタスクに関する詳細情報を取得
    - 必須入力：
      - `task_id`（文字列）：取得するタスクID
@@ -374,7 +402,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タスクの詳細情報
 
-5. `wrike_create_task`
+7. `wrike_create_task`
    - プロジェクトに新しいタスクを作成
    - 必須入力：
      - `folder_id`（文字列）：タスクを作成するフォルダ/プロジェクト
@@ -389,7 +417,7 @@ MCPの詳細はこちら：
      - `parent_id`（文字列）：このタスクを配置する親タスクID
    - 戻り値：作成されたタスクの情報
 
-6. `wrike_get_comments`
+8. `wrike_get_comments`
    - 様々なフィルタリングオプションでWrikeからコメントを取得
    - オプション入力（少なくとも1つは必須）：
      - `task_id`（文字列）：特定のタスクIDのコメントを取得
@@ -399,7 +427,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：コメントのリスト
 
-7. `wrike_update_task`
+9. `wrike_update_task`
    - 既存のタスクの詳細を更新
    - 必須入力：
      - `task_id`（文字列）：更新するタスクID
@@ -412,7 +440,7 @@ MCPの詳細はこちら：
      - `completed`（ブール値）：タスクを完了としてマークするかどうか
    - 戻り値：更新されたタスクの情報
 
-8. `wrike_get_project`
+10. `wrike_get_project`
    - 特定のフォルダ/プロジェクトに関する詳細情報を取得
    - 必須入力：
      - `project_id`（文字列）：取得するプロジェクトID
