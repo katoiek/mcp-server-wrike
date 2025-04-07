@@ -8,7 +8,8 @@ import {
   WrikeTask,
   WrikeComment,
   WrikeContact,
-  WrikeTimelog
+  WrikeTimelog,
+  WrikeTimelogCategory
 } from './types/wrike.js';
 import { parseOptFields, createWrikeClient, createTimelogData } from './utils/helpers.js';
 
@@ -32,6 +33,7 @@ export const functions = {
   wrike_create_timelog,
   wrike_update_timelog,
   wrike_delete_timelog,
+  wrike_get_timelog_categories,
 
   // Get space by ID
   wrike_get_space: async ({
@@ -625,4 +627,18 @@ export async function wrike_delete_timelog({
   // Delete timelog
   const success = await wrikeClient.deleteTimelog(timelog_id);
   return { success };
+}
+
+// Get timelog categories
+export async function wrike_get_timelog_categories({
+  opt_fields
+}: {
+  opt_fields?: string;
+}): Promise<WrikeTimelogCategory[]> {
+  // Initialize Wrike client
+  const wrikeClient = createWrikeClient();
+
+  // Get timelog categories
+  const params = parseOptFields(opt_fields);
+  return await wrikeClient.getTimelogCategories(params);
 }

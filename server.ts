@@ -706,6 +706,22 @@ async function handleDeleteTimelogTool(wrikeClient: WrikeClient, args: any): Pro
   };
 }
 
+/**
+ * Handle wrike_get_timelog_categories tool request
+ */
+async function handleGetTimelogCategoriesTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { opt_fields } = args as {
+    opt_fields?: string;
+  };
+
+  const params = parseOptFields(opt_fields);
+  const categories = await wrikeClient.getTimelogCategories(params);
+
+  return {
+    content: [{ type: 'text', text: JSON.stringify(categories, null, 2) }]
+  };
+}
+
 // Type definitions for request handlers
 type ToolHandlerRequest = {
   params: {
@@ -768,7 +784,8 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_get_timelogs': handleGetTimelogsTool,
             'wrike_create_timelog': handleCreateTimelogTool,
             'wrike_update_timelog': handleUpdateTimelogTool,
-            'wrike_delete_timelog': handleDeleteTimelogTool
+            'wrike_delete_timelog': handleDeleteTimelogTool,
+            'wrike_get_timelog_categories': handleGetTimelogCategoriesTool
           };
 
           const handler = handlers[request.params.name];

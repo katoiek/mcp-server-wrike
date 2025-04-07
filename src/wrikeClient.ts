@@ -8,6 +8,7 @@ import {
   WrikeComment,
   WrikeContact,
   WrikeTimelog,
+  WrikeTimelogCategory,
   WrikeRequestParams,
   WrikeTaskParams,
   WrikeTaskData,
@@ -422,6 +423,27 @@ export class WrikeClient {
       const response = await this.client.get(`/timelog_categories/${categoryId}/timelogs`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
+  /**
+   * Get all timelog categories
+   * @param params Request parameters
+   * @returns List of timelog categories
+   */
+  async getTimelogCategories(params: WrikeRequestParams = {}): Promise<WrikeTimelogCategory[]> {
+    try {
+      logger.debug('Getting timelog categories');
+      const response = await this.client.get('/timelog_categories', { params });
+      logger.debug(`Timelog categories response status: ${response.status}`);
+      return this.handleResponse<WrikeTimelogCategory[]>(response);
+    } catch (error) {
+      logger.error(`Error getting timelog categories: ${(error as Error).message}`);
+      if ((error as AxiosError).response) {
+        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
+      }
       return this.handleError(error as AxiosError);
     }
   }

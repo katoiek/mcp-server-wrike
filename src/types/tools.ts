@@ -113,6 +113,8 @@ export const deleteTimelogSchema = z.object({
   timelog_id: z.string().describe('ID of the timelog to delete')
 });
 
+export const getTimelogCategoriesSchema = optionalFieldsSchema.extend({});
+
 // Tool types
 export type EchoInput = z.infer<typeof echoSchema>;
 export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
@@ -130,6 +132,7 @@ export type GetTimelogsInput = z.infer<typeof getTimelogsSchema>;
 export type CreateTimelogInput = z.infer<typeof createTimelogSchema>;
 export type UpdateTimelogInput = z.infer<typeof updateTimelogSchema>;
 export type DeleteTimelogInput = z.infer<typeof deleteTimelogSchema>;
+export type GetTimelogCategoriesInput = z.infer<typeof getTimelogCategoriesSchema>;
 
 // Tool interface
 export interface Tool {
@@ -221,6 +224,11 @@ export const tools: Tool[] = [
     name: 'wrike_delete_timelog',
     description: 'Delete a timelog entry in Wrike',
     schema: deleteTimelogSchema
+  },
+  {
+    name: 'wrike_get_timelog_categories',
+    description: 'Get all timelog categories from Wrike',
+    schema: getTimelogCategoriesSchema
   },
   {
     name: 'echo',

@@ -676,6 +676,20 @@ server.tool(
   { description: 'Delete a timelog entry in Wrike' }
 );
 
+// Get timelog categories
+server.tool(
+  'wrike_get_timelog_categories',
+  z.object({
+    opt_fields: z.string().optional().describe('Optional fields to include in the response')
+  }),
+  async (params: {
+    opt_fields?: string;
+  }) => {
+    return await wrikeFunctions.wrike_get_timelog_categories(params);
+  },
+  { description: 'Get all timelog categories from Wrike' }
+);
+
 // Start server with stdio transport
 const transport = new StdioServerTransport();
 

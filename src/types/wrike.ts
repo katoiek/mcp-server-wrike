@@ -198,6 +198,15 @@ export interface WrikeIdConversion {
   oldId: string;
 }
 
+// Timelog Category Types
+export interface WrikeTimelogCategory {
+  id: string;
+  name: string;
+  order?: number;
+  hidden?: boolean;
+  [key: string]: any;
+}
+
 // Client Configuration
 export interface WrikeClientConfig {
   accessToken: string;

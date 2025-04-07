@@ -214,7 +214,13 @@ Examples:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
 
-15. `echo`
+15. `wrike_get_timelog_categories`
+    - Get all timelog categories from Wrike
+    - Optional input:
+      - `opt_fields` (string): Comma-separated list of optional fields to include
+    - Returns: List of timelog categories
+
+16. `echo`
     - Simple echo function for testing
     - Required input:
       - `message` (string): Message to echo back
