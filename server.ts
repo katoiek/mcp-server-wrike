@@ -12,7 +12,7 @@ import {
   ListResourceTemplatesRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { parseOptFields, convertTaskId, removeUndefinedValues } from './src/utils/helpers.js';
+import { parseOptFields, convertTaskId, removeUndefinedValues, createTimelogData } from './src/utils/helpers.js';
 import {
   WrikeRequestParams,
   WrikeTaskData,
@@ -580,6 +580,7 @@ async function handleCreateTimelogTool(wrikeClient: WrikeClient, args: any): Pro
     category_id?: string;
   };
 
+  // Validate required fields
   if (!task_id) {
     throw new Error('task_id is required');
   }
@@ -593,16 +594,10 @@ async function handleCreateTimelogTool(wrikeClient: WrikeClient, args: any): Pro
   // Convert task ID if needed
   const apiTaskId = await convertTaskId(wrikeClient, task_id);
 
-  const data = {
-    hours,
-    trackedDate: tracked_date,
-    comment,
-    categoryId: category_id
-  };
+  // Create timelog data
+  const data = createTimelogData(hours, tracked_date, comment, category_id);
 
-  // Remove undefined values
-  removeUndefinedValues(data);
-
+  // Create timelog
   const timelog = await wrikeClient.createTimelog(apiTaskId, data);
 
   return {
@@ -622,6 +617,7 @@ async function handleUpdateTimelogTool(wrikeClient: WrikeClient, args: any): Pro
     category_id?: string;
   };
 
+  // Validate required fields
   if (!timelog_id) {
     throw new Error('timelog_id is required');
   }
@@ -629,12 +625,10 @@ async function handleUpdateTimelogTool(wrikeClient: WrikeClient, args: any): Pro
     throw new Error('hours must be a positive number');
   }
 
-  const data: any = {};
-  if (hours !== undefined) data.hours = hours;
-  if (tracked_date) data.trackedDate = tracked_date;
-  if (comment !== undefined) data.comment = comment;
-  if (category_id !== undefined) data.categoryId = category_id;
+  // Create timelog data
+  const data = createTimelogData(hours, tracked_date, comment, category_id);
 
+  // Update timelog
   const timelog = await wrikeClient.updateTimelog(timelog_id, data);
 
   return {
@@ -650,10 +644,12 @@ async function handleDeleteTimelogTool(wrikeClient: WrikeClient, args: any): Pro
     timelog_id: string;
   };
 
+  // Validate required fields
   if (!timelog_id) {
     throw new Error('timelog_id is required');
   }
 
+  // Delete timelog
   const success = await wrikeClient.deleteTimelog(timelog_id);
 
   return {

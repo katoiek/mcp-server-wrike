@@ -220,12 +220,6 @@ Examples:
       - `message` (string): Message to echo back
     - Returns: The same message
 
-15. `echo`
-    - Simple echo function for testing
-    - Required input:
-      - `message` (string): Message to echo back
-    - Returns: The same message
-
 ### Setup
 
 #### 1. Create a Wrike account

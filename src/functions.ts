@@ -10,21 +10,28 @@ import {
   WrikeContact,
   WrikeTimelog
 } from './types/wrike.js';
-import { parseOptFields } from './utils/helpers.js';
+import { parseOptFields, createWrikeClient, createTimelogData } from './utils/helpers.js';
 
 // MCP Functions
-export const functions = {
-  // List spaces
-  wrike_list_spaces: async ({ opt_fields }: { opt_fields?: string }): Promise<WrikeSpace[]> => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
 
-    const params = parseOptFields(opt_fields);
-    const spaces = await wrikeClient.getSpaces(params);
-    return spaces;
-  },
+// List spaces
+export async function wrike_list_spaces({ opt_fields }: { opt_fields?: string }): Promise<WrikeSpace[]> {
+  // Initialize Wrike client for each request
+  const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+  const host = process.env.WRIKE_HOST || 'www.wrike.com';
+  const wrikeClient = new WrikeClient(accessToken, host);
+
+  const params = parseOptFields(opt_fields);
+  const spaces = await wrikeClient.getSpaces(params);
+  return spaces;
+}
+
+// For backward compatibility
+export const functions = {
+  wrike_list_spaces,
+  wrike_create_timelog,
+  wrike_update_timelog,
+  wrike_delete_timelog,
 
   // Get space by ID
   wrike_get_space: async ({
@@ -534,98 +541,88 @@ export const functions = {
 
     const contacts = await wrikeClient.getContacts(params);
     return contacts;
-  },
-
-  // Create timelog
-  wrike_create_timelog: async ({
-    task_id,
-    hours,
-    tracked_date,
-    comment,
-    category_id
-  }: {
-    task_id: string;
-    hours: number;
-    tracked_date: string;
-    comment?: string;
-    category_id?: string;
-  }): Promise<WrikeTimelog> => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!task_id) {
-      throw new Error('task_id is required');
-    }
-    if (hours <= 0) {
-      throw new Error('hours must be a positive number');
-    }
-    if (!tracked_date) {
-      throw new Error('tracked_date is required (format: YYYY-MM-DD)');
-    }
-
-    const data: WrikeTimelogData = {
-      hours,
-      trackedDate: tracked_date,
-      comment,
-      categoryId: category_id
-    };
-
-    const timelog = await wrikeClient.createTimelog(task_id, data);
-    return timelog;
-  },
-
-  // Update timelog
-  wrike_update_timelog: async ({
-    timelog_id,
-    hours,
-    tracked_date,
-    comment,
-    category_id
-  }: {
-    timelog_id: string;
-    hours?: number;
-    tracked_date?: string;
-    comment?: string;
-    category_id?: string;
-  }): Promise<WrikeTimelog> => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!timelog_id) {
-      throw new Error('timelog_id is required');
-    }
-
-    const data: WrikeTimelogData = {
-      hours,
-      trackedDate: tracked_date,
-      comment,
-      categoryId: category_id
-    };
-
-    const timelog = await wrikeClient.updateTimelog(timelog_id, data);
-    return timelog;
-  },
-
-  // Delete timelog
-  wrike_delete_timelog: async ({
-    timelog_id
-  }: {
-    timelog_id: string;
-  }) => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!timelog_id) {
-      throw new Error('timelog_id is required');
-    }
-
-    const success = await wrikeClient.deleteTimelog(timelog_id);
-    return { success };
   }
 };
+
+// Create timelog
+export async function wrike_create_timelog({
+  task_id,
+  hours,
+  tracked_date,
+  comment,
+  category_id
+}: {
+  task_id: string;
+  hours: number;
+  tracked_date: string;
+  comment?: string;
+  category_id?: string;
+}): Promise<WrikeTimelog> {
+  // Initialize Wrike client
+  const wrikeClient = createWrikeClient();
+
+  // Validate required fields
+  if (!task_id) {
+    throw new Error('task_id is required');
+  }
+  if (hours <= 0) {
+    throw new Error('hours must be a positive number');
+  }
+  if (!tracked_date) {
+    throw new Error('tracked_date is required (format: YYYY-MM-DD)');
+  }
+
+  // Create timelog data
+  const data = createTimelogData(hours, tracked_date, comment, category_id);
+
+  // Create timelog
+  return await wrikeClient.createTimelog(task_id, data);
+}
+
+// Update timelog
+export async function wrike_update_timelog({
+  timelog_id,
+  hours,
+  tracked_date,
+  comment,
+  category_id
+}: {
+  timelog_id: string;
+  hours?: number;
+  tracked_date?: string;
+  comment?: string;
+  category_id?: string;
+}): Promise<WrikeTimelog> {
+  // Initialize Wrike client
+  const wrikeClient = createWrikeClient();
+
+  // Validate required fields
+  if (!timelog_id) {
+    throw new Error('timelog_id is required');
+  }
+
+  // Create timelog data
+  const data = createTimelogData(hours, tracked_date, comment, category_id);
+
+  // Update timelog
+  return await wrikeClient.updateTimelog(timelog_id, data);
+}
+
+// Delete timelog
+export async function wrike_delete_timelog({
+  timelog_id
+}: {
+  timelog_id: string;
+}) {
+  // Initialize Wrike client
+  const wrikeClient = createWrikeClient();
+
+  // Validate required fields
+  if (!timelog_id) {
+    throw new Error('timelog_id is required');
+  }
+
+  // Delete timelog
+  const success = await wrikeClient.deleteTimelog(timelog_id);
+  return { success };
+}

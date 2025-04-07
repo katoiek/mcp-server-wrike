@@ -1,5 +1,5 @@
 import { WrikeClient } from '../wrikeClient.js';
-import { WrikeRequestParams } from '../types/wrike.js';
+import { WrikeRequestParams, WrikeTimelogData } from '../types/wrike.js';
 
 /**
  * Parse optional fields from a comma-separated string
@@ -54,4 +54,41 @@ export const removeUndefinedValues = <T extends Record<string, any>>(obj: T): vo
       delete obj[key];
     }
   });
+};
+
+/**
+ * Create a Wrike client instance
+ * @returns A new WrikeClient instance
+ */
+export const createWrikeClient = (): WrikeClient => {
+  const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+  const host = process.env.WRIKE_HOST || 'www.wrike.com';
+  return new WrikeClient(accessToken, host);
+};
+
+/**
+ * Create a timelog data object from parameters
+ * @param hours Number of hours
+ * @param tracked_date Date when the time was spent
+ * @param comment Comment for the timelog
+ * @param category_id ID of the timelog category
+ * @returns WrikeTimelogData object
+ */
+export const createTimelogData = (
+  hours?: number,
+  tracked_date?: string,
+  comment?: string,
+  category_id?: string
+): WrikeTimelogData => {
+  const data: WrikeTimelogData = {
+    hours,
+    trackedDate: tracked_date,
+    comment,
+    categoryId: category_id
+  };
+
+  // Remove undefined values
+  removeUndefinedValues(data);
+
+  return data;
 };

@@ -408,18 +408,16 @@ export class WrikeClient {
     }
   }
 
+  /**
+   * Create a timelog entry for a task
+   * @param taskId ID of the task to add the timelog to
+   * @param data Timelog data
+   * @returns Created timelog
+   */
   async createTimelog(taskId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
     try {
-      // Ensure data is formatted correctly for the API
-      const requestData = {
-        comment: data.comment,
-        hours: data.hours,
-        trackedDate: data.trackedDate,
-        categoryId: data.categoryId
-      };
-
-      logger.debug(`Creating timelog for task ${taskId} with data:`, requestData);
-      const response = await this.client.post(`/tasks/${taskId}/timelogs`, requestData);
+      logger.debug(`Creating timelog for task ${taskId} with data:`, data);
+      const response = await this.client.post(`/tasks/${taskId}/timelogs`, data);
       logger.debug(`Timelog creation response status: ${response.status}`);
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
@@ -433,18 +431,16 @@ export class WrikeClient {
     }
   }
 
+  /**
+   * Update a timelog entry
+   * @param timelogId ID of the timelog to update
+   * @param data Updated timelog data
+   * @returns Updated timelog
+   */
   async updateTimelog(timelogId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
     try {
-      // Ensure data is formatted correctly for the API
-      const requestData = {
-        comment: data.comment,
-        hours: data.hours,
-        trackedDate: data.trackedDate,
-        categoryId: data.categoryId
-      };
-
-      logger.debug(`Updating timelog ${timelogId} with data:`, requestData);
-      const response = await this.client.put(`/timelogs/${timelogId}`, requestData);
+      logger.debug(`Updating timelog ${timelogId} with data:`, data);
+      const response = await this.client.put(`/timelogs/${timelogId}`, data);
       logger.debug(`Timelog update response status: ${response.status}`);
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
@@ -458,6 +454,11 @@ export class WrikeClient {
     }
   }
 
+  /**
+   * Delete a timelog entry
+   * @param timelogId ID of the timelog to delete
+   * @returns True if deletion was successful
+   */
   async deleteTimelog(timelogId: string): Promise<boolean> {
     try {
       logger.debug(`Deleting timelog ${timelogId}`);
