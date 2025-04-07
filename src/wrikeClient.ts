@@ -87,6 +87,16 @@ export class WrikeClient {
     }
   }
 
+  async getSpace(spaceId: string, params: WrikeRequestParams = {}): Promise<WrikeSpace> {
+    try {
+      const response = await this.client.get(`/spaces/${spaceId}`, { params });
+      const spaces = this.handleResponse<WrikeSpace[]>(response);
+      return spaces[0];
+    } catch (error) {
+      return this.handleError(error as AxiosError);
+    }
+  }
+
   // Folders & Projects
   async getFolders(params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
     try {
@@ -240,6 +250,27 @@ export class WrikeClient {
       this.handleResponse(response);
     } catch (error) {
       this.handleError(error as AxiosError);
+    }
+  }
+
+  // Get tasks history
+  async getTasksHistory(taskIds: string[] | string, params: WrikeRequestParams = {}): Promise<WrikeTask[]> {
+    try {
+      if (!taskIds || (Array.isArray(taskIds) && taskIds.length === 0)) {
+        throw new Error('Task IDs are required');
+      }
+
+      // Convert array to comma-separated string if needed
+      const ids = Array.isArray(taskIds) ? taskIds.join(',') : taskIds;
+
+      if (ids.split(',').length > 100) {
+        throw new Error('Maximum of 100 task IDs allowed');
+      }
+
+      const response = await this.client.get(`/tasks/${ids}/tasks_history`, { params });
+      return this.handleResponse<WrikeTask[]>(response);
+    } catch (error) {
+      return this.handleError(error as AxiosError);
     }
   }
 

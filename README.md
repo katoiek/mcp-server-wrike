@@ -21,8 +21,14 @@ More details on MCP here:
 
 In your AI tool of choice (e.g., Claude Desktop), ask something about Wrike tasks, projects, spaces, and/or comments. Mentioning the word "wrike" will increase the chance of having the LLM pick the right tool.
 
-Example:
+Examples:
 > How many unfinished wrike tasks do we have in our Sprint 30 project?
+
+> Please list all spaces in Wrike.
+
+> Can you tell me the details of a task named "Website Redesign" in Wrike?
+
+> Please summarize all time logs entered by john.doe@example.com in Wrike during 2024.
 
 ### Available Functions
 
@@ -32,7 +38,15 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of spaces
 
-2. `wrike_create_folder`
+2. `wrike_get_space`
+   - Get detailed information about a specific space
+   - Required input:
+     - `space_id` (string): The space ID to retrieve
+   - Optional input:
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: Detailed space information
+
+3. `wrike_create_folder`
    - Create a new folder in Wrike
    - Required input:
      - `parent_id` (string): ID of the parent folder
@@ -89,7 +103,15 @@ Example:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Detailed task information
 
-7. `wrike_create_task`
+7. `wrike_get_tasks_history`
+   - Get field history for specific tasks
+   - Required input:
+     - `task_ids` (string or array of strings): Task ID or array of task IDs (up to 100)
+   - Optional input:
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: Task history information
+
+8. `wrike_create_task`
    - Create a new task in a project
    - Required input:
      - `folder_id` (string): The folder/project to create the task in
@@ -337,6 +359,12 @@ MCPの詳細はこちら：
 例：
 > Sprint 30プロジェクトには未完了のwrikeタスクがいくつありますか？
 
+> Wrikeでスペースの一覧をリストで作ってください。
+
+> Wrikeでタスク名「ウェブサイトリニューアル」の詳細を教えて下さい。
+
+> Wrikeでjohn.doe@example.comが2024年に入力したタイムログを集計してください。
+
 ### 利用可能な関数
 
 1. `wrike_list_spaces`
@@ -345,7 +373,15 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：スペースのリスト
 
-2. `wrike_create_folder`
+2. `wrike_get_space`
+   - 特定のスペースに関する詳細情報を取得
+   - 必須入力：
+     - `space_id`（文字列）：取得するスペースID
+   - オプション入力：
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：スペースの詳細情報
+
+3. `wrike_create_folder`
    - Wrikeに新しいフォルダを作成
    - 必須入力：
      - `parent_id`（文字列）：親フォルダのID
@@ -402,7 +438,15 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タスクの詳細情報
 
-7. `wrike_create_task`
+7. `wrike_get_tasks_history`
+   - 特定のタスクのフィールド履歴を取得
+   - 必須入力：
+     - `task_ids`（文字列または文字列の配列）：タスクIDまたはタスクIDの配列（最大100件）
+   - オプション入力：
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：タスクの履歴情報
+
+8. `wrike_create_task`
    - プロジェクトに新しいタスクを作成
    - 必須入力：
      - `folder_id`（文字列）：タスクを作成するフォルダ/プロジェクト

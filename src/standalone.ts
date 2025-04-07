@@ -79,6 +79,39 @@ function toolHandler(wrikeClient: WrikeClient) {
           } as any;
         }
 
+        case 'wrike_get_space': {
+          const { space_id, opt_fields } = args as { space_id: string; opt_fields?: string };
+          if (!space_id) {
+            throw new Error('space_id is required');
+          }
+          const response = await wrikeClient.getSpace(space_id, parseOptFields(opt_fields));
+          return {
+            content: [{ type: 'text', text: JSON.stringify(response, null, 2) }]
+          } as any;
+        }
+
+        case 'wrike_get_task': {
+          const { task_id, opt_fields } = args as { task_id: string; opt_fields?: string };
+          if (!task_id) {
+            throw new Error('task_id is required');
+          }
+          const response = await wrikeClient.getTask(task_id, parseOptFields(opt_fields));
+          return {
+            content: [{ type: 'text', text: JSON.stringify(response, null, 2) }]
+          } as any;
+        }
+
+        case 'wrike_get_tasks_history': {
+          const { task_ids, opt_fields } = args as { task_ids: string[] | string; opt_fields?: string };
+          if (!task_ids || (Array.isArray(task_ids) && task_ids.length === 0)) {
+            throw new Error('task_ids is required');
+          }
+          const response = await wrikeClient.getTasksHistory(task_ids, parseOptFields(opt_fields));
+          return {
+            content: [{ type: 'text', text: JSON.stringify(response, null, 2) }]
+          } as any;
+        }
+
         // Add other tool handlers here...
 
         default:

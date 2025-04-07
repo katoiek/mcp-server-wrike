@@ -24,6 +24,28 @@ export const functions = {
     return spaces;
   },
 
+  // Get space by ID
+  wrike_get_space: async ({
+    space_id,
+    opt_fields
+  }: {
+    space_id: string;
+    opt_fields?: string
+  }): Promise<WrikeSpace> => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    if (!space_id) {
+      throw new Error('space_id is required');
+    }
+
+    const params = parseOptFields(opt_fields);
+    const space = await wrikeClient.getSpace(space_id, params);
+    return space;
+  },
+
   // Search folders and projects
   wrike_search_folders_projects: async ({
     space_id,
@@ -212,6 +234,28 @@ export const functions = {
     const params = parseOptFields(opt_fields);
     const task = await wrikeClient.getTask(task_id, params);
     return task;
+  },
+
+  // Get tasks history
+  wrike_get_tasks_history: async ({
+    task_ids,
+    opt_fields
+  }: {
+    task_ids: string[] | string;
+    opt_fields?: string
+  }): Promise<WrikeTask[]> => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    if (!task_ids || (Array.isArray(task_ids) && task_ids.length === 0)) {
+      throw new Error('task_ids is required');
+    }
+
+    const params = parseOptFields(opt_fields);
+    const tasksHistory = await wrikeClient.getTasksHistory(task_ids, params);
+    return tasksHistory;
   },
 
   // Create task

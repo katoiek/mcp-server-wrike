@@ -73,6 +73,30 @@ server.tool(
   { description: 'List all spaces in Wrike' }
 );
 
+// Get space by ID
+server.tool(
+  'wrike_get_space',
+  z.object({
+    space_id: z.string().describe('ID of the space to retrieve'),
+    opt_fields: z.string().optional().describe('Optional fields to include in the response')
+  }),
+  async ({ space_id, opt_fields }: { space_id: string; opt_fields?: string }) => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    if (!space_id) {
+      throw new Error('space_id is required');
+    }
+
+    const params = parseOptFields(opt_fields);
+    const space = await wrikeClient.getSpace(space_id, params);
+    return space;
+  },
+  { description: 'Get details of a specific Wrike space' }
+);
+
 // Search folders and projects
 server.tool(
   'wrike_search_folders_projects',
@@ -281,6 +305,33 @@ server.tool(
     return task;
   },
   { description: 'Get details of a specific Wrike task' }
+);
+
+// Get tasks history
+server.tool(
+  'wrike_get_tasks_history',
+  z.object({
+    task_ids: z.union([z.string(), z.array(z.string())]).describe('Task ID or comma-separated list of task IDs (up to 100)'),
+    opt_fields: z.string().optional().describe('Optional fields to include in the response')
+  }),
+  async ({ task_ids, opt_fields }: {
+    task_ids: string[] | string;
+    opt_fields?: string;
+  }) => {
+    // Initialize Wrike client for each request
+    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
+    const host = process.env.WRIKE_HOST || 'www.wrike.com';
+    const wrikeClient = new WrikeClient(accessToken, host);
+
+    if (!task_ids || (Array.isArray(task_ids) && task_ids.length === 0)) {
+      throw new Error('task_ids is required');
+    }
+
+    const params = parseOptFields(opt_fields);
+    const tasksHistory = await wrikeClient.getTasksHistory(task_ids, params);
+    return tasksHistory;
+  },
+  { description: 'Get field history for specific Wrike tasks' }
 );
 
 // Create task
