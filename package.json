@@ -1,0 +1,58 @@
+{
+  "name": "@katoiek/mcp-server-wrike",
+  "version": "1.1.0",
+  "description": "Model Context Protocol server implementation for Wrike",
+  "main": "dist/server.js",
+  "type": "module",
+  "bin": {
+    "mcp-server-wrike": "dist/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katoiek/mcp-server-wrike.git"
+  },
+  "homepage": "https://github.com/katoiek/mcp-server-wrike#readme",
+  "bugs": {
+    "url": "https://github.com/katoiek/mcp-server-wrike/issues"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "start": "node dist/server.js",
+    "start:full": "node dist/index.js",
+    "build:start": "npm run build && npm run start",
+    "inspector": "npx @modelcontextprotocol/inspector",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm i --save-dev @types/express"
+  },
+  "keywords": [
+    "mcp",
+    "wrike",
+    "api",
+    "claude",
+    "anthropic",
+    "model-context-protocol"
+  ],
+  "author": "Kei Kato",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.18.0",
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.8.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
