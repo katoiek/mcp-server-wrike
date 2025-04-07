@@ -420,6 +420,55 @@ async function handleGetCommentsTool(wrikeClient: WrikeClient, args: any): Promi
 }
 
 /**
+ * Handle wrike_get_tasks_history tool request
+ */
+async function handleTasksHistoryTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { task_ids, ...opts } = args as {
+    task_ids: string[] | string;
+    opt_fields?: string;
+  };
+
+  if (!task_ids || (Array.isArray(task_ids) && task_ids.length === 0)) {
+    throw new Error('task_ids is required');
+  }
+
+  // Handle single task ID case
+  let processedTaskIds = task_ids;
+  if (typeof task_ids === 'string' && task_ids.includes('open.htm?id=')) {
+    // Extract the ID from the URL
+    const matches = task_ids.match(/id=(\d+)/);
+    if (matches && matches[1]) {
+      processedTaskIds = matches[1];
+      console.error(`Extracted task ID: ${processedTaskIds}`);
+    }
+  }
+
+  try {
+    // Convert task ID if needed
+    if (typeof processedTaskIds === 'string' && /^\d+$/.test(processedTaskIds)) {
+      try {
+        const apiTaskId = await convertTaskId(wrikeClient, processedTaskIds);
+        processedTaskIds = apiTaskId;
+        console.error(`Converted task ID: ${processedTaskIds}`);
+      } catch (error) {
+        console.error(`Error converting task ID: ${(error as Error).message}`);
+        // Continue with the original ID if conversion fails
+      }
+    }
+
+    const params = parseOptFields(opts.opt_fields);
+    const tasksHistory = await wrikeClient.getTasksHistory(processedTaskIds, params);
+
+    return {
+      content: [{ type: 'text', text: JSON.stringify(tasksHistory, null, 2) }]
+    };
+  } catch (error) {
+    console.error(`Error getting task history: ${(error as Error).message}`);
+    throw error;
+  }
+}
+
+/**
  * Handle wrike_get_task_comments tool request
  */
 async function handleGetTaskCommentsTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
@@ -708,6 +757,7 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_search_projects': handleSearchFoldersProjectsTool, // For backward compatibility
             'wrike_search_tasks': handleSearchTasksTool,
             'wrike_get_task': handleGetTaskTool,
+            'wrike_get_tasks_history': handleTasksHistoryTool,
             'wrike_create_task': handleCreateTaskTool,
             'wrike_update_task': handleUpdateTaskTool,
             'wrike_get_comments': handleGetCommentsTool,

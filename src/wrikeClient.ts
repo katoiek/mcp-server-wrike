@@ -254,23 +254,51 @@ export class WrikeClient {
     }
   }
 
-  // Get tasks history
-  async getTasksHistory(taskIds: string[] | string, params: WrikeRequestParams = {}): Promise<WrikeTask[]> {
+  /**
+   * Get tasks history
+   * @param taskIds Task ID or array of task IDs (up to 100)
+   * @param params Request parameters
+   * @returns Task history information
+   */
+  async getTasksHistory(taskIds: string[] | string, params: WrikeRequestParams = {}): Promise<any[]> {
     try {
       if (!taskIds || (Array.isArray(taskIds) && taskIds.length === 0)) {
         throw new Error('Task IDs are required');
       }
 
       // Convert array to comma-separated string if needed
-      const ids = Array.isArray(taskIds) ? taskIds.join(',') : taskIds;
+      let ids = Array.isArray(taskIds) ? taskIds.join(',') : taskIds;
 
       if (ids.split(',').length > 100) {
         throw new Error('Maximum of 100 task IDs allowed');
       }
 
-      const response = await this.client.get(`/tasks/${ids}/tasks_history`, { params });
-      return this.handleResponse<WrikeTask[]>(response);
+      // Log the request for debugging
+      logger.debug(`Getting history for tasks: ${ids}`);
+
+      // Try to convert task IDs if they are in numeric format
+      try {
+        if (/^\d+$/.test(ids) || ids.includes('open.htm?id=')) {
+          logger.debug(`Converting task ID from permalink format: ${ids}`);
+          const convertedId = await this.convertPermalinkId(ids, 'task');
+          ids = convertedId;
+          logger.debug(`Converted task ID: ${ids}`);
+        }
+      } catch (conversionError) {
+        logger.error(`Error converting task ID: ${(conversionError as Error).message}`);
+        // Continue with the original ID if conversion fails
+      }
+
+      // Use the correct endpoint for task history
+      const response = await this.client.get(`/tasks/${ids}/history`, { params });
+      logger.debug(`Task history response status: ${response.status}`);
+      return this.handleResponse<any[]>(response);
     } catch (error) {
+      logger.error(`Error getting task history: ${(error as Error).message}`);
+      if ((error as AxiosError).response) {
+        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
+      }
       return this.handleError(error as AxiosError);
     }
   }

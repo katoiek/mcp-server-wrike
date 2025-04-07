@@ -328,9 +328,25 @@ server.tool(
       throw new Error('task_ids is required');
     }
 
+    // Handle single task ID case
+    if (typeof task_ids === 'string' && task_ids.includes('open.htm?id=')) {
+      // Extract the ID from the URL
+      const matches = task_ids.match(/id=(\d+)/);
+      if (matches && matches[1]) {
+        task_ids = matches[1];
+        console.error(`Extracted task ID: ${task_ids}`);
+      }
+    }
+
     const params = parseOptFields(opt_fields);
-    const tasksHistory = await wrikeClient.getTasksHistory(task_ids, params);
-    return tasksHistory;
+
+    try {
+      const tasksHistory = await wrikeClient.getTasksHistory(task_ids, params);
+      return tasksHistory;
+    } catch (error) {
+      console.error(`Error getting task history: ${(error as Error).message}`);
+      throw error;
+    }
   },
   { description: 'Get field history for specific Wrike tasks' }
 );
