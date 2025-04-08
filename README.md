@@ -273,7 +273,7 @@ Examples:
 ```json
 {
   "mcpServers": {
-    "wrike-mcp-server": {
+    "Wrike": {
       "command": "node",
       "args": ["C:/installed-path/mcp-server-wrike/dist/server.js"],
       "env": {
@@ -643,7 +643,7 @@ MCPの詳細はこちら：
 ```json
 {
   "mcpServers": {
-    "wrike-mcp-server": {
+    "Wrike": {
       "command": "node",
       "args": ["C:/インストールパス/mcp-server-wrike/dist/server.js"],
       "env": {
