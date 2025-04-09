@@ -57,53 +57,38 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created folder information
 
-3. `wrike_search_folders_projects`
-   - Search for folders and projects in Wrike with advanced filtering
+4. `wrike_get_folder_project`
+   - Unified tool for working with Wrike folders, projects, and spaces
    - Optional input (at least one is recommended):
      - `space_id` (string): The space to search in
      - `folder_id` (string): The parent folder to search in
      - `folder_ids` (array of strings): Specific folder IDs to retrieve (up to 100)
+     - `single_folder_id` (string): ID of a specific folder, project, or space to retrieve
    - Optional input:
      - `name_pattern` (string): Regular expression pattern to match folder/project names
      - `project_only` (boolean): Only return folders that are projects (default: false)
      - `archived` (boolean): Include archived folders/projects (default: false)
      - `include_history` (boolean): Include folder history when using folder_ids (default: false)
      - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: List of matching folders/projects
+   - Returns: List of matching folders/projects or a single folder/project/space
 
-4. `wrike_search_projects` (Legacy - use `wrike_search_folders_projects` instead)
-   - Search for projects in Wrike using name pattern matching
-   - Required input:
-     - `space_id` (string): The space to search in
-     - `name_pattern` (string): Regular expression pattern to match project names
-   - Optional input:
-     - `archived` (boolean): Only return archived projects (default: false)
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: List of matching projects
-
-5. `wrike_search_tasks`
-   - Search tasks with advanced filtering options
-   - Required input:
-     - `folder_id` (string): The folder/project to search in
-   - Optional input:
-     - `title` (string): Text to search for in task titles
+5. `wrike_get_task`
+   - Unified tool for working with Wrike tasks
+   - Optional input (at least one is required):
+     - `task_id` (string): ID of a specific task to retrieve
+     - `folder_id` (string): The folder/project to search tasks in
+   - Optional input for task search:
+     - `title` (string): Filter by task title
      - `status` (string): Filter by task status
      - `importance` (string): Filter by task importance
-     - `completed` (boolean): Filter for completed tasks
-     - `subtasks` (boolean): Filter for subtasks
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-     - `custom_fields` (object): Object containing custom field filters
-   - Returns: List of matching tasks
-
-6. `wrike_get_task`
-   - Get detailed information about a specific task
-   - Required input:
-     - `task_id` (string): The task ID to retrieve
+     - `completed` (boolean): Filter by completion status (default: false)
+     - `subtasks` (boolean): Include subtasks (default: false)
+     - `custom_fields` (object): Custom fields to filter by
    - Optional input:
      - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Detailed task information
+   - Returns: Detailed task information or list of matching tasks
 
-7. `wrike_get_tasks_history`
+6. `wrike_get_tasks_history`
    - Get field history for specific tasks
    - Required input:
      - `task_ids` (string or array of strings): Task ID or array of task IDs (up to 100)
@@ -111,7 +96,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Task history information
 
-8. `wrike_create_task`
+7. `wrike_create_task`
    - Create a new task in a project
    - Required input:
      - `folder_id` (string): The folder/project to create the task in
@@ -149,15 +134,8 @@ Examples:
      - `completed` (boolean): Mark task as completed or not
    - Returns: Updated task information
 
-10. `wrike_get_folder_project`
-   - Get detailed information about a specific folder/project
-   - Required input:
-     - `folder_id` (string): The folder/project ID to retrieve
-   - Optional input:
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Detailed folder/project information
 
-11. `wrike_create_comment`
+10. `wrike_create_comment`
    - Create a comment on a task
    - Required input:
      - `task_id` (string): The task ID to add the comment to
@@ -166,14 +144,14 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created comment information
 
-12. `wrike_get_contacts`
+11. `wrike_get_contacts`
     - Get information about Wrike contacts/users
     - Optional input:
       - `me` (boolean): Return only the current user's information
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of contacts
 
-13. `wrike_get_timelogs`
+12. `wrike_get_timelogs`
     - Get timelogs from Wrike with filtering options
     - Optional input:
       - `task_id` (string): Filter timelogs by task ID
@@ -186,7 +164,7 @@ Examples:
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of timelogs
 
-12. `wrike_create_timelog`
+13. `wrike_create_timelog`
     - Create a new timelog entry for a task
     - Required input:
       - `task_id` (string): ID of the task to add the timelog to
@@ -197,7 +175,7 @@ Examples:
       - `category_id` (string): ID of the timelog category
     - Returns: Created timelog information
 
-13. `wrike_update_timelog`
+14. `wrike_update_timelog`
     - Update an existing timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to update
@@ -208,19 +186,19 @@ Examples:
       - `category_id` (string): New ID of the timelog category
     - Returns: Updated timelog information
 
-14. `wrike_delete_timelog`
+15. `wrike_delete_timelog`
     - Delete a timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
 
-15. `wrike_get_timelog_categories`
+16. `wrike_get_timelog_categories`
     - Get all timelog categories from Wrike
     - Optional input:
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of timelog categories
 
-16. `echo`
+17. `echo`
     - Simple echo function for testing
     - Required input:
       - `message` (string): Message to echo back
@@ -433,8 +411,8 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：作成されたフォルダの情報
 
-3. `wrike_search_folders_projects`
-   - 高度なフィルタリングでWrikeのフォルダとプロジェクトを検索
+4. `wrike_get_folder_project`
+   - Wrikeのフォルダ、プロジェクト、スペースを操作するための統合ツール
    - オプション入力（少なくとも1つは推奨）：
      - `space_id`（文字列）：検索対象のスペース
      - `folder_id`（文字列）：検索対象の親フォルダ
@@ -445,41 +423,25 @@ MCPの詳細はこちら：
      - `archived`（ブール値）：アーカイブされたフォルダ/プロジェクトを含める（デフォルト：false）
      - `include_history`（ブール値）：folder_ids使用時にフォルダ履歴を含める（デフォルト：false）
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：一致するフォルダ/プロジェクトのリスト
+   - 戻り値：一致するフォルダ/プロジェクトのリスト、または特定のフォルダ/プロジェクト/スペースの詳細
 
-4. `wrike_search_projects`（レガシー - 代わりに `wrike_search_folders_projects` を使用してください）
-   - 名前パターンマッチングを使用してWrikeのプロジェクトを検索
-   - 必須入力：
-     - `space_id`（文字列）：検索対象のスペース
-     - `name_pattern`（文字列）：プロジェクト名に一致する正規表現パターン
-   - オプション入力：
-     - `archived`（ブール値）：アーカイブされたプロジェクトのみを返す（デフォルト：false）
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：一致するプロジェクトのリスト
-
-5. `wrike_search_tasks`
-   - 高度なフィルタリングオプションでタスクを検索
-   - 必須入力：
-     - `folder_id`（文字列）：検索対象のフォルダ/プロジェクト
-   - オプション入力：
-     - `title`（文字列）：タスクタイトルで検索するテキスト
+5. `wrike_get_task`
+   - Wrikeタスクを操作するための統合ツール
+   - オプション入力（少なくとも1つは必須）：
+     - `task_id`（文字列）：取得する特定のタスクのID
+     - `folder_id`（文字列）：タスクを検索するフォルダ/プロジェクト
+   - タスク検索用のオプション入力：
+     - `title`（文字列）：タスクタイトルでフィルタリング
      - `status`（文字列）：タスクステータスでフィルタリング
      - `importance`（文字列）：タスクの重要度でフィルタリング
-     - `completed`（ブール値）：完了したタスクでフィルタリング
-     - `subtasks`（ブール値）：サブタスクでフィルタリング
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-     - `custom_fields`（オブジェクト）：カスタムフィールドフィルタを含むオブジェクト
-   - 戻り値：一致するタスクのリスト
-
-6. `wrike_get_task`
-   - 特定のタスクに関する詳細情報を取得
-   - 必須入力：
-     - `task_id`（文字列）：取得するタスクID
+     - `completed`（ブール値）：完了状態でフィルタリング（デフォルト：false）
+     - `subtasks`（ブール値）：サブタスクを含める（デフォルト：false）
+     - `custom_fields`（オブジェクト）：フィルタリングするカスタムフィールド
    - オプション入力：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：タスクの詳細情報
+   - 戻り値：タスクの詳細情報または一致するタスクのリスト
 
-7. `wrike_get_tasks_history`
+6. `wrike_get_tasks_history`
    - 特定のタスクのフィールド履歴を取得
    - 必須入力：
      - `task_ids`（文字列または文字列の配列）：タスクIDまたはタスクIDの配列（最大100件）
