@@ -22,8 +22,6 @@ More details on MCP here:
 In your AI tool of choice (e.g., Claude Desktop), ask something about Wrike tasks, projects, spaces, and/or comments. Mentioning the word "wrike" will increase the chance of having the LLM pick the right tool.
 
 Examples:
-> How many unfinished wrike tasks do we have in our Sprint 30 project?
-
 > Please list all spaces in Wrike.
 
 > Can you tell me the details of a task named "Website Redesign" in Wrike?
@@ -376,8 +374,6 @@ MCPの詳細はこちら：
 お好みのAIツール（Claude Desktopなど）で、Wrikeのタスク、プロジェクト、スペース、コメントについて質問してください。「wrike」という単語を含めると、LLMが適切なツールを選択する可能性が高まります。
 
 例：
-> Sprint 30プロジェクトには未完了のwrikeタスクがいくつありますか？
-
 > Wrikeでスペースの一覧をリストで作ってください。
 
 > Wrikeでタスク名「ウェブサイトリニューアル」の詳細を教えて下さい。
