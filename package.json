@@ -1,6 +1,6 @@
 {
   "name": "@katoiek/mcp-server-wrike",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Model Context Protocol server implementation for Wrike",
   "main": "dist/server.js",
   "type": "module",

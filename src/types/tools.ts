@@ -77,8 +77,8 @@ export const createCommentSchema = optionalFieldsSchema.extend({
   text: z.string().describe('Text content of the comment')
 });
 
-export const getProjectSchema = optionalFieldsSchema.extend({
-  project_id: z.string().describe('ID of the project to retrieve')
+export const getFolderProjectSchema = optionalFieldsSchema.extend({
+  folder_id: z.string().describe('ID of the folder/project to retrieve')
 });
 
 export const getContactsSchema = optionalFieldsSchema.extend({});
@@ -126,7 +126,7 @@ export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type GetCommentsInput = z.infer<typeof getCommentsSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
-export type GetProjectInput = z.infer<typeof getProjectSchema>;
+export type GetFolderProjectInput = z.infer<typeof getFolderProjectSchema>;
 export type GetContactsInput = z.infer<typeof getContactsSchema>;
 export type GetTimelogsInput = z.infer<typeof getTimelogsSchema>;
 export type CreateTimelogInput = z.infer<typeof createTimelogSchema>;
@@ -194,9 +194,9 @@ export const tools: Tool[] = [
     schema: createCommentSchema
   },
   {
-    name: 'wrike_get_project',
-    description: 'Get detailed information about a specific Wrike project',
-    schema: getProjectSchema
+    name: 'wrike_get_folder_project',
+    description: 'Get detailed information about a specific Wrike folder or project',
+    schema: getFolderProjectSchema
   },
   {
     name: 'wrike_get_contacts',

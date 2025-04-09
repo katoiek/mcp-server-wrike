@@ -519,23 +519,29 @@ async function handleCreateCommentTool(wrikeClient: WrikeClient, args: any): Pro
 }
 
 /**
- * Handle wrike_get_project tool request
+ * Handle wrike_get_folder_project tool request
  */
-async function handleGetProjectTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const { project_id, ...opts } = args as {
-    project_id: string;
+async function handleGetFolderProjectTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
+  const { folder_id, ...opts } = args as {
+    folder_id: string;
     opt_fields?: string;
   };
 
-  if (!project_id) {
-    throw new Error('project_id is required');
+  if (!folder_id) {
+    throw new Error('folder_id is required');
   }
 
-  const folder = await wrikeClient.getFolder(project_id, parseOptFields(opts.opt_fields));
-
-  if (!folder.project) {
-    throw new Error(`Folder ${project_id} is not a project`);
+  // Convert folder ID if it's a permalink or numeric ID
+  let apiFolder_id = folder_id;
+  if (folder_id.includes('open.htm?id=') || /^\d+$/.test(folder_id)) {
+    try {
+      apiFolder_id = await wrikeClient.convertPermalinkId(folder_id, 'folder');
+    } catch (error) {
+      throw new Error(`Failed to convert folder ID: ${(error as Error).message}`);
+    }
   }
+
+  const folder = await wrikeClient.getFolder(apiFolder_id, parseOptFields(opts.opt_fields));
 
   return {
     content: [{ type: 'text', text: JSON.stringify(folder, null, 2) }]
@@ -779,7 +785,7 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_get_comments': handleGetCommentsTool,
             'wrike_get_task_comments': handleGetTaskCommentsTool,
             'wrike_create_comment': handleCreateCommentTool,
-            'wrike_get_project': handleGetProjectTool,
+            'wrike_get_folder_project': handleGetFolderProjectTool,
             'wrike_get_contacts': handleGetContactsTool,
             'wrike_get_timelogs': handleGetTimelogsTool,
             'wrike_create_timelog': handleCreateTimelogTool,

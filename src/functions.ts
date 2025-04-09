@@ -242,6 +242,15 @@ export const functions = {
       throw new Error('task_id is required');
     }
 
+    // Convert task ID if it's a permalink or numeric ID
+    if (task_id.includes('open.htm?id=') || /^\d+$/.test(task_id)) {
+      try {
+        task_id = await wrikeClient.convertPermalinkId(task_id, 'task');
+      } catch (error) {
+        throw new Error(`Failed to convert task ID: ${(error as Error).message}`);
+      }
+    }
+
     const params = parseOptFields(opt_fields);
     const task = await wrikeClient.getTask(task_id, params);
     return task;
@@ -417,8 +426,8 @@ export const functions = {
     return task;
   },
 
-  // Get folder details
-  wrike_get_folder: async ({
+  // Get folder or project details
+  wrike_get_folder_project: async ({
     folder_id,
     opt_fields
   }: {
@@ -432,6 +441,15 @@ export const functions = {
 
     if (!folder_id) {
       throw new Error('folder_id is required');
+    }
+
+    // Convert folder ID if it's a permalink or numeric ID
+    if (folder_id.includes('open.htm?id=') || /^\d+$/.test(folder_id)) {
+      try {
+        folder_id = await wrikeClient.convertPermalinkId(folder_id, 'folder');
+      } catch (error) {
+        throw new Error(`Failed to convert folder ID: ${(error as Error).message}`);
+      }
     }
 
     const params = parseOptFields(opt_fields);
