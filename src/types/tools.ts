@@ -19,25 +19,30 @@ export const createFolderSchema = optionalFieldsSchema.extend({
   shareds: z.array(z.string()).optional().describe('Array of user IDs to share the folder with')
 });
 
-export const searchProjectsSchema = optionalFieldsSchema.extend({
-  space_id: z.string().describe('ID of the space to search in'),
-  name_pattern: z.string().describe('Pattern to match project names'),
-  archived: z.boolean().default(false).describe('Include archived projects')
+export const searchFoldersProjectsSchema = optionalFieldsSchema.extend({
+  space_id: z.string().optional().describe('ID of the space to search in'),
+  folder_id: z.string().optional().describe('ID of the parent folder to search in'),
+  folder_ids: z.array(z.string()).optional().describe('Specific folder IDs to retrieve (up to 100)'),
+  single_folder_id: z.string().optional().describe('ID of a specific folder, project, or space to retrieve'),
+  name_pattern: z.string().optional().describe('Pattern to match folder/project names'),
+  project_only: z.boolean().optional().default(false).describe('Only return folders that are projects'),
+  archived: z.boolean().optional().default(false).describe('Include archived folders/projects'),
+  include_history: z.boolean().optional().default(false).describe('Include folder history when using folder_ids')
 });
 
-export const searchTasksSchema = optionalFieldsSchema.extend({
-  space_id: z.string().describe('ID of the space to search in'),
-  title: z.string().optional().describe('Text to search for in task titles'),
-  status: z.string().optional().describe('Filter by task status (Active, Completed, Deferred, Cancelled)'),
-  importance: z.string().optional().describe('Filter by task importance (High, Normal, Low)'),
-  scheduled: z.boolean().optional().describe('Filter for tasks with scheduled dates'),
-  completed: z.boolean().optional().describe('Filter for completed tasks'),
-  authors: z.array(z.string()).optional().describe('Filter by task authors (array of user IDs)'),
-  responsibles: z.array(z.string()).optional().describe('Filter by task responsibles (array of user IDs)')
-});
+// searchProjectsSchema is now integrated into searchFoldersProjectsSchema
+
+// searchTasksSchema is now integrated into getTaskSchema
 
 export const getTaskSchema = optionalFieldsSchema.extend({
-  task_id: z.string().describe('ID of the task to retrieve')
+  task_id: z.string().optional().describe('ID of a specific task to retrieve'),
+  folder_id: z.string().optional().describe('ID of the folder to search tasks in'),
+  title: z.string().optional().describe('Filter by task title'),
+  status: z.string().optional().describe('Filter by task status (Active, Completed, Deferred, Cancelled)'),
+  importance: z.string().optional().describe('Filter by task importance (High, Normal, Low)'),
+  completed: z.boolean().optional().default(false).describe('Filter by completion status'),
+  subtasks: z.boolean().optional().default(false).describe('Include subtasks'),
+  custom_fields: z.any().optional().describe('Custom fields to filter by')
 });
 
 export const createTaskSchema = optionalFieldsSchema.extend({
@@ -77,9 +82,7 @@ export const createCommentSchema = optionalFieldsSchema.extend({
   text: z.string().describe('Text content of the comment')
 });
 
-export const getFolderProjectSchema = optionalFieldsSchema.extend({
-  folder_id: z.string().describe('ID of the folder/project to retrieve')
-});
+// getFolderProjectSchema is now integrated into searchFoldersProjectsSchema
 
 export const getContactsSchema = optionalFieldsSchema.extend({});
 
@@ -119,14 +122,14 @@ export const getTimelogCategoriesSchema = optionalFieldsSchema.extend({});
 export type EchoInput = z.infer<typeof echoSchema>;
 export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;
-export type SearchProjectsInput = z.infer<typeof searchProjectsSchema>;
-export type SearchTasksInput = z.infer<typeof searchTasksSchema>;
+export type SearchFoldersProjectsInput = z.infer<typeof searchFoldersProjectsSchema>;
+// SearchTasksInput is now integrated into GetTaskInput
 export type GetTaskInput = z.infer<typeof getTaskSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type GetCommentsInput = z.infer<typeof getCommentsSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
-export type GetFolderProjectInput = z.infer<typeof getFolderProjectSchema>;
+// GetFolderProjectInput is now integrated into SearchFoldersProjectsInput
 export type GetContactsInput = z.infer<typeof getContactsSchema>;
 export type GetTimelogsInput = z.infer<typeof getTimelogsSchema>;
 export type CreateTimelogInput = z.infer<typeof createTimelogSchema>;
@@ -159,18 +162,14 @@ export const tools: Tool[] = [
     schema: getTimelogsSchema
   },
   {
-    name: 'wrike_search_projects',
-    description: 'Search for projects in a Wrike space',
-    schema: searchProjectsSchema
+    name: 'wrike_get_folder_project',
+    description: 'Unified tool for working with Wrike folders, projects, and spaces. Can search for multiple items or get a specific one.',
+    schema: searchFoldersProjectsSchema
   },
-  {
-    name: 'wrike_search_tasks',
-    description: 'Search tasks in a Wrike space with filtering options',
-    schema: searchTasksSchema
-  },
+  // wrike_search_projects and wrike_search_tasks are now integrated into wrike_get_folder_project and wrike_get_task
   {
     name: 'wrike_get_task',
-    description: 'Get detailed information about a specific Wrike task',
+    description: 'Unified tool for working with Wrike tasks. Can get a specific task by ID or search for tasks in a folder.',
     schema: getTaskSchema
   },
   {
@@ -193,11 +192,7 @@ export const tools: Tool[] = [
     description: 'Create a comment on a Wrike task',
     schema: createCommentSchema
   },
-  {
-    name: 'wrike_get_folder_project',
-    description: 'Get detailed information about a specific Wrike folder or project',
-    schema: getFolderProjectSchema
-  },
+  // wrike_get_folder_project now includes the functionality of wrike_search_folders_projects
   {
     name: 'wrike_get_contacts',
     description: 'Get contacts/users in Wrike',

@@ -647,4 +647,143 @@ export class WrikeClient {
       return legacyId;
     }
   }
+
+  /**
+   * Enhanced search for folders, projects, and spaces
+   * This method can be used in two modes:
+   * 1. Search mode: Find multiple folders/projects based on criteria
+   * 2. Get mode: Retrieve a single folder, project, or space by ID
+   */
+  async searchFoldersProjects(options: {
+    space_id?: string;
+    folder_id?: string;
+    folder_ids?: string[];
+    single_folder_id?: string;
+    name_pattern?: string;
+    project_only?: boolean;
+    archived?: boolean;
+    include_history?: boolean;
+    opt_fields?: string;
+  }): Promise<WrikeFolder[] | WrikeFolder | WrikeSpace> {
+    const {
+      space_id,
+      folder_id,
+      folder_ids,
+      single_folder_id,
+      name_pattern,
+      project_only = false,
+      archived = false,
+      include_history = false,
+      opt_fields
+    } = options;
+
+    const params = this.parseOptFields(opt_fields);
+
+    // MODE 1: Get a single folder, project, or space by ID
+    if (single_folder_id) {
+      try {
+        // Strategy 1: Try as a space first
+        try {
+          logger.debug(`Attempting to retrieve as space: ${single_folder_id}`);
+          const space = await this.getSpace(single_folder_id, params);
+
+          if (space) {
+            logger.debug(`Successfully retrieved as space: ${single_folder_id}`);
+            return space;
+          }
+        } catch (spaceError) {
+          // Not a space, continue to folder logic
+          logger.debug(`Not a space ID, trying as folder: ${(spaceError as Error).message}`);
+        }
+
+        // Strategy 2: Try as a folder/project
+        // Convert folder ID if needed
+        let apiFolder_id = single_folder_id;
+
+        if (single_folder_id.includes('open.htm?id=') || /^\d+$/.test(single_folder_id)) {
+          try {
+            logger.debug(`Converting folder ID: ${single_folder_id}`);
+            apiFolder_id = await this.convertPermalinkId(single_folder_id, 'folder');
+            logger.debug(`Converted to: ${apiFolder_id}`);
+          } catch (error) {
+            logger.error(`ID conversion error: ${(error as Error).message}`);
+            // Continue with original ID if conversion fails
+          }
+        }
+
+        // Get folder details
+        logger.debug(`Retrieving folder: ${apiFolder_id}`);
+        const folder = await this.getFolder(apiFolder_id, params);
+        return folder;
+      } catch (error) {
+        logger.error(`Error retrieving single folder/project/space: ${(error as Error).message}`);
+        throw new Error(`Failed to get folder/project/space: ${(error as Error).message}`);
+      }
+    }
+
+    // MODE 2: Search for multiple folders/projects
+    try {
+      let folders: WrikeFolder[] = [];
+
+      // Determine which API endpoint to use based on provided parameters
+      if (space_id) {
+        // Get all folders in the space
+        folders = await this.getFoldersBySpace(space_id, params);
+      } else if (folder_id) {
+        // Get all subfolders of a parent folder
+        folders = await this.getFoldersByParent(folder_id, params);
+      } else if (folder_ids && folder_ids.length > 0) {
+        // Get specific folders by IDs
+        if (include_history) {
+          folders = await this.getFoldersHistory(folder_ids, params);
+        } else {
+          folders = await this.getFoldersByIds(folder_ids, params);
+        }
+      } else {
+        // Get all folders
+        folders = await this.getFolders(params);
+      }
+
+      // Apply filters if provided
+      if (name_pattern || project_only || archived !== undefined) {
+        const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
+
+        folders = folders.filter(folder => {
+          // Filter by project status if requested
+          if (project_only && folder.project === undefined) {
+            return false;
+          }
+
+          // Filter by name pattern if provided
+          if (regex && !regex.test(folder.title)) {
+            return false;
+          }
+
+          // Filter by archive status
+          if (archived !== undefined) {
+            const archiveMatches = archived ? folder.archived : !folder.archived;
+            if (!archiveMatches) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      return folders;
+    } catch (error) {
+      logger.error(`Error searching folders/projects: ${(error as Error).message}`);
+      throw new Error(`Failed to search folders/projects: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Helper method to parse optional fields
+   */
+  private parseOptFields(optFields?: string): WrikeRequestParams {
+    if (!optFields) return {};
+    const fields = optFields.split(',').map(field => field.trim());
+    return { fields: fields.join(',') };
+  }
 }
