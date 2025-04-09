@@ -105,16 +105,18 @@ server.tool(
     space_id: z.string().optional().describe('ID of the space to search in'),
     folder_id: z.string().optional().describe('ID of the parent folder to search in'),
     folder_ids: z.array(z.string()).optional().describe('Specific folder IDs to retrieve (up to 100)'),
+    single_folder_id: z.string().optional().describe('ID of a specific folder, project, or space to retrieve'),
     name_pattern: z.string().optional().describe('Pattern to match folder/project names'),
     project_only: z.boolean().optional().default(false).describe('Only return folders that are projects'),
     archived: z.boolean().optional().default(false).describe('Include archived folders/projects'),
     include_history: z.boolean().optional().default(false).describe('Include folder history when using folder_ids'),
     opt_fields: z.string().optional().describe('Optional fields to include in the response')
   }),
-  async ({ space_id, folder_id, folder_ids, name_pattern, project_only = false, archived = false, include_history = false, opt_fields }: {
+  async ({ space_id, folder_id, folder_ids, single_folder_id, name_pattern, project_only = false, archived = false, include_history = false, opt_fields }: {
     space_id?: string;
     folder_id?: string;
     folder_ids?: string[];
+    single_folder_id?: string;
     name_pattern?: string;
     project_only?: boolean;
     archived?: boolean;
@@ -126,110 +128,43 @@ server.tool(
     const host = process.env.WRIKE_HOST || 'www.wrike.com';
     const wrikeClient = new WrikeClient(accessToken, host);
 
-    const params = {
-      ...parseOptFields(opt_fields)
-    };
-
-    let folders: WrikeFolder[] = [];
-
-    // Determine which API endpoint to use based on provided parameters
-    if (space_id) {
-      // Get all folders in the space
-      folders = await wrikeClient.getFoldersBySpace(space_id, params);
-    } else if (folder_id) {
-      // Get all subfolders of a parent folder
-      folders = await wrikeClient.getFoldersByParent(folder_id, params);
-    } else if (folder_ids && folder_ids.length > 0) {
-      // Get specific folders by IDs
-      if (include_history) {
-        folders = await wrikeClient.getFoldersHistory(folder_ids, params);
-      } else {
-        folders = await wrikeClient.getFoldersByIds(folder_ids, params);
-      }
-    } else {
-      // Get all folders
-      folders = await wrikeClient.getFolders(params);
-    }
-
-    // Apply filters if provided
-    if (name_pattern || project_only || archived !== undefined) {
-      const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
-
-      folders = folders.filter(folder => {
-        // Filter by project status if requested
-        if (project_only && folder.project === undefined) {
-          return false;
-        }
-
-        // Filter by name pattern if provided
-        if (regex && !regex.test(folder.title)) {
-          return false;
-        }
-
-        // Filter by archive status
-        if (archived !== undefined) {
-          const archiveMatches = archived ? folder.archived : !folder.archived;
-          if (!archiveMatches) {
-            return false;
-          }
-        }
-
-        return true;
-      });
-    }
-
-    return folders;
+    // Use the enhanced searchFoldersProjects method
+    return await wrikeClient.searchFoldersProjects({
+      space_id,
+      folder_id,
+      folder_ids,
+      single_folder_id,
+      name_pattern,
+      project_only,
+      archived,
+      include_history,
+      opt_fields
+    });
   },
-  { description: 'Search for folders and projects in Wrike with advanced filtering' }
+  {
+    description: 'Unified tool for working with Wrike folders, projects, and spaces. Can search for multiple items or get a specific one.',
+    examples: [
+      // Example 1: Search for folders in a space
+      {
+        input: { space_id: 'IEAAAAAQ' },
+        output: [{ id: 'IEAAAAAQI', title: 'Marketing Campaign', scope: 'WsFolder' }]
+      },
+      // Example 2: Get a specific folder/project/space (replaces wrike_get_folder_project)
+      {
+        input: { single_folder_id: 'IEAAAAAQ' },
+        output: { id: 'IEAAAAAQ', title: 'Marketing', childIds: ['IEAAAAAQI', 'IEAAAAAQII'], scope: 'WsFolder' }
+      },
+      // Example 3: Search for projects only (replaces wrike_search_projects)
+      {
+        input: { space_id: 'IEAAAAAQ', project_only: true, name_pattern: 'Marketing' },
+        output: [{ id: 'IEAAAAAQI', title: 'Marketing Campaign', project: { status: 'Green' }, scope: 'WsFolder' }]
+      }
+    ]
+  }
 );
 
 // Search projects (for backward compatibility)
-server.tool(
-  'wrike_search_projects',
-  z.object({
-    space_id: z.string().describe('ID of the space to search in'),
-    name_pattern: z.string().describe('Pattern to match project names'),
-    archived: z.boolean().optional().default(false).describe('Include archived projects'),
-    opt_fields: z.string().optional().describe('Optional fields to include in the response')
-  }),
-  async ({ space_id, name_pattern, archived = false, opt_fields }: {
-    space_id: string;
-    name_pattern: string;
-    archived?: boolean;
-    opt_fields?: string
-  }) => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!space_id) {
-      throw new Error('space_id is required');
-    }
-    if (!name_pattern) {
-      throw new Error('name_pattern is required');
-    }
-
-    const params = {
-      ...parseOptFields(opt_fields)
-    };
-
-    // Get all folders in the space
-    const folders = await wrikeClient.getFoldersBySpace(space_id, params);
-
-    // Filter folders that are projects and match the name pattern
-    const regex = new RegExp(name_pattern, 'i');
-    const projects = folders.filter(folder => {
-      const isProject = folder.project !== undefined;
-      const nameMatches = regex.test(folder.title);
-      const archiveMatches = archived ? folder.archived : !folder.archived;
-      return isProject && nameMatches && archiveMatches;
-    });
-
-    return projects;
-  },
-  { description: 'Search for projects in a Wrike space (legacy version)' }
-);
+// This tool is now deprecated in favor of wrike_search_folders_projects with project_only=true
 
 // Search tasks
 server.tool(
@@ -474,41 +409,9 @@ server.tool(
   { description: 'Update an existing Wrike task' }
 );
 
-// Get folder or project details
-server.tool(
-  'wrike_get_folder_project',
-  z.object({
-    folder_id: z.string().describe('ID of the folder/project to retrieve'),
-    opt_fields: z.string().optional().describe('Optional fields to include in the response')
-  }),
-  async ({ folder_id, opt_fields }: {
-    folder_id: string;
-    opt_fields?: string;
-  }) => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!folder_id) {
-      throw new Error('folder_id is required');
-    }
-
-    // Convert folder ID if it's a permalink or numeric ID
-    if (folder_id.includes('open.htm?id=') || /^\d+$/.test(folder_id)) {
-      try {
-        folder_id = await wrikeClient.convertPermalinkId(folder_id, 'folder');
-      } catch (error) {
-        throw new Error(`Failed to convert folder ID: ${(error as Error).message}`);
-      }
-    }
-
-    const params = parseOptFields(opt_fields);
-    const folder = await wrikeClient.getFolder(folder_id, params);
-    return folder;
-  },
-  { description: 'Get details of a specific Wrike folder or project' }
-);
+// Get folder, project, or space details
+// This tool is now deprecated in favor of wrike_search_folders_projects with single_folder_id parameter
+// The implementation is kept for backward compatibility but will be removed in a future version
 
 // Create comment
 server.tool(

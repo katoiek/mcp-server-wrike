@@ -165,12 +165,16 @@ async function handleCreateFolderTool(wrikeClient: WrikeClient, args: any): Prom
 
 /**
  * Handle wrike_search_folders_projects tool request
+ * This function can be used in two modes:
+ * 1. Search mode: Find multiple folders/projects based on criteria
+ * 2. Get mode: Retrieve a single folder, project, or space by ID
  */
 async function handleSearchFoldersProjectsTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
   const {
     space_id,
     folder_id,
     folder_ids,
+    single_folder_id,
     name_pattern,
     project_only = false,
     archived = false,
@@ -180,6 +184,7 @@ async function handleSearchFoldersProjectsTool(wrikeClient: WrikeClient, args: a
     space_id?: string;
     folder_id?: string;
     folder_ids?: string[];
+    single_folder_id?: string;
     name_pattern?: string;
     project_only?: boolean;
     archived?: boolean;
@@ -187,6 +192,56 @@ async function handleSearchFoldersProjectsTool(wrikeClient: WrikeClient, args: a
     opt_fields?: string;
   };
 
+  // MODE 1: Get a single folder, project, or space by ID
+  if (single_folder_id) {
+    try {
+      logger.debug(`Retrieving single folder/project/space with ID: ${single_folder_id}`);
+
+      // Strategy 1: Try as a space first
+      try {
+        logger.debug(`Attempting to retrieve as space: ${single_folder_id}`);
+        const space = await wrikeClient.getSpace(single_folder_id, parseOptFields(opts.opt_fields));
+
+        if (space) {
+          logger.debug(`Successfully retrieved as space: ${single_folder_id}`);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(space, null, 2) }]
+          };
+        }
+      } catch (spaceError) {
+        // Not a space, continue to folder logic
+        logger.debug(`Not a space ID, trying as folder: ${(spaceError as Error).message}`);
+      }
+
+      // Strategy 2: Try as a folder/project
+      // Convert folder ID if needed
+      let apiFolder_id = single_folder_id;
+
+      if (single_folder_id.includes('open.htm?id=') || /^\d+$/.test(single_folder_id)) {
+        try {
+          logger.debug(`Converting folder ID: ${single_folder_id}`);
+          apiFolder_id = await wrikeClient.convertPermalinkId(single_folder_id, 'folder');
+          logger.debug(`Converted to: ${apiFolder_id}`);
+        } catch (error) {
+          logger.error(`ID conversion error: ${(error as Error).message}`);
+          // Continue with original ID if conversion fails
+        }
+      }
+
+      // Get folder details
+      logger.debug(`Retrieving folder: ${apiFolder_id}`);
+      const folder = await wrikeClient.getFolder(apiFolder_id, parseOptFields(opts.opt_fields));
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(folder, null, 2) }]
+      };
+    } catch (error) {
+      logger.error(`Error retrieving single folder/project/space: ${(error as Error).message}`);
+      throw new Error(`Failed to get folder/project/space: ${(error as Error).message}`);
+    }
+  }
+
+  // MODE 2: Search for multiple folders/projects
   const params = {
     ...parseOptFields(opts.opt_fields)
   };
@@ -518,35 +573,7 @@ async function handleCreateCommentTool(wrikeClient: WrikeClient, args: any): Pro
   };
 }
 
-/**
- * Handle wrike_get_folder_project tool request
- */
-async function handleGetFolderProjectTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const { folder_id, ...opts } = args as {
-    folder_id: string;
-    opt_fields?: string;
-  };
-
-  if (!folder_id) {
-    throw new Error('folder_id is required');
-  }
-
-  // Convert folder ID if it's a permalink or numeric ID
-  let apiFolder_id = folder_id;
-  if (folder_id.includes('open.htm?id=') || /^\d+$/.test(folder_id)) {
-    try {
-      apiFolder_id = await wrikeClient.convertPermalinkId(folder_id, 'folder');
-    } catch (error) {
-      throw new Error(`Failed to convert folder ID: ${(error as Error).message}`);
-    }
-  }
-
-  const folder = await wrikeClient.getFolder(apiFolder_id, parseOptFields(opts.opt_fields));
-
-  return {
-    content: [{ type: 'text', text: JSON.stringify(folder, null, 2) }]
-  };
-}
+// handleGetFolderProjectTool has been removed and integrated into handleSearchFoldersProjectsTool
 
 /**
  * Handle wrike_get_contacts tool request
@@ -776,7 +803,6 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_list_spaces': handleListSpacesTool,
             'wrike_create_folder': handleCreateFolderTool,
             'wrike_search_folders_projects': handleSearchFoldersProjectsTool,
-            'wrike_search_projects': handleSearchFoldersProjectsTool, // For backward compatibility
             'wrike_search_tasks': handleSearchTasksTool,
             'wrike_get_task': handleGetTaskTool,
             'wrike_get_tasks_history': handleTasksHistoryTool,
@@ -785,7 +811,6 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_get_comments': handleGetCommentsTool,
             'wrike_get_task_comments': handleGetTaskCommentsTool,
             'wrike_create_comment': handleCreateCommentTool,
-            'wrike_get_folder_project': handleGetFolderProjectTool,
             'wrike_get_contacts': handleGetContactsTool,
             'wrike_get_timelogs': handleGetTimelogsTool,
             'wrike_create_timelog': handleCreateTimelogTool,
