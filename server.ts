@@ -299,60 +299,72 @@ async function handleSearchFoldersProjectsTool(wrikeClient: WrikeClient, args: a
   };
 }
 
-/**
- * Handle wrike_search_tasks tool request
- */
-async function handleSearchTasksTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const { space_id, ...searchOpts } = args as {
-    space_id: string;
-    title?: string;
-    status?: string;
-    importance?: string;
-    scheduled?: boolean;
-    completed?: boolean;
-    authors?: string[];
-    responsibles?: string[];
-    opt_fields?: string;
-  };
-
-  if (!space_id) {
-    throw new Error('space_id is required');
-  }
-
-  // Get all tasks in the space
-  const tasks = await wrikeClient.getTasks({
-    spaceId: space_id,
-    ...searchOpts,
-    ...parseOptFields(searchOpts.opt_fields)
-  });
-
-  return {
-    content: [{ type: 'text', text: JSON.stringify(tasks, null, 2) }]
-  };
-}
+// handleSearchTasksTool has been removed and integrated into handleGetTaskTool
 
 /**
  * Handle wrike_get_task tool request
+ * This function can be used in two modes:
+ * 1. Get mode: Retrieve a single task by ID
+ * 2. Search mode: Find tasks in a folder with filtering
  */
 async function handleGetTaskTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const { task_id, ...opts } = args as {
-    task_id: string;
+  const {
+    task_id,
+    folder_id,
+    title,
+    status,
+    importance,
+    completed,
+    subtasks,
+    custom_fields,
+    ...opts
+  } = args as {
+    task_id?: string;
+    folder_id?: string;
+    title?: string;
+    status?: string;
+    importance?: string;
+    completed?: boolean;
+    subtasks?: boolean;
+    custom_fields?: any;
     opt_fields?: string;
   };
 
-  if (!task_id) {
-    throw new Error('task_id is required');
+  // MODE 1: Get a specific task by ID
+  if (task_id) {
+    // Convert task ID if needed
+    const apiTaskId = await convertTaskId(wrikeClient, task_id);
+
+    const params = parseOptFields(opts.opt_fields);
+    const task = await wrikeClient.getTask(apiTaskId, params);
+
+    return {
+      content: [{ type: 'text', text: JSON.stringify(task, null, 2) }]
+    };
   }
 
-  // Convert task ID if needed
-  const apiTaskId = await convertTaskId(wrikeClient, task_id);
+  // MODE 2: Search for tasks in a folder
+  if (folder_id) {
+    const params: WrikeRequestParams = {
+      ...parseOptFields(opts.opt_fields)
+    };
 
-  const params = parseOptFields(opts.opt_fields);
-  const task = await wrikeClient.getTask(apiTaskId, params);
+    // Add filters if provided
+    if (title) params.title = title;
+    if (status) params.status = status;
+    if (importance) params.importance = importance;
+    if (completed !== undefined) params.completed = completed;
+    if (subtasks !== undefined) params.subtasks = subtasks;
+    if (custom_fields) params.customFields = JSON.stringify(custom_fields);
 
-  return {
-    content: [{ type: 'text', text: JSON.stringify(task, null, 2) }]
-  };
+    const tasks = await wrikeClient.getTasksByFolder(folder_id, params);
+
+    return {
+      content: [{ type: 'text', text: JSON.stringify(tasks, null, 2) }]
+    };
+  }
+
+  throw new Error('Either task_id or folder_id must be provided');
 }
 
 /**
@@ -803,7 +815,6 @@ function toolHandler(wrikeClient: WrikeClient) {
             'wrike_list_spaces': handleListSpacesTool,
             'wrike_create_folder': handleCreateFolderTool,
             'wrike_get_folder_project': handleSearchFoldersProjectsTool,
-            'wrike_search_tasks': handleSearchTasksTool,
             'wrike_get_task': handleGetTaskTool,
             'wrike_get_tasks_history': handleTasksHistoryTool,
             'wrike_create_task': handleCreateTaskTool,

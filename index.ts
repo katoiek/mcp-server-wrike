@@ -166,65 +166,32 @@ server.tool(
 // Search projects (for backward compatibility)
 // This tool is now deprecated in favor of wrike_get_folder_project with project_only=true
 
-// Search tasks
+// Search tasks (for backward compatibility)
+// This functionality is now integrated into wrike_get_task with folder_id parameter
+
+// Unified tool for working with Wrike tasks
 server.tool(
-  'wrike_search_tasks',
+  'wrike_get_task',
   z.object({
-    folder_id: z.string().describe('ID of the folder to search in'),
+    task_id: z.string().optional().describe('ID of a specific task to retrieve'),
+    folder_id: z.string().optional().describe('ID of the folder to search tasks in'),
     title: z.string().optional().describe('Filter by task title'),
     status: z.string().optional().describe('Filter by task status'),
     importance: z.string().optional().describe('Filter by task importance'),
     completed: z.boolean().optional().default(false).describe('Filter by completion status'),
     subtasks: z.boolean().optional().default(false).describe('Include subtasks'),
-    opt_fields: z.string().optional().describe('Optional fields to include in the response'),
-    custom_fields: z.any().optional().describe('Custom fields to filter by')
+    custom_fields: z.any().optional().describe('Custom fields to filter by'),
+    opt_fields: z.string().optional().describe('Optional fields to include in the response')
   }),
-  async ({ folder_id, title, status, importance, completed = false, subtasks = false, opt_fields, custom_fields }: {
-    folder_id: string;
+  async ({ task_id, folder_id, title, status, importance, completed = false, subtasks = false, custom_fields, opt_fields }: {
+    task_id?: string;
+    folder_id?: string;
     title?: string;
     status?: string;
     importance?: string;
     completed?: boolean;
     subtasks?: boolean;
-    opt_fields?: string;
     custom_fields?: any;
-  }) => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!folder_id) {
-      throw new Error('folder_id is required');
-    }
-
-    const params: WrikeRequestParams = {
-      ...parseOptFields(opt_fields)
-    };
-
-    // Add filters if provided
-    if (title) params.title = title;
-    if (status) params.status = status;
-    if (importance) params.importance = importance;
-    if (completed !== undefined) params.completed = completed;
-    if (subtasks !== undefined) params.subtasks = subtasks;
-    if (custom_fields) params.customFields = JSON.stringify(custom_fields);
-
-    const tasks = await wrikeClient.getTasksByFolder(folder_id, params);
-    return tasks;
-  },
-  { description: 'Search for tasks in a Wrike folder' }
-);
-
-// Get task details
-server.tool(
-  'wrike_get_task',
-  z.object({
-    task_id: z.string().describe('ID of the task to retrieve'),
-    opt_fields: z.string().optional().describe('Optional fields to include in the response')
-  }),
-  async ({ task_id, opt_fields }: {
-    task_id: string;
     opt_fields?: string;
   }) => {
     // Initialize Wrike client for each request
@@ -232,15 +199,48 @@ server.tool(
     const host = process.env.WRIKE_HOST || 'www.wrike.com';
     const wrikeClient = new WrikeClient(accessToken, host);
 
-    if (!task_id) {
-      throw new Error('task_id is required');
+    // MODE 1: Get a specific task by ID
+    if (task_id) {
+      const params = parseOptFields(opt_fields);
+      const task = await wrikeClient.getTask(task_id, params);
+      return task;
     }
 
-    const params = parseOptFields(opt_fields);
-    const task = await wrikeClient.getTask(task_id, params);
-    return task;
+    // MODE 2: Search for tasks in a folder
+    if (folder_id) {
+      const params: WrikeRequestParams = {
+        ...parseOptFields(opt_fields)
+      };
+
+      // Add filters if provided
+      if (title) params.title = title;
+      if (status) params.status = status;
+      if (importance) params.importance = importance;
+      if (completed !== undefined) params.completed = completed;
+      if (subtasks !== undefined) params.subtasks = subtasks;
+      if (custom_fields) params.customFields = JSON.stringify(custom_fields);
+
+      const tasks = await wrikeClient.getTasksByFolder(folder_id, params);
+      return tasks;
+    }
+
+    throw new Error('Either task_id or folder_id must be provided');
   },
-  { description: 'Get details of a specific Wrike task' }
+  {
+    description: 'Unified tool for working with Wrike tasks. Can get a specific task by ID or search for tasks in a folder.',
+    examples: [
+      // Example 1: Get a specific task by ID
+      {
+        input: { task_id: 'IEAAAAAQIIIII' },
+        output: { id: 'IEAAAAAQIIIII', title: 'Complete project documentation', status: 'Active' }
+      },
+      // Example 2: Search for tasks in a folder
+      {
+        input: { folder_id: 'IEAAAAAQI', status: 'Active', completed: false },
+        output: [{ id: 'IEAAAAAQIIIII', title: 'Complete project documentation', status: 'Active' }]
+      }
+    ]
+  }
 );
 
 // Get tasks history

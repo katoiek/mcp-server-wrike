@@ -32,19 +32,17 @@ export const searchFoldersProjectsSchema = optionalFieldsSchema.extend({
 
 // searchProjectsSchema is now integrated into searchFoldersProjectsSchema
 
-export const searchTasksSchema = optionalFieldsSchema.extend({
-  space_id: z.string().describe('ID of the space to search in'),
-  title: z.string().optional().describe('Text to search for in task titles'),
-  status: z.string().optional().describe('Filter by task status (Active, Completed, Deferred, Cancelled)'),
-  importance: z.string().optional().describe('Filter by task importance (High, Normal, Low)'),
-  scheduled: z.boolean().optional().describe('Filter for tasks with scheduled dates'),
-  completed: z.boolean().optional().describe('Filter for completed tasks'),
-  authors: z.array(z.string()).optional().describe('Filter by task authors (array of user IDs)'),
-  responsibles: z.array(z.string()).optional().describe('Filter by task responsibles (array of user IDs)')
-});
+// searchTasksSchema is now integrated into getTaskSchema
 
 export const getTaskSchema = optionalFieldsSchema.extend({
-  task_id: z.string().describe('ID of the task to retrieve')
+  task_id: z.string().optional().describe('ID of a specific task to retrieve'),
+  folder_id: z.string().optional().describe('ID of the folder to search tasks in'),
+  title: z.string().optional().describe('Filter by task title'),
+  status: z.string().optional().describe('Filter by task status (Active, Completed, Deferred, Cancelled)'),
+  importance: z.string().optional().describe('Filter by task importance (High, Normal, Low)'),
+  completed: z.boolean().optional().default(false).describe('Filter by completion status'),
+  subtasks: z.boolean().optional().default(false).describe('Include subtasks'),
+  custom_fields: z.any().optional().describe('Custom fields to filter by')
 });
 
 export const createTaskSchema = optionalFieldsSchema.extend({
@@ -125,7 +123,7 @@ export type EchoInput = z.infer<typeof echoSchema>;
 export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;
 export type SearchFoldersProjectsInput = z.infer<typeof searchFoldersProjectsSchema>;
-export type SearchTasksInput = z.infer<typeof searchTasksSchema>;
+// SearchTasksInput is now integrated into GetTaskInput
 export type GetTaskInput = z.infer<typeof getTaskSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
@@ -168,15 +166,10 @@ export const tools: Tool[] = [
     description: 'Unified tool for working with Wrike folders, projects, and spaces. Can search for multiple items or get a specific one.',
     schema: searchFoldersProjectsSchema
   },
-  // wrike_search_projects is now integrated into wrike_search_folders_projects
-  {
-    name: 'wrike_search_tasks',
-    description: 'Search tasks in a Wrike space with filtering options',
-    schema: searchTasksSchema
-  },
+  // wrike_search_projects and wrike_search_tasks are now integrated into wrike_get_folder_project and wrike_get_task
   {
     name: 'wrike_get_task',
-    description: 'Get detailed information about a specific Wrike task',
+    description: 'Unified tool for working with Wrike tasks. Can get a specific task by ID or search for tasks in a folder.',
     schema: getTaskSchema
   },
   {
@@ -199,7 +192,7 @@ export const tools: Tool[] = [
     description: 'Create a comment on a Wrike task',
     schema: createCommentSchema
   },
-  // wrike_get_folder_project is now integrated into wrike_search_folders_projects
+  // wrike_get_folder_project now includes the functionality of wrike_search_folders_projects
   {
     name: 'wrike_get_contacts',
     description: 'Get contacts/users in Wrike',

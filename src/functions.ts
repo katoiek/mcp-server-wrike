@@ -190,80 +190,75 @@ export const functions = {
 
   // Search projects function has been removed and integrated into wrike_get_folder_project
 
-  // Search tasks
-  wrike_search_tasks: async ({
+  // Search tasks function has been removed and integrated into wrike_get_task
+
+  /**
+   * Unified tool for working with Wrike tasks
+   * This function can be used in two modes:
+   * 1. Get mode: Retrieve a single task by ID
+   * 2. Search mode: Find tasks in a folder with filtering
+   */
+  wrike_get_task: async ({
+    task_id,
     folder_id,
     title,
     status,
     importance,
     completed = false,
     subtasks = false,
-    opt_fields,
-    custom_fields
+    custom_fields,
+    opt_fields
   }: {
-    folder_id: string;
+    task_id?: string;
+    folder_id?: string;
     title?: string;
     status?: string;
     importance?: string;
     completed?: boolean;
     subtasks?: boolean;
-    opt_fields?: string;
-    custom_fields?: any
-  }): Promise<WrikeTask[]> => {
-    // Initialize Wrike client for each request
-    const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-    const host = process.env.WRIKE_HOST || 'www.wrike.com';
-    const wrikeClient = new WrikeClient(accessToken, host);
-
-    if (!folder_id) {
-      throw new Error('folder_id is required');
-    }
-
-    const params: WrikeRequestParams = {
-      ...parseOptFields(opt_fields)
-    };
-
-    // Add filters if provided
-    if (title) params.title = title;
-    if (status) params.status = status;
-    if (importance) params.importance = importance;
-    if (completed !== undefined) params.completed = completed;
-    if (subtasks !== undefined) params.subtasks = subtasks;
-    if (custom_fields) params.customFields = JSON.stringify(custom_fields);
-
-    const tasks = await wrikeClient.getTasksByFolder(folder_id, params);
-    return tasks;
-  },
-
-  // Get task details
-  wrike_get_task: async ({
-    task_id,
-    opt_fields
-  }: {
-    task_id: string;
+    custom_fields?: any;
     opt_fields?: string
-  }): Promise<WrikeTask> => {
+  }): Promise<WrikeTask | WrikeTask[]> => {
     // Initialize Wrike client for each request
     const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
     const host = process.env.WRIKE_HOST || 'www.wrike.com';
     const wrikeClient = new WrikeClient(accessToken, host);
 
-    if (!task_id) {
-      throw new Error('task_id is required');
-    }
-
-    // Convert task ID if it's a permalink or numeric ID
-    if (task_id.includes('open.htm?id=') || /^\d+$/.test(task_id)) {
-      try {
-        task_id = await wrikeClient.convertPermalinkId(task_id, 'task');
-      } catch (error) {
-        throw new Error(`Failed to convert task ID: ${(error as Error).message}`);
+    // MODE 1: Get a specific task by ID
+    if (task_id) {
+      // Convert task ID if it's a permalink or numeric ID
+      if (task_id.includes('open.htm?id=') || /^\d+$/.test(task_id)) {
+        try {
+          task_id = await wrikeClient.convertPermalinkId(task_id, 'task');
+        } catch (error) {
+          throw new Error(`Failed to convert task ID: ${(error as Error).message}`);
+        }
       }
+
+      const params = parseOptFields(opt_fields);
+      const task = await wrikeClient.getTask(task_id, params);
+      return task;
     }
 
-    const params = parseOptFields(opt_fields);
-    const task = await wrikeClient.getTask(task_id, params);
-    return task;
+    // MODE 2: Search for tasks in a folder
+    if (folder_id) {
+      const params: WrikeRequestParams = {
+        ...parseOptFields(opt_fields)
+      };
+
+      // Add filters if provided
+      if (title) params.title = title;
+      if (status) params.status = status;
+      if (importance) params.importance = importance;
+      if (completed !== undefined) params.completed = completed;
+      if (subtasks !== undefined) params.subtasks = subtasks;
+      if (custom_fields) params.customFields = JSON.stringify(custom_fields);
+
+      const tasks = await wrikeClient.getTasksByFolder(folder_id, params);
+      return tasks;
+    }
+
+    throw new Error('Either task_id or folder_id must be provided');
   },
 
   // Get tasks history
