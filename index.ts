@@ -98,9 +98,9 @@ server.tool(
   { description: 'Get details of a specific Wrike space' }
 );
 
-// Search folders and projects
+// Unified tool for working with Wrike folders, projects, and spaces
 server.tool(
-  'wrike_search_folders_projects',
+  'wrike_get_folder_project',
   z.object({
     space_id: z.string().optional().describe('ID of the space to search in'),
     folder_id: z.string().optional().describe('ID of the parent folder to search in'),
@@ -149,12 +149,12 @@ server.tool(
         input: { space_id: 'IEAAAAAQ' },
         output: [{ id: 'IEAAAAAQI', title: 'Marketing Campaign', scope: 'WsFolder' }]
       },
-      // Example 2: Get a specific folder/project/space (replaces wrike_get_folder_project)
+      // Example 2: Get a specific folder/project/space by ID
       {
         input: { single_folder_id: 'IEAAAAAQ' },
         output: { id: 'IEAAAAAQ', title: 'Marketing', childIds: ['IEAAAAAQI', 'IEAAAAAQII'], scope: 'WsFolder' }
       },
-      // Example 3: Search for projects only (replaces wrike_search_projects)
+      // Example 3: Search for projects only
       {
         input: { space_id: 'IEAAAAAQ', project_only: true, name_pattern: 'Marketing' },
         output: [{ id: 'IEAAAAAQI', title: 'Marketing Campaign', project: { status: 'Green' }, scope: 'WsFolder' }]
@@ -164,7 +164,7 @@ server.tool(
 );
 
 // Search projects (for backward compatibility)
-// This tool is now deprecated in favor of wrike_search_folders_projects with project_only=true
+// This tool is now deprecated in favor of wrike_get_folder_project with project_only=true
 
 // Search tasks
 server.tool(
@@ -410,7 +410,7 @@ server.tool(
 );
 
 // Get folder, project, or space details
-// This tool is now deprecated in favor of wrike_search_folders_projects with single_folder_id parameter
+// This functionality is now integrated into wrike_get_folder_project with single_folder_id parameter
 // The implementation is kept for backward compatibility but will be removed in a future version
 
 // Create comment

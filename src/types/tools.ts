@@ -164,8 +164,8 @@ export const tools: Tool[] = [
     schema: getTimelogsSchema
   },
   {
-    name: 'wrike_search_folders_projects',
-    description: 'Search for folders and projects in Wrike with advanced filtering, or get a specific folder/project/space by ID',
+    name: 'wrike_get_folder_project',
+    description: 'Unified tool for working with Wrike folders, projects, and spaces. Can search for multiple items or get a specific one.',
     schema: searchFoldersProjectsSchema
   },
   // wrike_search_projects is now integrated into wrike_search_folders_projects

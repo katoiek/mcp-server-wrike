@@ -59,12 +59,12 @@ export const functions = {
   },
 
   /**
-   * Search folders and projects, or get a specific folder/project/space
+   * Unified tool for working with Wrike folders, projects, and spaces
    * This function can be used in two modes:
    * 1. Search mode: Find multiple folders/projects based on criteria
    * 2. Get mode: Retrieve a single folder, project, or space by ID
    */
-  wrike_search_folders_projects: async ({
+  wrike_get_folder_project: async ({
     space_id,
     folder_id,
     folder_ids,
@@ -188,7 +188,7 @@ export const functions = {
     }
   },
 
-  // Search projects function has been removed and integrated into wrike_search_folders_projects
+  // Search projects function has been removed and integrated into wrike_get_folder_project
 
   // Search tasks
   wrike_search_tasks: async ({
@@ -436,7 +436,7 @@ export const functions = {
     return task;
   },
 
-  // Get folder or project details function has been removed and integrated into wrike_search_folders_projects
+  // Get folder or project details function has been removed and integrated into wrike_get_folder_project
 
   // Create comment
   wrike_create_comment: async ({

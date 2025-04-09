@@ -164,7 +164,7 @@ async function handleCreateFolderTool(wrikeClient: WrikeClient, args: any): Prom
 }
 
 /**
- * Handle wrike_search_folders_projects tool request
+ * Handle wrike_get_folder_project tool request
  * This function can be used in two modes:
  * 1. Search mode: Find multiple folders/projects based on criteria
  * 2. Get mode: Retrieve a single folder, project, or space by ID
@@ -802,7 +802,7 @@ function toolHandler(wrikeClient: WrikeClient) {
             'echo': handleEchoTool,
             'wrike_list_spaces': handleListSpacesTool,
             'wrike_create_folder': handleCreateFolderTool,
-            'wrike_search_folders_projects': handleSearchFoldersProjectsTool,
+            'wrike_get_folder_project': handleSearchFoldersProjectsTool,
             'wrike_search_tasks': handleSearchTasksTool,
             'wrike_get_task': handleGetTaskTool,
             'wrike_get_tasks_history': handleTasksHistoryTool,
