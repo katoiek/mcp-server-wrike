@@ -474,11 +474,11 @@ server.tool(
   { description: 'Update an existing Wrike task' }
 );
 
-// Get folder details
+// Get folder or project details
 server.tool(
-  'wrike_get_folder',
+  'wrike_get_folder_project',
   z.object({
-    folder_id: z.string().describe('ID of the folder to retrieve'),
+    folder_id: z.string().describe('ID of the folder/project to retrieve'),
     opt_fields: z.string().optional().describe('Optional fields to include in the response')
   }),
   async ({ folder_id, opt_fields }: {
@@ -494,11 +494,20 @@ server.tool(
       throw new Error('folder_id is required');
     }
 
+    // Convert folder ID if it's a permalink or numeric ID
+    if (folder_id.includes('open.htm?id=') || /^\d+$/.test(folder_id)) {
+      try {
+        folder_id = await wrikeClient.convertPermalinkId(folder_id, 'folder');
+      } catch (error) {
+        throw new Error(`Failed to convert folder ID: ${(error as Error).message}`);
+      }
+    }
+
     const params = parseOptFields(opt_fields);
     const folder = await wrikeClient.getFolder(folder_id, params);
     return folder;
   },
-  { description: 'Get details of a specific Wrike folder' }
+  { description: 'Get details of a specific Wrike folder or project' }
 );
 
 // Create comment

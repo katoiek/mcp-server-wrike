@@ -149,15 +149,15 @@ Examples:
      - `completed` (boolean): Mark task as completed or not
    - Returns: Updated task information
 
-10. `wrike_get_project`
+10. `wrike_get_folder_project`
    - Get detailed information about a specific folder/project
    - Required input:
-     - `project_id` (string): The project ID to retrieve
+     - `folder_id` (string): The folder/project ID to retrieve
    - Optional input:
      - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Detailed project information
+   - Returns: Detailed folder/project information
 
-9. `wrike_create_comment`
+11. `wrike_create_comment`
    - Create a comment on a task
    - Required input:
      - `task_id` (string): The task ID to add the comment to
@@ -166,14 +166,14 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created comment information
 
-10. `wrike_get_contacts`
+12. `wrike_get_contacts`
     - Get information about Wrike contacts/users
     - Optional input:
       - `me` (boolean): Return only the current user's information
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of contacts
 
-11. `wrike_get_timelogs`
+13. `wrike_get_timelogs`
     - Get timelogs from Wrike with filtering options
     - Optional input:
       - `task_id` (string): Filter timelogs by task ID
@@ -525,13 +525,13 @@ MCPの詳細はこちら：
      - `completed`（ブール値）：タスクを完了としてマークするかどうか
    - 戻り値：更新されたタスクの情報
 
-10. `wrike_get_project`
+10. `wrike_get_folder_folderproject`
    - 特定のフォルダ/プロジェクトに関する詳細情報を取得
    - 必須入力：
-     - `project_id`（文字列）：取得するプロジェクトID
+     - `folder_id`（文字列）：取得するフォルダ/フォルダ/プロジェクトID
    - オプション入力：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：プロジェクトの詳細情報
+   - 戻り値：フォルダ/フォルダ/プロジェクトの詳細情報
 
 9. `wrike_create_comment`
    - タスクにコメントを作成
