@@ -182,5 +182,8 @@ export interface WrikeTimelogData {
 
 // ID Conversion Types
 export interface WrikeIdConversion {
- ing;
+  id: string;
+  permalink: string;
+  type: string;
+  [key: string]: any;
 }

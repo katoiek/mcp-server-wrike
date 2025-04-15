@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { WrikeClient } from './src/wrikeClient.js';
+import { WrikeClient } from './src/utils/wrikeClient.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,

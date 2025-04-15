@@ -1,4 +1,4 @@
-import { WrikeClient } from './wrikeClient.js';
+import { WrikeClient } from './utils/wrikeClient.js';
 import {
   WrikeRequestParams,
   WrikeTaskData,
