@@ -2,10 +2,10 @@
   "name": "@katoiek/mcp-server-wrike",
   "version": "1.2.0",
   "description": "Model Context Protocol server implementation for Wrike",
-  "main": "dist/server.js",
+  "main": "dist/server-mcp.js",
   "type": "module",
   "bin": {
-    "mcp-server-wrike": "dist/server.js"
+    "mcp-server-wrike": "dist/server-mcp.js"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,9 @@
     "build": "tsc",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "start": "node dist/index.js",
+    "start": "node dist/server-mcp.js",
     "start:legacy": "node dist/server.js",
+    "start:old": "node dist/index.js",
     "build:start": "npm run build && npm run start",
     "inspector": "npx @modelcontextprotocol/inspector",
     "test": "echo \"Error: no test specified\" && exit 1",

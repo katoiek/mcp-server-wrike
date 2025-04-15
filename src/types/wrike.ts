@@ -1,16 +1,18 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 
-// Wrike API Response Types
+// API Response Types
 export interface WrikeApiResponse<T> {
   kind: string;
   data: T;
 }
 
-// Wrike Entity Types
+// Core Types
 export interface WrikeSpace {
   id: string;
   title: string;
   avatarUrl?: string;
+  accessType?: string;
+  archived?: boolean;
   [key: string]: any;
 }
 
@@ -18,7 +20,7 @@ export interface WrikeFolder {
   id: string;
   title: string;
   childIds?: string[];
-  scope: string;
+  scope?: string;
   project?: {
     authorId: string;
     ownerIds: string[];
@@ -26,23 +28,11 @@ export interface WrikeFolder {
     startDate?: string;
     endDate?: string;
     createdDate: string;
-    completedDate?: string;
   };
   description?: string;
   briefDescription?: string;
   color?: string;
-  customFields?: WrikeCustomField[];
-  customColumnIds?: string[];
-  hasAttachments?: boolean;
-  attachmentCount?: number;
-  permalink?: string;
-  workflowId?: string;
-  metadata?: any[];
-  accountId?: string;
-  createdDate?: string;
-  updatedDate?: string;
-  completedDate?: string;
-  archived?: boolean;
+  customFields?: { id: string; value: string | number | boolean | null }[];
   [key: string]: any;
 }
 
@@ -60,28 +50,15 @@ export interface WrikeTask {
   importance: string;
   createdDate: string;
   updatedDate: string;
-  completedDate?: string;
   dates?: {
     type: string;
     duration: number;
     start?: string;
     due?: string;
-    workOnWeekends?: boolean;
   };
   scope: string;
   authorIds: string[];
-  customStatusId?: string;
-  hasAttachments?: boolean;
-  attachmentCount?: number;
-  permalink?: string;
-  priority?: string;
-  followedByMe?: boolean;
-  followerIds?: string[];
-  superTaskIds?: string[];
-  subTaskIds?: string[];
-  dependencyIds?: string[];
-  metadata?: any[];
-  customFields?: WrikeCustomField[];
+  customFields?: { id: string; value: string | number | boolean | null }[];
   [key: string]: any;
 }
 
@@ -90,7 +67,6 @@ export interface WrikeComment {
   authorId: string;
   text: string;
   createdDate: string;
-  updatedDate?: string;
   taskId?: string;
   [key: string]: any;
 }
@@ -109,7 +85,7 @@ export interface WrikeContact {
   avatarUrl?: string;
   timezone?: string;
   locale?: string;
-  deleted?: boolean;
+  deleted: boolean;
   me?: boolean;
   [key: string]: any;
 }
@@ -126,30 +102,40 @@ export interface WrikeTimelog {
   [key: string]: any;
 }
 
+export interface WrikeTimelogCategory {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
 export interface WrikeCustomField {
   id: string;
   value: string | number | boolean | null;
   [key: string]: any;
 }
 
-// Parameter Types
+// Request Types
 export interface WrikeRequestParams {
-  fields?: string;
   [key: string]: any;
 }
 
 export interface WrikeTaskParams extends WrikeRequestParams {
-  title?: string;
   status?: string;
   importance?: string;
+  startDate?: string;
+  dueDate?: string;
   scheduled?: boolean;
-  completed?: boolean;
-  authors?: string[];
-  responsibles?: string[];
-  spaceId?: string;
   [key: string]: any;
 }
 
+// カスタムフィールドの型（オプショナルプロパティ）
+export interface WrikeCustomFieldOptional {
+  id?: string;
+  value?: string | number | boolean | null;
+  [key: string]: any;
+}
+
+// Data Types for Creation/Update
 export interface WrikeTaskData {
   title?: string;
   description?: string;
@@ -159,6 +145,7 @@ export interface WrikeTaskData {
     start?: string;
     due?: string;
     type?: string;
+    duration?: number;
   };
   responsibles?: string[];
   customFields?: { id: string; value: string | number | boolean | null }[];
@@ -175,12 +162,13 @@ export interface WrikeFolderData {
     startDate?: string;
     endDate?: string;
   };
-  customFields?: { id: string; value: string | number | boolean | null }[];
+  customFields?: WrikeCustomField[];
   [key: string]: any;
 }
 
 export interface WrikeCommentData {
   text: string;
+  plainText?: boolean;
   [key: string]: any;
 }
 
@@ -194,21 +182,5 @@ export interface WrikeTimelogData {
 
 // ID Conversion Types
 export interface WrikeIdConversion {
-  id: string;
-  oldId: string;
-}
-
-// Timelog Category Types
-export interface WrikeTimelogCategory {
-  id: string;
-  name: string;
-  order?: number;
-  hidden?: boolean;
-  [key: string]: any;
-}
-
-// Client Configuration
-export interface WrikeClientConfig {
-  accessToken: string;
-  host?: string;
+ ing;
 }
