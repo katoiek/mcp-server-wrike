@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { logger } from './utils/logger.js';
+import { logger } from './logger.js';
 import {
   WrikeApiResponse,
   WrikeSpace,
@@ -16,7 +16,7 @@ import {
   WrikeCommentData,
   WrikeTimelogData,
   WrikeIdConversion
-} from './types/wrike.js';
+} from '../types/wrike.js';
 
 export class WrikeClient {
   private accessToken: string;
@@ -52,7 +52,7 @@ export class WrikeClient {
   // Helper method to handle API errors
   async handleError(error: AxiosError): Promise<never> {
     // Import logger dynamically to avoid circular dependencies
-    const { logger } = await import('./utils/logger.js');
+    const { logger } = await import('./logger.js');
 
     logger.error('Wrike API Error:', error);
 
@@ -458,323 +458,82 @@ export class WrikeClient {
     }
   }
 
-  /**
-   * Create a timelog entry for a task
-   * @param taskId ID of the task to add the timelog to
-   * @param data Timelog data
-   * @returns Created timelog
-   */
-  async createTimelog(taskId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
+  async createTimelog(taskId: string, data: WrikeTimelogData, params: WrikeRequestParams = {}): Promise<WrikeTimelog> {
     try {
-      logger.debug(`Creating timelog for task ${taskId} with data:`, data);
-      const response = await this.client.post(`/tasks/${taskId}/timelogs`, data);
-      logger.debug(`Timelog creation response status: ${response.status}`);
+      const response = await this.client.post(`/tasks/${taskId}/timelogs`, data, { params });
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
     } catch (error) {
-      logger.error(`Error creating timelog: ${(error as Error).message}`);
-      if ((error as AxiosError).response) {
-        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
-        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
-      }
       return this.handleError(error as AxiosError);
     }
   }
 
-  /**
-   * Update a timelog entry
-   * @param timelogId ID of the timelog to update
-   * @param data Updated timelog data
-   * @returns Updated timelog
-   */
-  async updateTimelog(timelogId: string, data: WrikeTimelogData): Promise<WrikeTimelog> {
+  async updateTimelog(timelogId: string, data: WrikeTimelogData, params: WrikeRequestParams = {}): Promise<WrikeTimelog> {
     try {
-      logger.debug(`Updating timelog ${timelogId} with data:`, data);
-      const response = await this.client.put(`/timelogs/${timelogId}`, data);
-      logger.debug(`Timelog update response status: ${response.status}`);
+      const response = await this.client.put(`/timelogs/${timelogId}`, data, { params });
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
     } catch (error) {
-      logger.error(`Error updating timelog: ${(error as Error).message}`);
-      if ((error as AxiosError).response) {
-        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
-        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
-      }
       return this.handleError(error as AxiosError);
     }
   }
 
-  /**
-   * Delete a timelog entry
-   * @param timelogId ID of the timelog to delete
-   * @returns True if deletion was successful
-   */
-  async deleteTimelog(timelogId: string): Promise<boolean> {
+  async deleteTimelog(timelogId: string): Promise<void> {
     try {
-      logger.debug(`Deleting timelog ${timelogId}`);
       const response = await this.client.delete(`/timelogs/${timelogId}`);
-      logger.debug(`Timelog deletion response status: ${response.status}`);
-      return response.status === 200;
+      this.handleResponse(response);
     } catch (error) {
-      logger.error(`Error deleting timelog: ${(error as Error).message}`);
-      if ((error as AxiosError).response) {
-        logger.error(`Response status: ${(error as AxiosError).response?.status}`);
-        logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
-      }
-      return this.handleError(error as AxiosError);
-    }
-  }
-
-  // ID Conversion
-  async convertLegacyIds(type: string, legacyIds: string[] | string): Promise<WrikeIdConversion[]> {
-    try {
-      // Convert comma-separated string to array if needed
-      const ids = Array.isArray(legacyIds)
-        ? legacyIds
-        : legacyIds.split(',').map(id => id.trim());
-
-      // Log conversion attempt at debug level
-      logger.debug(`Converting legacy IDs: ${ids.join(',')} of type ${type}`);
-
-      // Call the Wrike API to convert IDs using the correct format
-      // Format: /api/v4/ids?ids=[ID]&type=ApiV2Task
-      const apiType = type === 'task' ? 'ApiV2Task' :
-                     type === 'folder' ? 'ApiV2Folder' :
-                     type === 'comment' ? 'ApiV2Comment' : type;
-
-      const response = await this.client.get('/ids', {
-        params: {
-          ids: `[${ids.join(',')}]`,
-          type: apiType
-        }
-      });
-
-      // Log conversion response at debug level
-      logger.debug("ID conversion response received");
-
-      return this.handleResponse<WrikeIdConversion[]>(response);
-    } catch (error) {
-      // Log error at error level
-      logger.error(`Error converting legacy IDs: ${(error as Error).message}`);
-
-      return this.handleError(error as AxiosError);
-    }
-  }
-
-  // Helper method to convert a permalink ID to API v4 ID
-  async convertPermalinkId(permalinkId: string, type: string = 'task'): Promise<string> {
-    logger.debug(`Converting permalink ID: ${permalinkId} of type ${type}`);
-
-    // Extract the numeric ID from the permalink
-    // Permalink format: https://www.wrike.com/open.htm?id=1633695731
-    let legacyId: string;
-
-    if (typeof permalinkId === 'string' && permalinkId.includes('open.htm?id=')) {
-      // Extract ID from permalink URL
-      const match = permalinkId.match(/id=(\d+)/);
-      if (match && match[1]) {
-        legacyId = match[1];
-        logger.debug(`Extracted legacy ID from permalink: ${legacyId}`);
-      } else {
-        throw new Error('Invalid permalink format');
-      }
-    } else if (typeof permalinkId === 'string' && /^\d+$/.test(permalinkId)) {
-      // If it's already a numeric ID, use it directly
-      legacyId = permalinkId;
-      logger.debug(`Using numeric ID directly: ${legacyId}`);
-    } else {
-      // If it's already in the API v4 format (IEAAXXXXX), return it directly
-      if (typeof permalinkId === 'string' && permalinkId.startsWith('IEAA')) {
-        logger.debug(`ID already in API v4 format: ${permalinkId}`);
-        return permalinkId;
-      }
-
-      throw new Error(`Invalid permalink or ID format: ${permalinkId}`);
-    }
-
-    try {
-      // Use the correct API endpoint format to convert the ID
-      logger.debug(`Converting legacy ID to API v4 format: ${legacyId}`);
-
-      // Determine the correct API type based on the provided type
-      const apiType = type === 'task' ? 'ApiV2Task' :
-                     type === 'folder' ? 'ApiV2Folder' :
-                     type === 'comment' ? 'ApiV2Comment' : type;
-
-      // Make a direct request to the IDs endpoint with the correct format
-      const response = await this.client.get('/ids', {
-        params: {
-          ids: `[${legacyId}]`,
-          type: apiType
-        }
-      });
-
-      logger.debug("ID conversion response received");
-
-      // Extract the converted ID from the response
-      if (response.data &&
-          response.data.data &&
-          response.data.data.length > 0 &&
-          response.data.data[0].id) {
-        const convertedId = response.data.data[0].id;
-        logger.debug(`Successfully converted to API v4 ID: ${convertedId}`);
-        return convertedId;
-      }
-
-      // If conversion fails, try to use the task ID directly as a fallback
-      logger.debug(`ID conversion did not return expected result, trying direct task retrieval for ID: ${legacyId}`);
-
-      try {
-        const taskResponse = await this.client.get(`/tasks/${legacyId}`);
-        if (taskResponse.data && taskResponse.data.data) {
-          logger.debug(`Successfully retrieved task with ID: ${legacyId}`);
-          return legacyId;
-        }
-      } catch (directError) {
-        logger.debug(`Direct task retrieval failed: ${(directError as Error).message}`);
-      }
-
-      // As a last resort, return the original ID
-      logger.debug(`All conversion attempts failed, returning original ID: ${legacyId}`);
-
-      return legacyId;
-    } catch (error) {
-      logger.error(`Error in convertPermalinkId: ${(error as Error).message}`);
-
-      // As a last resort, try to use the legacy ID directly
-      logger.debug(`Falling back to using the legacy ID directly: ${legacyId}`);
-
-      return legacyId;
+      this.handleError(error as AxiosError);
     }
   }
 
   /**
-   * Enhanced search for folders, projects, and spaces
-   * This method can be used in two modes:
-   * 1. Search mode: Find multiple folders/projects based on criteria
-   * 2. Get mode: Retrieve a single folder, project, or space by ID
+   * Convert a permalink ID to an API ID
+   * @param id The permalink ID or numeric ID
+   * @param type The type of entity (task, folder, etc.)
+   * @returns The API ID
    */
-  async searchFoldersProjects(options: {
-    space_id?: string;
-    folder_id?: string;
-    folder_ids?: string[];
-    single_folder_id?: string;
-    name_pattern?: string;
-    project_only?: boolean;
-    archived?: boolean;
-    include_history?: boolean;
-    opt_fields?: string;
-  }): Promise<WrikeFolder[] | WrikeFolder | WrikeSpace> {
-    const {
-      space_id,
-      folder_id,
-      folder_ids,
-      single_folder_id,
-      name_pattern,
-      project_only = false,
-      archived = false,
-      include_history = false,
-      opt_fields
-    } = options;
-
-    const params = this.parseOptFields(opt_fields);
-
-    // MODE 1: Get a single folder, project, or space by ID
-    if (single_folder_id) {
-      try {
-        // Strategy 1: Try as a space first
-        try {
-          logger.debug(`Attempting to retrieve as space: ${single_folder_id}`);
-          const space = await this.getSpace(single_folder_id, params);
-
-          if (space) {
-            logger.debug(`Successfully retrieved as space: ${single_folder_id}`);
-            return space;
-          }
-        } catch (spaceError) {
-          // Not a space, continue to folder logic
-          logger.debug(`Not a space ID, trying as folder: ${(spaceError as Error).message}`);
-        }
-
-        // Strategy 2: Try as a folder/project
-        // Convert folder ID if needed
-        let apiFolder_id = single_folder_id;
-
-        if (single_folder_id.includes('open.htm?id=') || /^\d+$/.test(single_folder_id)) {
-          try {
-            logger.debug(`Converting folder ID: ${single_folder_id}`);
-            apiFolder_id = await this.convertPermalinkId(single_folder_id, 'folder');
-            logger.debug(`Converted to: ${apiFolder_id}`);
-          } catch (error) {
-            logger.error(`ID conversion error: ${(error as Error).message}`);
-            // Continue with original ID if conversion fails
-          }
-        }
-
-        // Get folder details
-        logger.debug(`Retrieving folder: ${apiFolder_id}`);
-        const folder = await this.getFolder(apiFolder_id, params);
-        return folder;
-      } catch (error) {
-        logger.error(`Error retrieving single folder/project/space: ${(error as Error).message}`);
-        throw new Error(`Failed to get folder/project/space: ${(error as Error).message}`);
-      }
-    }
-
-    // MODE 2: Search for multiple folders/projects
+  async convertPermalinkId(id: string, type: 'task' | 'folder' | 'contact' | 'timelog'): Promise<string> {
     try {
-      let folders: WrikeFolder[] = [];
+      // If it's already in the API format (IEABC123), return it
+      if (/^[A-Z0-9]{8,}$/.test(id)) {
+        return id;
+      }
 
-      // Determine which API endpoint to use based on provided parameters
-      if (space_id) {
-        // Get all folders in the space
-        folders = await this.getFoldersBySpace(space_id, params);
-      } else if (folder_id) {
-        // Get all subfolders of a parent folder
-        folders = await this.getFoldersByParent(folder_id, params);
-      } else if (folder_ids && folder_ids.length > 0) {
-        // Get specific folders by IDs
-        if (include_history) {
-          folders = await this.getFoldersHistory(folder_ids, params);
-        } else {
-          folders = await this.getFoldersByIds(folder_ids, params);
+      // Extract ID from permalink if needed
+      let numericId = id;
+      if (id.includes('open.htm?id=')) {
+        const match = id.match(/id=(\d+)/);
+        if (!match) {
+          throw new Error(`Invalid permalink format: ${id}`);
         }
-      } else {
-        // Get all folders
-        folders = await this.getFolders(params);
+        numericId = match[1];
       }
 
-      // Apply filters if provided
-      if (name_pattern || project_only || archived !== undefined) {
-        const regex = name_pattern ? new RegExp(name_pattern, 'i') : null;
-
-        folders = folders.filter(folder => {
-          // Filter by project status if requested
-          if (project_only && folder.project === undefined) {
-            return false;
-          }
-
-          // Filter by name pattern if provided
-          if (regex && !regex.test(folder.title)) {
-            return false;
-          }
-
-          // Filter by archive status
-          if (archived !== undefined) {
-            const archiveMatches = archived ? folder.archived : !folder.archived;
-            if (!archiveMatches) {
-              return false;
-            }
-          }
-
-          return true;
-        });
+      // Ensure we have a numeric ID
+      if (!/^\d+$/.test(numericId)) {
+        throw new Error(`ID must be numeric or a valid permalink: ${id}`);
       }
 
-      return folders;
+      // Make the conversion request
+      logger.debug(`Converting ${type} ID: ${numericId}`);
+      const response = await this.client.get('/ids', {
+        params: {
+          ids: [numericId],
+          type
+        }
+      });
+
+      const conversions = this.handleResponse<WrikeIdConversion[]>(response);
+      if (!conversions || conversions.length === 0) {
+        throw new Error(`No conversion found for ${type} ID: ${numericId}`);
+      }
+
+      logger.debug(`Converted ${type} ID ${numericId} to ${conversions[0].id}`);
+      return conversions[0].id;
     } catch (error) {
-      logger.error(`Error searching folders/projects: ${(error as Error).message}`);
-      throw new Error(`Failed to search folders/projects: ${(error as Error).message}`);
+      logger.error(`Error converting ${type} ID: ${(error as Error).message}`);
+      return this.handleError(error as AxiosError);
     }
   }
 

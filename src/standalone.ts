@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { WrikeClient } from './wrikeClient.js';
+import { WrikeClient } from './utils/wrikeClient.js';
 import { parseOptFields, convertTaskId } from './utils/helpers.js';
 import { tools } from './types/tools.js';
 import { z } from 'zod';
