@@ -330,11 +330,8 @@ function log(level: LogLevel, message: string, data?: any) {
     console.error(`Failed to write to log file: ${error}`);
   }
 
-  // Also output to console for development
-  if (process.env.NODE_ENV !== 'production') {
-    // Use process.stderr.write to avoid infinite recursion with console.error
-    process.stderr.write(logMessage + '\n');
-  }
+  // Disable console output for MCP compatibility
+  // Only write to log file, not to stdout/stderr
 }
 
 /**

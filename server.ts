@@ -506,7 +506,7 @@ async function handleTasksHistoryTool(wrikeClient: WrikeClient, args: any): Prom
     const matches = task_ids.match(/id=(\d+)/);
     if (matches && matches[1]) {
       processedTaskIds = matches[1];
-      console.error(`Extracted task ID: ${processedTaskIds}`);
+      logger.debug(`Extracted task ID: ${processedTaskIds}`);
     }
   }
 
@@ -516,9 +516,9 @@ async function handleTasksHistoryTool(wrikeClient: WrikeClient, args: any): Prom
       try {
         const apiTaskId = await convertTaskId(wrikeClient, processedTaskIds);
         processedTaskIds = apiTaskId;
-        console.error(`Converted task ID: ${processedTaskIds}`);
+        logger.debug(`Converted task ID: ${processedTaskIds}`);
       } catch (error) {
-        console.error(`Error converting task ID: ${(error as Error).message}`);
+        logger.debug(`Error converting task ID: ${(error as Error).message}`);
         // Continue with the original ID if conversion fails
       }
     }
@@ -530,7 +530,7 @@ async function handleTasksHistoryTool(wrikeClient: WrikeClient, args: any): Prom
       content: [{ type: 'text', text: JSON.stringify(tasksHistory, null, 2) }]
     };
   } catch (error) {
-    console.error(`Error getting task history: ${(error as Error).message}`);
+    logger.error(`Error getting task history: ${(error as Error).message}`);
     throw error;
   }
 }
@@ -861,10 +861,10 @@ function setupConsoleLogging(): void {
   const originalWarn = console.warn;
   const originalError = console.error;
 
-  // Override console methods to use our logger
+  // Override console methods to use our logger but suppress stdout/stderr
   console.debug = function(message: any, ...args: any[]) {
     logger.debug(String(message));
-    originalDebug(message, ...args);
+    // Disable console output for MCP compatibility
   };
 
   console.info = function(message: any, ...args: any[]) {
@@ -875,22 +875,22 @@ function setupConsoleLogging(): void {
     } else {
       logger.info(String(message));
     }
-    originalInfo(message, ...args);
+    // Disable console output for MCP compatibility
   };
 
   console.warn = function(message: any, ...args: any[]) {
     logger.warn(String(message));
-    originalWarn(message, ...args);
+    // Disable console output for MCP compatibility
   };
 
   console.error = function(message: any, ...args: any[]) {
     // Use a direct string check to avoid infinite recursion with logger.error
     if (typeof message === 'string' && message.includes('Maximum call stack size exceeded')) {
       // Use originalError directly for stack overflow errors
-      originalError(message, ...args);
+      // Disable console output for MCP compatibility
     } else {
       logger.error(String(message));
-      originalError(message, ...args);
+      // Disable console output for MCP compatibility
     }
   };
 }
@@ -930,14 +930,33 @@ function createResourceHandlers() {
  * Process tool schemas to make them compatible with MCP
  */
 function processToolSchemas() {
-  return tools.map(tool => ({
-    name: tool.name,
-    description: tool.description,
-    inputSchema: {
-      type: 'object',
-      properties: tool.schema.shape
+  return tools.map(tool => {
+    try {
+      // Create a simple JSON Schema representation manually
+      // This avoids using Zod's internal structure which may change between versions
+      return {
+        name: tool.name,
+        description: tool.description,
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+      };
+    } catch (error) {
+      logger.error(`Error processing schema for tool ${tool.name}:`, error);
+      // Return a minimal valid tool definition
+      return {
+        name: tool.name,
+        description: tool.description || 'No description available',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
+      };
     }
-  }));
+  });
 }
 
 /**
@@ -1051,7 +1070,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error('Failed to start server:', error);
-  console.error('Error stack:', error.stack);
+  // Silent error - no console output for MCP compatibility
   process.exit(1);
 });

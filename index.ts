@@ -1,62 +1,13 @@
-import dotenv from 'dotenv';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { WrikeClient } from './src/wrikeClient.js';
-import { z } from 'zod';
-import { parseOptFields } from './src/utils/helpers.js';
-import { WrikeRequestParams, WrikeTaskData, WrikeTimelogData, WrikeFolder } from './src/types/wrike.js';
-import * as wrikeFunctions from './src/functions.js';
+// This file is now just a wrapper around server.ts
+// Import the server module
+import './server.js';
 
-// Initialize environment variables
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+// The server.ts file has its own main() function that is called automatically
+// No additional code needed here
 
-// Get the directory name in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Try to load from multiple possible locations
-const envPaths = [
-  path.join(__dirname, '.env'),
-  path.join(process.cwd(), '.env'),
-  path.join(path.dirname(process.execPath), '.env')
-];
-
-let envLoaded = false;
-for (const envPath of envPaths) {
-  if (fs.existsSync(envPath)) {
-    console.error(`Loading environment from: ${envPath}`);
-    dotenv.config({ path: envPath });
-    envLoaded = true;
-    break;
-  }
-}
-
-if (!envLoaded) {
-  console.error('Warning: No .env file found. Checking environment variables directly.');
-}
-
-// Check for required environment variables
-if (!process.env.WRIKE_ACCESS_TOKEN) {
-  console.error('Error: WRIKE_ACCESS_TOKEN environment variable is required');
-  console.error('Please set it in .env file or in the Claude Desktop configuration');
-  console.error('Current environment variables:', Object.keys(process.env).join(', '));
-  process.exit(1);
-}
-
-// Create MCP server
-const port = process.env.PORT || 3000;
-
-const server = new McpServer({
-  name: 'wrike',
-  version: '1.0.0',
-  description: 'Wrike API integration for MCP'
-});
-
-// Register tools using the new format
-// List spaces
-server.tool(
+/* All tool registrations have been moved to server.ts
+// Example of old code:
+// server.tool(
   'wrike_list_spaces',
   z.object({
     opt_fields: z.string().optional().describe('Optional fields to include in the response')
@@ -269,7 +220,7 @@ server.tool(
       const matches = task_ids.match(/id=(\d+)/);
       if (matches && matches[1]) {
         task_ids = matches[1];
-        console.error(`Extracted task ID: ${task_ids}`);
+        // Silent debug - no console output for MCP compatibility
       }
     }
 
@@ -279,7 +230,7 @@ server.tool(
       const tasksHistory = await wrikeClient.getTasksHistory(task_ids, params);
       return tasksHistory;
     } catch (error) {
-      console.error(`Error getting task history: ${(error as Error).message}`);
+      // Silent error - no console output for MCP compatibility
       throw error;
     }
   },
@@ -602,13 +553,4 @@ server.tool(
   { description: 'Get all timelog categories from Wrike' }
 );
 
-// Start server with stdio transport
-const transport = new StdioServerTransport();
-
-// Connect to the transport
-server.connect(transport).then(() => {
-  console.log(`MCP Server for Wrike is running with stdio transport`);
-}).catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+*/
