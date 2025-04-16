@@ -1,30 +1,60 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { registerSpaceTools } from './spaces.js';
-import { registerFolderTools } from './folders.js';
-import { registerTaskTools } from './tasks.js';
-import { registerCommentTools } from './comments.js';
-import { registerContactTools } from './contacts.js';
-import { registerTimelogTools } from './timelogs.js';
+import { registerWrikeListSpacesTool } from './wrike_list_spaces.js';
+import { registerWrikeCreateFolderTool } from './wrike_create_folder.js';
+import { registerWrikeGetTimelogsTool } from './wrike_get_timelogs.js';
+import { registerWrikeGetFolderProjectTool } from './wrike_get_folder_project.js';
+import { registerWrikeGetTaskTool } from './wrike_get_task.js';
+import { registerWrikeCreateTaskTool } from './wrike_create_task.js';
+import { registerWrikeUpdateTaskTool } from './wrike_update_task.js';
+import { registerWrikeGetCommentsTool } from './wrike_get_comments.js';
+import { registerWrikeCreateCommentTool } from './wrike_create_comment.js';
+import { registerWrikeGetContactsTool } from './wrike_get_contacts.js';
+import { registerWrikeGetTaskCommentsTool } from './wrike_get_task_comments.js';
+import { registerWrikeCreateTimelogTool } from './wrike_create_timelog.js';
+import { registerWrikeUpdateTimelogTool } from './wrike_update_timelog.js';
+import { registerWrikeDeleteTimelogTool } from './wrike_delete_timelog.js';
+import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categories.js';
+import { registerEchoTool } from './echo.js';
 
 /**
  * すべてのWrike関連ツールをMCPサーバーに登録する関数
  * @param server McpServerインスタンス
  */
 export function registerAllWrikeTools(server: McpServer): void {
-  // 各カテゴリのツールを登録
-  registerSpaceTools(server);
-  registerFolderTools(server);
-  registerTaskTools(server);
-  registerCommentTools(server);
-  registerContactTools(server);
-  registerTimelogTools(server);
+  // 個別のツールを登録
+  registerWrikeListSpacesTool(server);
+  registerWrikeCreateFolderTool(server);
+  registerWrikeGetTimelogsTool(server);
+  registerWrikeGetFolderProjectTool(server);
+  registerWrikeGetTaskTool(server);
+  registerWrikeCreateTaskTool(server);
+  registerWrikeUpdateTaskTool(server);
+  registerWrikeGetCommentsTool(server);
+  registerWrikeCreateCommentTool(server);
+  registerWrikeGetContactsTool(server);
+  registerWrikeGetTaskCommentsTool(server);
+  registerWrikeCreateTimelogTool(server);
+  registerWrikeUpdateTimelogTool(server);
+  registerWrikeDeleteTimelogTool(server);
+  registerWrikeGetTimelogCategoriesTool(server);
+  registerEchoTool(server);
 }
 
 // 個別のツールモジュールをエクスポート
-export * from './spaces.js';
-export * from './folders.js';
-export * from './tasks.js';
-export * from './comments.js';
-export * from './contacts.js';
-export * from './timelogs.js';
+export * from './wrike_list_spaces.js';
+export * from './wrike_create_folder.js';
+export * from './wrike_get_timelogs.js';
+export * from './wrike_get_folder_project.js';
+export * from './wrike_get_task.js';
+export * from './wrike_create_task.js';
+export * from './wrike_update_task.js';
+export * from './wrike_get_comments.js';
+export * from './wrike_create_comment.js';
+export * from './wrike_get_contacts.js';
+export * from './wrike_get_task_comments.js';
+export * from './wrike_create_timelog.js';
+export * from './wrike_update_timelog.js';
+export * from './wrike_delete_timelog.js';
+export * from './wrike_get_timelog_categories.js';
+export * from './echo.js';
 export * from './client.js';

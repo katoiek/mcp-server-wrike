@@ -1,0 +1,54 @@
+import { z } from 'zod';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { WrikeTimelog, WrikeTimelogData } from '../types/wrike.js';
+import { createWrikeClient } from '../utils/helpers.js';
+import { logger } from '../utils/logger.js';
+
+/**
+ * タイムログを更新するツール
+ * @param server McpServerインスタンス
+ */
+export function registerWrikeUpdateTimelogTool(server: McpServer): void {
+  server.tool(
+    'wrike_update_timelog',
+    {
+      timelog_id: z.string().describe('タイムログID'),
+      hours: z.number().optional().describe('時間数'),
+      comment: z.string().optional().describe('コメント'),
+      tracked_date: z.string().optional().describe('記録日（YYYY-MM-DD）'),
+      timelog_category_id: z.string().optional().describe('タイムログカテゴリID')
+    },
+    async ({ timelog_id, hours, comment, tracked_date, timelog_category_id }) => {
+      try {
+        logger.debug(`Updating timelog: ${timelog_id}`);
+        const wrikeClient = createWrikeClient();
+
+        // WrikeTimelogDataには必須フィールドがあるため、更新時にも必要
+        const data: Partial<WrikeTimelogData> = {};
+        if (hours !== undefined) data.hours = hours;
+        if (comment !== undefined) data.comment = comment;
+        if (tracked_date !== undefined) data.trackedDate = tracked_date;
+        if (timelog_category_id !== undefined) data.categoryId = timelog_category_id;
+
+        const response = await wrikeClient.client.put(`/timelogs/${timelog_id}`, data);
+        const timelogs = wrikeClient.handleResponse<WrikeTimelog[]>(response);
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(timelogs[0], null, 2)
+          }]
+        };
+      } catch (error) {
+        logger.error(`Error updating timelog ${timelog_id}:`, error);
+        return {
+          content: [{
+            type: 'text',
+            text: `Error updating timelog: ${(error as Error).message}`
+          }],
+          isError: true
+        };
+      }
+    }
+  );
+}

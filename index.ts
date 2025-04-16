@@ -175,10 +175,24 @@ server.tool(
       return tasks;
     }
 
-    throw new Error('Either task_id or folder_id must be provided');
+    // MODE 3: Get all tasks (no specific task_id or folder_id)
+    const params: WrikeRequestParams = {
+      ...parseOptFields(opt_fields)
+    };
+
+    // Add filters if provided
+    if (title) params.title = title;
+    if (status) params.status = status;
+    if (importance) params.importance = importance;
+    if (completed !== undefined) params.completed = completed;
+    if (subtasks !== undefined) params.subtasks = subtasks;
+    if (custom_fields) params.customFields = JSON.stringify(custom_fields);
+
+    const tasks = await wrikeClient.getTasks(params);
+    return tasks;
   },
   {
-    description: 'Unified tool for working with Wrike tasks. Can get a specific task by ID or search for tasks in a folder.',
+    description: 'Unified tool for working with Wrike tasks. Can get a specific task by ID, search for tasks in a folder, or get all tasks.',
     examples: [
       // Example 1: Get a specific task by ID
       {
@@ -188,6 +202,11 @@ server.tool(
       // Example 2: Search for tasks in a folder
       {
         input: { folder_id: 'IEAAAAAQI', status: 'Active', completed: false },
+        output: [{ id: 'IEAAAAAQIIIII', title: 'Complete project documentation', status: 'Active' }]
+      },
+      // Example 3: Get all tasks
+      {
+        input: {},
         output: [{ id: 'IEAAAAAQIIIII', title: 'Complete project documentation', status: 'Active' }]
       }
     ]

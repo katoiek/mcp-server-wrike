@@ -364,7 +364,25 @@ async function handleGetTaskTool(wrikeClient: WrikeClient, args: any): Promise<T
     };
   }
 
-  throw new Error('Either task_id or folder_id must be provided');
+  // MODE 3: Get all tasks (no specific task_id or folder_id)
+  const params: WrikeRequestParams = {
+    ...parseOptFields(opts.opt_fields)
+  };
+
+  // Add filters if provided
+  if (title) params.title = title;
+  if (status) params.status = status;
+  if (importance) params.importance = importance;
+  if (completed !== undefined) params.completed = completed;
+  if (subtasks !== undefined) params.subtasks = subtasks;
+  if (custom_fields) params.customFields = JSON.stringify(custom_fields);
+
+  logger.debug('Getting all tasks');
+  const tasks = await wrikeClient.getTasks(params);
+
+  return {
+    content: [{ type: 'text', text: JSON.stringify(tasks, null, 2) }]
+  };
 }
 
 /**
