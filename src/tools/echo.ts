@@ -8,8 +8,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 export function registerEchoTool(server: McpServer): void {
   server.tool(
     'echo',
+    'Echo a message back to the user',
     {
-      message: z.string().describe('エコーするメッセージ')
+      message: z.string().describe('Message to echo back')
     },
     async ({ message }) => {
       return {
