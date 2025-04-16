@@ -72,9 +72,10 @@ Examples:
 
 5. `wrike_get_task`
    - Unified tool for working with Wrike tasks
-   - Optional input (at least one is required):
+   - Optional input:
      - `task_id` (string): ID of a specific task to retrieve
      - `folder_id` (string): The folder/project to search tasks in
+     - If neither `task_id` nor `folder_id` is provided, all tasks will be retrieved
    - Optional input for task search:
      - `title` (string): Filter by task title
      - `status` (string): Filter by task status
@@ -423,9 +424,10 @@ MCPの詳細はこちら：
 
 5. `wrike_get_task`
    - Wrikeタスクを操作するための統合ツール
-   - オプション入力（少なくとも1つは必須）：
+   - オプション入力：
      - `task_id`（文字列）：取得する特定のタスクのID
      - `folder_id`（文字列）：タスクを検索するフォルダ/プロジェクト
+     - `task_id`も`folder_id`も指定されていない場合、すべてのタスクが取得されます
    - タスク検索用のオプション入力：
      - `title`（文字列）：タスクタイトルでフィルタリング
      - `status`（文字列）：タスクステータスでフィルタリング
