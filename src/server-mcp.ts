@@ -5,34 +5,39 @@ import { logger } from './utils/logger.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-// 環境変数を読み込む
+// Load environment variables / 環境変数を読み込む
 dotenv.config();
 
 /**
+ * Function to create and start the MCP server
  * MCPサーバーを作成して起動する関数
  */
 async function startServer() {
   try {
-    // MCPサーバーを作成
+    // Create MCP server / MCPサーバーを作成
     const server = new McpServer({
       name: 'Wrike MCP Server',
       version: '1.0.0',
       description: 'Model Context Protocol server for Wrike API integration'
     });
 
-    // すべてのWrike関連ツールを登録
+    // Register all Wrike-related tools / すべてのWrike関連ツールを登録
     registerAllWrikeTools(server);
 
+    // Start the server using standard input/output
+    // Only log to file, not to standard output
     // 標準入出力を使用してサーバーを起動
     // ファイルにのみログを記録し、標準出力には書き込まない
     logger.info('Starting Wrike MCP Server...');
 
+    // Use StdioServerTransport for JSON-RPC communication
     // StdioServerTransportを使用してJSON-RPC通信を行う
     const transport = new StdioServerTransport();
 
-    // サーバーを接続
+    // Connect the server / サーバーを接続
     await server.connect(transport);
 
+    // Log successful connection (do not write to standard output)
     // 接続成功をログに記録（標準出力には書き込まない）
     logger.info('Wrike MCP Server started successfully');
   } catch (error) {
