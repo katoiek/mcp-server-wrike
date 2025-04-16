@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import dotenv from 'dotenv';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { WrikeClient } from './src/utils/wrikeClient.js';
+import { registerAllWrikeTools } from './src/tools/index.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -1004,87 +1005,65 @@ function setupErrorHandling() {
 
 /**
  * Main function to start the server
+ * サーバーを起動するメイン関数
  */
 async function main(): Promise<void> {
-  // Create server
-  const server = new Server(
-    {
-      name: 'wrike-mcp-server',
-      version: '1.0.0',
-      description: 'Wrike API integration for MCP'
-    },
-    {
-      capabilities: {
-        tools: {},
-        prompts: {},
-        resources: {}
-      }
-    }
-  );
+  await startServer();
+}
 
-  // Initialize Wrike client
-  const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
-  const host = process.env.WRIKE_HOST || 'www.wrike.com';
-
-  if (!accessToken || accessToken === 'YOUR_ACTUAL_WRIKE_ACCESS_TOKEN' || accessToken === 'YOUR_WRIKE_ACCESS_TOKEN_HERE') {
-    logger.error('Invalid Wrike API token. Please set a valid token in your Claude Desktop configuration.');
-    logger.error('You can generate a token in your Wrike account under Apps & Integrations > API.');
-    throw new Error('Invalid Wrike API token. Please set a valid token in your Claude Desktop configuration.');
-  }
-
-  logger.info('Creating Wrike client');
-
-  const wrikeClient = new WrikeClient(accessToken, host);
-
-  // Test the connection
-  logger.info('Testing Wrike API connection...');
+/**
+ * Start the server using the MCP server implementation
+ * MCPサーバー実装を使用してサーバーを起動する
+ */
+async function startServer(): Promise<void> {
   try {
-    await wrikeClient.getSpaces();
-    logger.info('Wrike API connection successful');
+    // Create MCP server / MCPサーバーを作成
+    const server = new McpServer({
+      name: 'Wrike MCP Server',
+      version: '1.0.0',
+      description: 'Model Context Protocol server for Wrike API integration'
+    });
+
+    // Register all Wrike-related tools / すべてのWrike関連ツールを登録
+    registerAllWrikeTools(server);
+
+    // Start the server using standard input/output
+    // Only log to file, not to standard output
+    // 標準入出力を使用してサーバーを起動
+    // ファイルにのみログを記録し、標準出力には書き込まない
+    logger.info('Starting Wrike MCP Server...');
+
+    // Use StdioServerTransport for JSON-RPC communication
+    // StdioServerTransportを使用してJSON-RPC通信を行う
+    const transport = new StdioServerTransport();
+
+    // Connect the server / サーバーを接続
+    await server.connect(transport);
+
+    // Log successful connection (do not write to standard output)
+    // 接続成功をログに記録（標準出力には書き込まない）
+    logger.info('Wrike MCP Server started successfully');
   } catch (error) {
-    logger.error('Wrike API connection test failed');
-    // If it's an authentication error, we should stop
-    if (error instanceof Error && error.message.includes('Authentication Error')) {
-      throw error;
-    }
-    // For other errors, continue anyway
+    // エラーをログファイルに記録（標準エラー出力には書き込まない）
+    logger.error('Error starting Wrike MCP Server:', error);
+
+    // 標準エラー出力にJSON形式でエラーを出力
+    // これによりMCPクライアントがエラーを適切に処理できる
+    const errorMessage = {
+      jsonrpc: '2.0',
+      error: {
+        code: -32000,
+        message: `Server initialization error: ${error instanceof Error ? error.message : String(error)}`
+      },
+      id: null
+    };
+
+    // 標準エラー出力にJSON形式でエラーを書き込む
+    // ファイルディスクリプタ2は標準エラー出力
+    fs.writeSync(2, JSON.stringify(errorMessage) + '\n');
+
+    process.exit(1);
   }
-
-  // Set up custom logging for MCP messages
-  setupConsoleLogging();
-
-  // Set up error handling
-  setupErrorHandling();
-
-  // Set request handlers
-  server.setRequestHandler(CallToolRequestSchema, toolHandler(wrikeClient));
-
-  // Process tool schemas to make them compatible with MCP
-  const processedTools = processToolSchemas();
-
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: processedTools
-  }));
-
-  // Add prompt handlers
-  const promptHandlers = createPromptHandlers();
-  server.setRequestHandler(ListPromptsRequestSchema, promptHandlers.listPrompts);
-  server.setRequestHandler(GetPromptRequestSchema, promptHandlers.getPrompt);
-
-  // Add resource handlers
-  const resourceHandlers = createResourceHandlers();
-  server.setRequestHandler(ListResourcesRequestSchema, resourceHandlers.listResources);
-  server.setRequestHandler(ListResourceTemplatesRequestSchema, resourceHandlers.listResourceTemplates);
-  server.setRequestHandler(ReadResourceRequestSchema, resourceHandlers.readResource);
-
-  // Start server with stdio transport
-  const transport = new StdioServerTransport();
-
-  // Connect to the transport
-  await server.connect(transport);
-
-  // The transport will automatically disconnect when the client closes
-  logger.info('Server connected and ready to process requests');
 }
 
 main().catch((error) => {
