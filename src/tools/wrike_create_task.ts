@@ -6,8 +6,8 @@ import { logger } from '../utils/logger.js';
 
 // カスタムフィールドのZodスキーマを定義
 const customFieldSchema = z.object({
-  id: z.string(),
-  value: z.union([z.string(), z.number(), z.boolean(), z.null()])
+  id: z.string().describe('Custom field ID'),
+  value: z.union([z.string(), z.number(), z.boolean(), z.null()]).describe('Custom field value')
 }).strict();
 
 /**
@@ -15,22 +15,25 @@ const customFieldSchema = z.object({
  * @param server McpServerインスタンス
  */
 export function registerWrikeCreateTaskTool(server: McpServer): void {
+  const datesSchema = z.object({
+    start: z.string().optional().describe('Start date in YYYY-MM-DD format'),
+    due: z.string().optional().describe('Due date in YYYY-MM-DD format'),
+    type: z.string().optional().describe('Date type'),
+    duration: z.number().optional().describe('Duration in days')
+  }).optional().describe('Task dates object with start and due dates');
+
   server.tool(
     'wrike_create_task',
+    'Create a new task in a Wrike project or folder',
     {
-      folder_id: z.string().describe('フォルダID'),
-      title: z.string().describe('タスクのタイトル'),
-      description: z.string().optional().describe('タスクの説明'),
-      status: z.string().optional().describe('タスクのステータス'),
-      importance: z.string().optional().describe('タスクの重要度'),
-      dates: z.object({
-        start: z.string().optional(),
-        due: z.string().optional(),
-        type: z.string().optional(),
-        duration: z.number().optional()
-      }).optional().describe('タスクの日付情報'),
-      responsible_ids: z.array(z.string()).optional().describe('担当者のID配列'),
-      custom_fields: z.array(customFieldSchema).optional().describe('カスタムフィールドの配列')
+      folder_id: z.string().describe('ID of the folder/project to create the task in'),
+      title: z.string().describe('Title of the task'),
+      description: z.string().optional().describe('Description of the task'),
+      status: z.string().optional().describe('Status of the task (Active, Completed, Deferred, Cancelled)'),
+      importance: z.string().optional().describe('Importance of the task (High, Normal, Low)'),
+      dates: datesSchema,
+      responsible_ids: z.array(z.string()).optional().describe('Array of user IDs to assign as responsibles'),
+      custom_fields: z.array(customFieldSchema).optional().describe('Array of custom fields to set on the task')
     },
     async ({ folder_id, title, description, status, importance, dates, responsible_ids, custom_fields }) => {
       try {

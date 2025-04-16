@@ -1,8 +1,8 @@
-// This file is now just a wrapper around server.ts
+// This file is now just a wrapper around server-mcp.ts
 // Import the server module
-import './server.js';
+import './src/server-mcp.js';
 
-// The server.ts file has its own main() function that is called automatically
+// The server-mcp.ts file has its own startServer() function that is called automatically
 // No additional code needed here
 
 /* All tool registrations have been moved to server.ts

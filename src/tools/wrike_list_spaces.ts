@@ -11,8 +11,9 @@ import { logger } from '../utils/logger.js';
 export function registerWrikeListSpacesTool(server: McpServer): void {
   server.tool(
     'wrike_list_spaces',
+    'List all available spaces in Wrike',
     {
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      opt_fields: z.string().optional().describe('Comma-separated list of optional fields to include')
     },
     async ({ opt_fields }) => {
       try {
