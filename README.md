@@ -36,15 +36,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of spaces
 
-2. `wrike_get_space`
-   - Get detailed information about a specific space
-   - Required input:
-     - `space_id` (string): The space ID to retrieve
-   - Optional input:
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Detailed space information
-
-3. `wrike_create_folder`
+2. `wrike_create_folder`
    - Create a new folder in Wrike
    - Required input:
      - `parent_id` (string): ID of the parent folder
@@ -55,13 +47,12 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created folder information
 
-4. `wrike_get_folder_project`
+3. `wrike_get_folder_project`
    - Unified tool for working with Wrike folders, projects, and spaces
    - Optional input (at least one is recommended):
      - `space_id` (string): The space to search in
      - `folder_id` (string): The parent folder to search in
      - `folder_ids` (array of strings): Specific folder IDs to retrieve (up to 100)
-     - `single_folder_id` (string): ID of a specific folder, project, or space to retrieve
    - Optional input:
      - `name_pattern` (string): Regular expression pattern to match folder/project names
      - `project_only` (boolean): Only return folders that are projects (default: false)
@@ -70,7 +61,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of matching folders/projects or a single folder/project/space
 
-5. `wrike_get_task`
+4. `wrike_get_task`
    - Unified tool for working with Wrike tasks
    - Optional input:
      - `task_id` (string): ID of a specific task to retrieve
@@ -87,15 +78,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Detailed task information or list of matching tasks
 
-6. `wrike_get_tasks_history`
-   - Get field history for specific tasks
-   - Required input:
-     - `task_ids` (string or array of strings): Task ID or array of task IDs (up to 100)
-   - Optional input:
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Task history information
-
-7. `wrike_create_task`
+5. `wrike_create_task`
    - Create a new task in a project
    - Required input:
      - `folder_id` (string): The folder/project to create the task in
@@ -110,17 +93,7 @@ Examples:
      - `parent_id` (string): The parent task ID to set this task under
    - Returns: Created task information
 
-8. `wrike_get_comments`
-   - Get comments from Wrike with various filtering options
-   - Optional input (at least one is required):
-     - `task_id` (string): Get comments for a specific task ID
-     - `folder_id` (string): Get comments for a specific folder ID
-     - `comment_ids` (array of strings): Get specific comments by IDs (up to 100)
-   - Optional input:
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: List of comments
-
-9. `wrike_update_task`
+6. `wrike_update_task`
    - Update an existing task's details
    - Required input:
      - `task_id` (string): The task ID to update
@@ -133,8 +106,25 @@ Examples:
      - `completed` (boolean): Mark task as completed or not
    - Returns: Updated task information
 
+7. `wrike_get_comments`
+   - Get comments from Wrike with various filtering options
+   - Optional input (at least one is required):
+     - `task_id` (string): Get comments for a specific task ID
+     - `folder_id` (string): Get comments for a specific folder ID
+     - `comment_ids` (array of strings): Get specific comments by IDs (up to 100)
+   - Optional input:
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of comments
 
-10. `wrike_create_comment`
+8. `wrike_get_task_comments`
+   - Get comments for a specific task
+   - Required input:
+     - `task_id` (string): The task ID to get comments for
+   - Optional input:
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of comments for the specified task
+
+9. `wrike_create_comment`
    - Create a comment on a task
    - Required input:
      - `task_id` (string): The task ID to add the comment to
@@ -143,14 +133,14 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Created comment information
 
-11. `wrike_get_contacts`
+10. `wrike_get_contacts`
     - Get information about Wrike contacts/users
     - Optional input:
       - `me` (boolean): Return only the current user's information
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of contacts
 
-12. `wrike_get_timelogs`
+11. `wrike_get_timelogs`
     - Get timelogs from Wrike with filtering options
     - Optional input:
       - `task_id` (string): Filter timelogs by task ID
@@ -163,7 +153,7 @@ Examples:
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of timelogs
 
-13. `wrike_create_timelog`
+12. `wrike_create_timelog`
     - Create a new timelog entry for a task
     - Required input:
       - `task_id` (string): ID of the task to add the timelog to
@@ -174,7 +164,7 @@ Examples:
       - `category_id` (string): ID of the timelog category
     - Returns: Created timelog information
 
-14. `wrike_update_timelog`
+13. `wrike_update_timelog`
     - Update an existing timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to update
@@ -185,23 +175,17 @@ Examples:
       - `category_id` (string): New ID of the timelog category
     - Returns: Updated timelog information
 
-15. `wrike_delete_timelog`
+14. `wrike_delete_timelog`
     - Delete a timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
 
-16. `wrike_get_timelog_categories`
+15. `wrike_get_timelog_categories`
     - Get all timelog categories from Wrike
     - Optional input:
       - `opt_fields` (string): Comma-separated list of optional fields to include
     - Returns: List of timelog categories
-
-17. `echo`
-    - Simple echo function for testing
-    - Required input:
-      - `message` (string): Message to echo back
-    - Returns: The same message
 
 ### Setup
 
@@ -389,15 +373,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：スペースのリスト
 
-2. `wrike_get_space`
-   - 特定のスペースに関する詳細情報を取得
-   - 必須入力：
-     - `space_id`（文字列）：取得するスペースID
-   - オプション入力：
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：スペースの詳細情報
-
-3. `wrike_create_folder`
+2. `wrike_create_folder`
    - Wrikeに新しいフォルダを作成
    - 必須入力：
      - `parent_id`（文字列）：親フォルダのID
@@ -408,7 +384,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：作成されたフォルダの情報
 
-4. `wrike_get_folder_project`
+3. `wrike_get_folder_project`
    - Wrikeのフォルダ、プロジェクト、スペースを操作するための統合ツール
    - オプション入力（少なくとも1つは推奨）：
      - `space_id`（文字列）：検索対象のスペース
@@ -422,7 +398,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：一致するフォルダ/プロジェクトのリスト、または特定のフォルダ/プロジェクト/スペースの詳細
 
-5. `wrike_get_task`
+4. `wrike_get_task`
    - Wrikeタスクを操作するための統合ツール
    - オプション入力：
      - `task_id`（文字列）：取得する特定のタスクのID
@@ -439,15 +415,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タスクの詳細情報または一致するタスクのリスト
 
-6. `wrike_get_tasks_history`
-   - 特定のタスクのフィールド履歴を取得
-   - 必須入力：
-     - `task_ids`（文字列または文字列の配列）：タスクIDまたはタスクIDの配列（最大100件）
-   - オプション入力：
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：タスクの履歴情報
-
-8. `wrike_create_task`
+5. `wrike_create_task`
    - プロジェクトに新しいタスクを作成
    - 必須入力：
      - `folder_id`（文字列）：タスクを作成するフォルダ/プロジェクト
@@ -462,17 +430,7 @@ MCPの詳細はこちら：
      - `parent_id`（文字列）：このタスクを配置する親タスクID
    - 戻り値：作成されたタスクの情報
 
-8. `wrike_get_comments`
-   - 様々なフィルタリングオプションでWrikeからコメントを取得
-   - オプション入力（少なくとも1つは必須）：
-     - `task_id`（文字列）：特定のタスクIDのコメントを取得
-     - `folder_id`（文字列）：特定のフォルダIDのコメントを取得
-     - `comment_ids`（文字列の配列）：特定のコメントをIDで取得（最大100件）
-   - オプション入力：
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：コメントのリスト
-
-9. `wrike_update_task`
+6. `wrike_update_task`
    - 既存のタスクの詳細を更新
    - 必須入力：
      - `task_id`（文字列）：更新するタスクID
@@ -485,13 +443,23 @@ MCPの詳細はこちら：
      - `completed`（ブール値）：タスクを完了としてマークするかどうか
    - 戻り値：更新されたタスクの情報
 
-10. `wrike_get_folder_folderproject`
-   - 特定のフォルダ/プロジェクトに関する詳細情報を取得
-   - 必須入力：
-     - `folder_id`（文字列）：取得するフォルダ/フォルダ/プロジェクトID
+7. `wrike_get_comments`
+   - 様々なフィルタリングオプションでWrikeからコメントを取得
+   - オプション入力（少なくとも1つは必須）：
+     - `task_id`（文字列）：特定のタスクIDのコメントを取得
+     - `folder_id`（文字列）：特定のフォルダIDのコメントを取得
+     - `comment_ids`（文字列の配列）：特定のコメントをIDで取得（最大100件）
    - オプション入力：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：フォルダ/フォルダ/プロジェクトの詳細情報
+   - 戻り値：コメントのリスト
+
+8. `wrike_get_task_comments`
+   - 特定のタスクのコメントを取得
+   - 必須入力：
+     - `task_id`（文字列）：コメントを取得するタスクID
+   - オプション入力：
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：指定されたタスクのコメントリスト
 
 9. `wrike_create_comment`
    - タスクにコメントを作成
@@ -550,11 +518,11 @@ MCPの詳細はこちら：
       - `timelog_id`（文字列）：削除するタイムログのID
     - 戻り値：成功ステータス
 
-15. `echo`
-    - テスト用の単純なエコー機能
-    - 必須入力：
-      - `message`（文字列）：エコーバックするメッセージ
-    - 戻り値：同じメッセージ
+15. `wrike_get_timelog_categories`
+    - Wrikeからすべてのタイムログカテゴリを取得
+    - オプション入力：
+      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+    - 戻り値：タイムログカテゴリのリスト
 
 ### セットアップ
 
