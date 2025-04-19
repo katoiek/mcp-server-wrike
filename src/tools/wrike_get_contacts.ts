@@ -5,16 +5,16 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * コンタクト情報を取得するツール
- * @param server McpServerインスタンス
+ * Tool to retrieve contact information
+ * @param server McpServer instance
  */
 export function registerWrikeGetContactsTool(server: McpServer): void {
   server.tool(
     'wrike_get_contacts',
     {
-      contact_ids: z.array(z.string()).optional().describe('コンタクトID配列（指定した場合は特定のコンタクトを取得、最大100件）'),
-      me: z.boolean().optional().describe('自分の連絡先情報のみを取得するかどうか'),
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      contact_ids: z.array(z.string()).optional().describe('Array of contact IDs (retrieves specific contacts if specified, maximum 100)'),
+      me: z.boolean().optional().describe('Whether to retrieve only your own contact information'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ contact_ids, me, opt_fields }) => {
       try {

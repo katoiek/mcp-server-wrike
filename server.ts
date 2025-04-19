@@ -1035,7 +1035,7 @@ async function startMcpServer(): Promise<void> {
       description: 'Model Context Protocol server for Wrike API integration'
     });
 
-    // Register all Wrike-related tools / すべてのWrike関連ツールを登録
+    // Register all Wrike-related tools
     registerAllWrikeTools(server);
 
     // Start the server using standard input/output

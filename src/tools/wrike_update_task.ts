@@ -4,33 +4,33 @@ import { WrikeTask, WrikeTaskData, WrikeCustomField } from '../types/wrike.js';
 import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
-// カスタムフィールドのZodスキーマを定義
+// Define Zod schema for custom fields
 const customFieldSchema = z.object({
   id: z.string(),
   value: z.union([z.string(), z.number(), z.boolean(), z.null()])
 }).strict();
 
 /**
- * タスクを更新するツール
- * @param server McpServerインスタンス
+ * Tool to update a task
+ * @param server McpServer instance
  */
 export function registerWrikeUpdateTaskTool(server: McpServer): void {
   server.tool(
     'wrike_update_task',
     {
-      task_id: z.string().describe('タスクID'),
-      title: z.string().optional().describe('タスクのタイトル'),
-      description: z.string().optional().describe('タスクの説明'),
-      status: z.string().optional().describe('タスクのステータス'),
-      importance: z.string().optional().describe('タスクの重要度'),
+      task_id: z.string().describe('Task ID'),
+      title: z.string().optional().describe('Task title'),
+      description: z.string().optional().describe('Task description'),
+      status: z.string().optional().describe('Task status'),
+      importance: z.string().optional().describe('Task importance'),
       dates: z.object({
         start: z.string().optional(),
         due: z.string().optional(),
         type: z.string().optional(),
         duration: z.number().optional()
-      }).optional().describe('タスクの日付情報'),
-      responsible_ids: z.array(z.string()).optional().describe('担当者のID配列'),
-      custom_fields: z.array(customFieldSchema).optional().describe('カスタムフィールドの配列')
+      }).optional().describe('Task date information'),
+      responsible_ids: z.array(z.string()).optional().describe('Array of responsible user IDs'),
+      custom_fields: z.array(customFieldSchema).optional().describe('Array of custom fields')
     },
     async ({ task_id, title, description, status, importance, dates, responsible_ids, custom_fields }) => {
       try {

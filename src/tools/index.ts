@@ -17,11 +17,10 @@ import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categ
 
 /**
  * Register all Wrike-related tools to the MCP server
- * すべてのWrike関連ツールをMCPサーバーに登録する関数
- * @param server McpServer instance / McpServerインスタンス
+ * @param server McpServer instance
  */
 export function registerAllWrikeTools(server: McpServer): void {
-  // Register individual tools / 個別のツールを登録
+  // Register individual tools
   registerWrikeListSpacesTool(server);
   registerWrikeCreateFolderTool(server);
   registerWrikeGetTimelogsTool(server);
@@ -39,7 +38,7 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeGetTimelogCategoriesTool(server);
 }
 
-// Export individual tool modules / 個別のツールモジュールをエクスポート
+// Export individual tool modules
 export * from './wrike_list_spaces.js';
 export * from './wrike_create_folder.js';
 export * from './wrike_get_timelogs.js';

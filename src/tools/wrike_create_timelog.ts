@@ -5,18 +5,18 @@ import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タイムログを作成するツール
- * @param server McpServerインスタンス
+ * Tool to create a timelog
+ * @param server McpServer instance
  */
 export function registerWrikeCreateTimelogTool(server: McpServer): void {
   server.tool(
     'wrike_create_timelog',
     {
-      task_id: z.string().describe('タスクID'),
-      hours: z.number().describe('時間数'),
-      comment: z.string().optional().describe('コメント'),
-      tracked_date: z.string().optional().describe('記録日（YYYY-MM-DD）'),
-      timelog_category_id: z.string().optional().describe('タイムログカテゴリID')
+      task_id: z.string().describe('Task ID'),
+      hours: z.number().describe('Number of hours'),
+      comment: z.string().optional().describe('Comment'),
+      tracked_date: z.string().optional().describe('Tracked date (YYYY-MM-DD)'),
+      timelog_category_id: z.string().optional().describe('Timelog category ID')
     },
     async ({ task_id, hours, comment, tracked_date, timelog_category_id }) => {
       try {

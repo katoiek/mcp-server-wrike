@@ -5,17 +5,17 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * コメントを取得するツール
- * @param server McpServerインスタンス
+ * Tool to retrieve comments
+ * @param server McpServer instance
  */
 export function registerWrikeGetCommentsTool(server: McpServer): void {
   server.tool(
     'wrike_get_comments',
     {
-      task_id: z.string().optional().describe('タスクID（指定した場合はタスクのコメントを取得）'),
-      folder_id: z.string().optional().describe('フォルダID（指定した場合はフォルダのコメントを取得）'),
-      comment_ids: z.array(z.string()).optional().describe('コメントID配列（指定した場合は特定のコメントを取得、最大100件）'),
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      task_id: z.string().optional().describe('Task ID (retrieves comments for the task if specified)'),
+      folder_id: z.string().optional().describe('Folder ID (retrieves comments for the folder if specified)'),
+      comment_ids: z.array(z.string()).optional().describe('Array of comment IDs (retrieves specific comments if specified, maximum 100)'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ task_id, folder_id, comment_ids, opt_fields }) => {
       try {

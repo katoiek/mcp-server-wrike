@@ -4,14 +4,14 @@ import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タイムログを削除するツール
- * @param server McpServerインスタンス
+ * Tool to delete a timelog
+ * @param server McpServer instance
  */
 export function registerWrikeDeleteTimelogTool(server: McpServer): void {
   server.tool(
     'wrike_delete_timelog',
     {
-      timelog_id: z.string().describe('タイムログID')
+      timelog_id: z.string().describe('Timelog ID')
     },
     async ({ timelog_id }) => {
       try {

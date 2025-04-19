@@ -5,18 +5,18 @@ import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タイムログを更新するツール
- * @param server McpServerインスタンス
+ * Tool to update a timelog
+ * @param server McpServer instance
  */
 export function registerWrikeUpdateTimelogTool(server: McpServer): void {
   server.tool(
     'wrike_update_timelog',
     {
-      timelog_id: z.string().describe('タイムログID'),
-      hours: z.number().optional().describe('時間数'),
-      comment: z.string().optional().describe('コメント'),
-      tracked_date: z.string().optional().describe('記録日（YYYY-MM-DD）'),
-      timelog_category_id: z.string().optional().describe('タイムログカテゴリID')
+      timelog_id: z.string().describe('Timelog ID'),
+      hours: z.number().optional().describe('Number of hours'),
+      comment: z.string().optional().describe('Comment'),
+      tracked_date: z.string().optional().describe('Tracked date (YYYY-MM-DD)'),
+      timelog_category_id: z.string().optional().describe('Timelog category ID')
     },
     async ({ timelog_id, hours, comment, tracked_date, timelog_category_id }) => {
       try {

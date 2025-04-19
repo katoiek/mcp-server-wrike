@@ -4,29 +4,29 @@ import { WrikeFolder, WrikeFolderData, WrikeCustomField } from '../types/wrike.j
 import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
-// カスタムフィールドのZodスキーマを定義
+// Define Zod schema for custom fields
 const customFieldSchema = z.object({
   id: z.string(),
   value: z.union([z.string(), z.number(), z.boolean(), z.null()])
 }).strict();
 
 /**
- * フォルダを作成するツール
- * @param server McpServerインスタンス
+ * Tool to create a folder
+ * @param server McpServer instance
  */
 export function registerWrikeCreateFolderTool(server: McpServer): void {
   server.tool(
     'wrike_create_folder',
     {
-      parent_folder_id: z.string().describe('親フォルダID'),
-      title: z.string().describe('フォルダのタイトル'),
-      description: z.string().optional().describe('フォルダの説明'),
-      is_project: z.boolean().optional().describe('プロジェクトとして作成するかどうか'),
-      project_owner_ids: z.array(z.string()).optional().describe('プロジェクトオーナーのID配列'),
-      project_status: z.string().optional().describe('プロジェクトのステータス'),
-      project_start_date: z.string().optional().describe('プロジェクトの開始日'),
-      project_end_date: z.string().optional().describe('プロジェクトの終了日'),
-      custom_fields: z.array(customFieldSchema).optional().describe('カスタムフィールドの配列')
+      parent_folder_id: z.string().describe('Parent folder ID'),
+      title: z.string().describe('Folder title'),
+      description: z.string().optional().describe('Folder description'),
+      is_project: z.boolean().optional().describe('Whether to create as a project'),
+      project_owner_ids: z.array(z.string()).optional().describe('Array of project owner IDs'),
+      project_status: z.string().optional().describe('Project status'),
+      project_start_date: z.string().optional().describe('Project start date'),
+      project_end_date: z.string().optional().describe('Project end date'),
+      custom_fields: z.array(customFieldSchema).optional().describe('Array of custom fields')
     },
     async ({ parent_folder_id, title, description, is_project, project_owner_ids, project_status, project_start_date, project_end_date, custom_fields }) => {
       try {

@@ -5,15 +5,15 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タスクのコメントを取得するツール（レガシーメソッド）
- * @param server McpServerインスタンス
+ * Tool to retrieve comments for a task (legacy method)
+ * @param server McpServer instance
  */
 export function registerWrikeGetTaskCommentsTool(server: McpServer): void {
   server.tool(
     'wrike_get_task_comments',
     {
-      task_id: z.string().describe('タスクID'),
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      task_id: z.string().describe('Task ID'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ task_id, opt_fields }) => {
       try {

@@ -5,16 +5,16 @@ import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * コメントを作成するツール
- * @param server McpServerインスタンス
+ * Tool to create a comment
+ * @param server McpServer instance
  */
 export function registerWrikeCreateCommentTool(server: McpServer): void {
   server.tool(
     'wrike_create_comment',
     {
-      task_id: z.string().describe('タスクID'),
-      text: z.string().describe('コメントのテキスト'),
-      plain_text: z.boolean().optional().describe('プレーンテキストとして扱うかどうか')
+      task_id: z.string().describe('Task ID'),
+      text: z.string().describe('Comment text'),
+      plain_text: z.boolean().optional().describe('Whether to treat as plain text')
     },
     async ({ task_id, text, plain_text }) => {
       try {
