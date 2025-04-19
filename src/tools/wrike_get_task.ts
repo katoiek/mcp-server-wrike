@@ -5,16 +5,16 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タスク情報を取得するツール
- * @param server McpServerインスタンス
+ * Tool to retrieve task information
+ * @param server McpServer instance
  */
 export function registerWrikeGetTaskTool(server: McpServer): void {
   server.tool(
     'wrike_get_task',
     {
-      task_id: z.string().optional().describe('タスクID（指定した場合は特定のタスクを取得）'),
-      folder_id: z.string().optional().describe('フォルダID（指定した場合はフォルダ内のタスクを取得）'),
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      task_id: z.string().optional().describe('Task ID (retrieves a specific task if specified) or Wrike permalink (e.g., https://www.wrike.com/open.htm?id=1234567)'),
+      folder_id: z.string().optional().describe('Folder ID (retrieves tasks within the folder if specified) or Wrike permalink'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ task_id, folder_id, opt_fields }) => {
       try {

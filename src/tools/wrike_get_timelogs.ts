@@ -5,21 +5,21 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タイムログ一覧を取得するツール
- * @param server McpServerインスタンス
+ * Tool to retrieve timelogs
+ * @param server McpServer instance
  */
 export function registerWrikeGetTimelogsTool(server: McpServer): void {
   server.tool(
     'wrike_get_timelogs',
     {
-      task_id: z.string().optional().describe('タスクID（指定した場合はタスクのタイムログを取得）'),
-      contact_id: z.string().optional().describe('コンタクトID（指定した場合はコンタクトのタイムログを取得）'),
-      folder_id: z.string().optional().describe('フォルダID（指定した場合はフォルダのタイムログを取得）'),
-      category_id: z.string().optional().describe('カテゴリID（指定した場合はカテゴリのタイムログを取得）'),
+      task_id: z.string().optional().describe('Task ID (retrieves timelogs for the task if specified)'),
+      contact_id: z.string().optional().describe('Contact ID (retrieves timelogs for the contact if specified)'),
+      folder_id: z.string().optional().describe('Folder ID (retrieves timelogs for the folder if specified)'),
+      category_id: z.string().optional().describe('Category ID (retrieves timelogs for the category if specified)'),
       start_date: z.string().optional().describe('開始日（YYYY-MM-DD）'),
       end_date: z.string().optional().describe('終了日（YYYY-MM-DD）'),
-      me: z.boolean().optional().describe('自分のタイムログのみを取得するかどうか'),
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      me: z.boolean().optional().describe('Whether to retrieve only your own timelogs'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ task_id, contact_id, folder_id, category_id, start_date, end_date, me, opt_fields }) => {
       try {

@@ -6,18 +6,17 @@ import { logger } from '../utils/logger.js';
 
 /**
  * Tool to retrieve folder/project information
- * フォルダ/プロジェクト情報を取得するツール
- * @param server McpServer instance / McpServerインスタンス
+ * @param server McpServer instance
  */
 export function registerWrikeGetFolderProjectTool(server: McpServer): void {
   server.tool(
     'wrike_get_folder_project',
     {
-      id: z.string().optional().describe('Folder/project/space ID (if not specified, root folders will be retrieved) / フォルダ/プロジェクト/スペースID（指定しない場合はルートフォルダを取得）'),
-      parent_id: z.string().optional().describe('Parent folder ID (if specified, folders within the parent folder will be retrieved) / 親フォルダID（指定した場合は親フォルダ内のフォルダを取得）'),
-      space_id: z.string().optional().describe('Space ID (if specified, folders within the space will be retrieved) / スペースID（指定した場合はスペース内のフォルダを取得）'),
-      folder_ids: z.array(z.string()).optional().describe('Specify multiple folder IDs (maximum 100) / 複数のフォルダIDを指定（最大100件）'),
-      opt_fields: z.string().optional().describe('Comma-separated list of field names / カンマ区切りのフィールド名リスト')
+      id: z.string().optional().describe('Folder/project/space ID (if not specified, root folders will be retrieved)'),
+      parent_id: z.string().optional().describe('Parent folder ID (if specified, folders within the parent folder will be retrieved)'),
+      space_id: z.string().optional().describe('Space ID (if specified, folders within the space will be retrieved)'),
+      folder_ids: z.array(z.string()).optional().describe('Specify multiple folder IDs (maximum 100)'),
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ id, parent_id, space_id, folder_ids, opt_fields }) => {
       try {
@@ -27,10 +26,10 @@ export function registerWrikeGetFolderProjectTool(server: McpServer): void {
         let responseText = '';
 
         // Priority: id > folder_ids > parent_id > space_id > root folders
-        // 優先順位: id > folder_ids > parent_id > space_id > ルートフォルダ
+        // Priority: id > folder_ids > parent_id > space_id > root folders
         if (id) {
           // Retrieve a single folder/project
-          // 単一のフォルダ/プロジェクトを取得
+          // Retrieve a single folder/project
           logger.debug(`Getting folder/project: ${id}`);
           const response = await wrikeClient.client.get(`/folders/${id}`, { params });
           folders = wrikeClient.handleResponse<WrikeFolder[]>(response);
@@ -38,7 +37,7 @@ export function registerWrikeGetFolderProjectTool(server: McpServer): void {
         }
         else if (folder_ids && folder_ids.length > 0) {
           // Retrieve multiple folders/projects by IDs
-          // 複数のフォルダ/プロジェクトをIDで取得
+          // Retrieve multiple folders/projects by IDs
           if (folder_ids.length > 100) {
             return {
               content: [{
@@ -56,7 +55,7 @@ export function registerWrikeGetFolderProjectTool(server: McpServer): void {
         }
         else if (parent_id) {
           // Retrieve folders within the parent folder
-          // 親フォルダ内のフォルダを取得
+          // Retrieve folders within the parent folder
           logger.debug(`Getting folders for parent folder: ${parent_id}`);
           const response = await wrikeClient.client.get(`/folders/${parent_id}/folders`, { params });
           folders = wrikeClient.handleResponse<WrikeFolder[]>(response);
@@ -64,7 +63,7 @@ export function registerWrikeGetFolderProjectTool(server: McpServer): void {
         }
         else if (space_id) {
           // Retrieve folders within the space
-          // スペース内のフォルダを取得
+          // Retrieve folders within the space
           logger.debug(`Getting folders for space: ${space_id}`);
           const response = await wrikeClient.client.get(`/spaces/${space_id}/folders`, { params });
           folders = wrikeClient.handleResponse<WrikeFolder[]>(response);
@@ -72,7 +71,7 @@ export function registerWrikeGetFolderProjectTool(server: McpServer): void {
         }
         else {
           // Retrieve root folders
-          // ルートフォルダを取得
+          // Retrieve root folders
           logger.debug('Getting root folders');
           const response = await wrikeClient.client.get('/folders', { params });
           folders = wrikeClient.handleResponse<WrikeFolder[]>(response);

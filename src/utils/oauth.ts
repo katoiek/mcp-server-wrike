@@ -102,7 +102,7 @@ export class WrikeOAuth {
   }
 
   /**
-   * 従来のaxiosを使用したアクセストークン取得メソッド
+   * Legacy method to get access token using axios
    * @param {string} code The authorization code received from Wrike
    * @returns {Promise<TokenResponse>} The token response containing access_token, refresh_token, etc.
    */
@@ -133,7 +133,7 @@ export class WrikeOAuth {
    */
   async refreshAccessToken(refreshToken: string, scope: string = ''): Promise<TokenResponse> {
     try {
-      // 既存のトークンからAccessTokenインスタンスを作成
+      // Create AccessToken instance from existing token
       const existingToken = {
         refresh_token: refreshToken,
       };

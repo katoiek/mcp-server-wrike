@@ -11,8 +11,8 @@ const customFieldSchema = z.object({
 }).strict();
 
 /**
- * タスクを作成するツール
- * @param server McpServerインスタンス
+ * Tool to create a task
+ * @param server McpServer instance
  */
 export function registerWrikeCreateTaskTool(server: McpServer): void {
   const datesSchema = z.object({

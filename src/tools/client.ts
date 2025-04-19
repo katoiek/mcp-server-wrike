@@ -2,8 +2,8 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { logger } from '../utils/logger.js';
 
 /**
- * Wrikeクライアントの基本機能を提供するクラス
- * ModelContextProtocolのTypeScript SDKに準拠
+ * Base class providing core functionality for Wrike client
+ * Compliant with ModelContextProtocol TypeScript SDK
  */
 export class WrikeClientBase {
   private accessToken: string;
@@ -65,8 +65,8 @@ export class WrikeClientBase {
 }
 
 /**
- * Wrikeクライアントのインスタンスを作成する関数
- * 環境変数からアクセストークンとホストを取得
+ * Function to create a Wrike client instance
+ * Gets access token and host from environment variables
  */
 export function createWrikeClient(): WrikeClientBase {
   const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
@@ -80,7 +80,7 @@ export function createWrikeClient(): WrikeClientBase {
 }
 
 /**
- * リクエストパラメータからopt_fieldsを解析する関数
+ * Function to parse opt_fields from request parameters
  */
 export function parseOptFields(opt_fields?: string): Record<string, any> {
   const params: Record<string, any> = {};

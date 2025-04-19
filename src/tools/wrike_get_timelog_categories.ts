@@ -5,14 +5,14 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * タイムログカテゴリ一覧を取得するツール
- * @param server McpServerインスタンス
+ * Tool to retrieve timelog categories
+ * @param server McpServer instance
  */
 export function registerWrikeGetTimelogCategoriesTool(server: McpServer): void {
   server.tool(
     'wrike_get_timelog_categories',
     {
-      opt_fields: z.string().optional().describe('カンマ区切りのフィールド名リスト')
+      opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
     async ({ opt_fields }) => {
       try {

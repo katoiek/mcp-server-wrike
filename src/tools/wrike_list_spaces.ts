@@ -5,8 +5,8 @@ import { createWrikeClient, parseOptFields } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * スペース一覧を取得するツール
- * @param server McpServerインスタンス
+ * Tool to list all spaces
+ * @param server McpServer instance
  */
 export function registerWrikeListSpacesTool(server: McpServer): void {
   server.tool(
