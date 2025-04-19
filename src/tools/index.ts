@@ -14,7 +14,6 @@ import { registerWrikeCreateTimelogTool } from './wrike_create_timelog.js';
 import { registerWrikeUpdateTimelogTool } from './wrike_update_timelog.js';
 import { registerWrikeDeleteTimelogTool } from './wrike_delete_timelog.js';
 import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categories.js';
-import { registerEchoTool } from './echo.js';
 
 /**
  * Register all Wrike-related tools to the MCP server
@@ -38,7 +37,6 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeUpdateTimelogTool(server);
   registerWrikeDeleteTimelogTool(server);
   registerWrikeGetTimelogCategoriesTool(server);
-  registerEchoTool(server);
 }
 
 // Export individual tool modules / 個別のツールモジュールをエクスポート
@@ -57,5 +55,4 @@ export * from './wrike_create_timelog.js';
 export * from './wrike_update_timelog.js';
 export * from './wrike_delete_timelog.js';
 export * from './wrike_get_timelog_categories.js';
-export * from './echo.js';
 export * from './client.js';

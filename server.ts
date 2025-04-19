@@ -2,8 +2,6 @@
 import dotenv from 'dotenv';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { WrikeClient } from './src/utils/wrikeClient.js';
-import { registerAllWrikeTools } from './src/tools/index.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -13,6 +11,9 @@ import {
   ListResourceTemplatesRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { registerAllWrikeTools } from './src/tools/index.js';
+import { logger, LogLevel } from './src/utils/logger.js';
+import { WrikeClient } from './src/utils/wrikeClient.js';
 import { parseOptFields, convertTaskId, removeUndefinedValues, createTimelogData } from './src/utils/helpers.js';
 import {
   WrikeRequestParams,
@@ -27,7 +28,6 @@ import {
 } from './src/types/wrike.js';
 import { ToolResponse, ServerResult } from './src/types/server.js';
 import { tools } from './src/types/tools.js';
-import { logger, LogLevel } from './src/utils/logger.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -1004,18 +1004,29 @@ function setupErrorHandling() {
 }
 
 /**
- * Main function to start the server
- * サーバーを起動するメイン関数
+ * Main function to start the MCP server
+ * MCPサーバーを起動するメイン関数
  */
 async function main(): Promise<void> {
-  await startServer();
+  try {
+    // Initialize environment
+    initializeEnvironment();
+
+    // Start the MCP server
+    await startMcpServer();
+
+    logger.info('Server started successfully');
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
 /**
- * Start the server using the MCP server implementation
- * MCPサーバー実装を使用してサーバーを起動する
+ * Start the MCP server implementation
+ * MCPサーバー実装を起動する
  */
-async function startServer(): Promise<void> {
+async function startMcpServer(): Promise<void> {
   try {
     // Create MCP server / MCPサーバーを作成
     const server = new McpServer({

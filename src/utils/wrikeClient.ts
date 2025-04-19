@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { logger } from './logger.js';
+import { removeUndefinedValues } from './helpers.js';
 import {
   WrikeApiResponse,
   WrikeSpace,
@@ -23,19 +24,72 @@ export class WrikeClient {
   private baseUrl: string;
   public client: AxiosInstance;
 
+  /**
+   * Create a new Wrike API client
+   * @param accessToken Wrike API access token
+   * @param host Wrike API host (default: www.wrike.com)
+   */
   constructor(accessToken: string, host: string = 'www.wrike.com') {
+    if (!accessToken) {
+      throw new Error('Access token is required');
+    }
+
     this.accessToken = accessToken;
     this.baseUrl = `https://${host}/api/v4`;
+
+    // Create axios instance with default configuration
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
         'Authorization': `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 30000 // 30 seconds timeout
     });
+
+    // Add response interceptor for logging
+    this.client.interceptors.response.use(
+      response => response,
+      error => this.handleApiError(error)
+    );
   }
 
-  // Helper method to handle API responses
+  /**
+   * Handle API error and convert to a more useful format
+   * @param error Axios error
+   * @returns Rejected promise with formatted error
+   */
+  private handleApiError(error: any): Promise<never> {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const status = axiosError.response?.status;
+      const data = axiosError.response?.data as any;
+
+      let message = 'API request failed';
+      if (data?.error) {
+        message = `API error: ${data.error}`;
+      } else if (axiosError.message) {
+        message = axiosError.message;
+      }
+
+      logger.error('Wrike API error', {
+        status,
+        message,
+        url: axiosError.config?.url
+      });
+
+      return Promise.reject(new Error(message));
+    }
+
+    logger.error('Unknown API error', { error });
+    return Promise.reject(error);
+  }
+
+  /**
+   * Extract data from Wrike API response
+   * @param response Axios response from Wrike API
+   * @returns Extracted data of type T
+   */
   handleResponse<T>(response: AxiosResponse): T {
     // Avoid memory leaks by not storing the entire response
     if (response.data && response.data.data) {
@@ -49,73 +103,68 @@ export class WrikeClient {
     return result;
   }
 
-  // Helper method to handle API errors
-  async handleError(error: AxiosError): Promise<never> {
-    // Import logger dynamically to avoid circular dependencies
-    const { logger } = await import('./logger.js');
-
-    logger.error('Wrike API Error:', error);
-
-    if (error.response && error.response.data) {
-      const responseData = error.response.data as any;
-      logger.debug('Wrike API Response Data:', responseData);
-
-      if (error.response.status === 401) {
-        logger.error('Authentication error: Your Wrike API token may be invalid or expired.');
-        logger.error('Please check your token and make sure it has the necessary permissions.');
-        logger.error('You can generate a new token in your Wrike account under Apps & Integrations > API.');
-        throw new Error(`Wrike API Authentication Error: ${responseData.error} - ${responseData.errorDescription}. Please check your API token.`);
-      }
-
-      throw new Error(`Wrike API Error: ${responseData.error} - ${responseData.errorDescription}`);
-    }
-
-    if (error.request) {
-      logger.error('Wrike API Request Error - No Response Received');
-      throw new Error(`Wrike API Request Error: No response received - ${error.message}`);
-    }
-
-    logger.error('Wrike API Error - Request Setup Failed:', error.message);
-    throw error;
-  }
-
-  // Spaces
+  /**
+   * Get all spaces
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeSpace objects
+   */
   async getSpaces(params: WrikeRequestParams = {}): Promise<WrikeSpace[]> {
-    try {
-      const response = await this.client.get('/spaces', { params });
-      return this.handleResponse<WrikeSpace[]>(response);
-    } catch (error) {
-      return this.handleError(error as AxiosError);
-    }
+    const response = await this.client.get('/spaces', {
+      params: removeUndefinedValues(params)
+    });
+    return this.handleResponse<WrikeSpace[]>(response);
   }
 
+  /**
+   * Get a specific space by ID
+   * @param spaceId ID of the space to retrieve
+   * @param params Optional request parameters
+   * @returns Promise resolving to a WrikeSpace object
+   */
   async getSpace(spaceId: string, params: WrikeRequestParams = {}): Promise<WrikeSpace> {
-    try {
-      const response = await this.client.get(`/spaces/${spaceId}`, { params });
-      const spaces = this.handleResponse<WrikeSpace[]>(response);
-      return spaces[0];
-    } catch (error) {
-      return this.handleError(error as AxiosError);
+    if (!spaceId) {
+      throw new Error('Space ID is required');
     }
+
+    const response = await this.client.get(`/spaces/${spaceId}`, {
+      params: removeUndefinedValues(params)
+    });
+    const spaces = this.handleResponse<WrikeSpace[]>(response);
+
+    if (!spaces || spaces.length === 0) {
+      throw new Error(`Space with ID ${spaceId} not found`);
+    }
+
+    return spaces[0];
   }
 
-  // Folders & Projects
+  /**
+   * Get all folders
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeFolder objects
+   */
   async getFolders(params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
-    try {
-      const response = await this.client.get('/folders', { params });
-      return this.handleResponse<WrikeFolder[]>(response);
-    } catch (error) {
-      return this.handleError(error as AxiosError);
-    }
+    const response = await this.client.get('/folders', {
+      params: removeUndefinedValues(params)
+    });
+    return this.handleResponse<WrikeFolder[]>(response);
   }
 
+  /**
+   * Get folders in a specific space
+   * @param spaceId ID of the space
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeFolder objects
+   */
   async getFoldersBySpace(spaceId: string, params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
-    try {
-      const response = await this.client.get(`/spaces/${spaceId}/folders`, { params });
-      return this.handleResponse<WrikeFolder[]>(response);
-    } catch (error) {
-      return this.handleError(error as AxiosError);
+    if (!spaceId) {
+      throw new Error('Space ID is required');
     }
+
+    const response = await this.client.get(`/spaces/${spaceId}/folders`, {
+      params: removeUndefinedValues(params)
+    });
+    return this.handleResponse<WrikeFolder[]>(response);
   }
 
   async getFoldersByParent(parentFolderId: string, params: WrikeRequestParams = {}): Promise<WrikeFolder[]> {
@@ -123,7 +172,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${parentFolderId}/folders`, { params });
       return this.handleResponse<WrikeFolder[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -140,7 +189,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${folderIds.join(',')}`, { params });
       return this.handleResponse<WrikeFolder[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -163,7 +212,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${folderIds.join(',')}`, { params: historyParams });
       return this.handleResponse<WrikeFolder[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -173,7 +222,7 @@ export class WrikeClient {
       const folders = this.handleResponse<WrikeFolder[]>(response);
       return folders[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -183,7 +232,7 @@ export class WrikeClient {
       const folders = this.handleResponse<WrikeFolder[]>(response);
       return folders[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -193,7 +242,7 @@ export class WrikeClient {
       const folders = this.handleResponse<WrikeFolder[]>(response);
       return folders[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -203,7 +252,7 @@ export class WrikeClient {
       const response = await this.client.get('/tasks', { params });
       return this.handleResponse<WrikeTask[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -212,7 +261,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${folderId}/tasks`, { params });
       return this.handleResponse<WrikeTask[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -222,7 +271,7 @@ export class WrikeClient {
       const tasks = this.handleResponse<WrikeTask[]>(response);
       return tasks[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -232,7 +281,7 @@ export class WrikeClient {
       const tasks = this.handleResponse<WrikeTask[]>(response);
       return tasks[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -242,7 +291,7 @@ export class WrikeClient {
       const tasks = this.handleResponse<WrikeTask[]>(response);
       return tasks[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -251,7 +300,7 @@ export class WrikeClient {
       const response = await this.client.delete(`/tasks/${taskId}`);
       this.handleResponse(response);
     } catch (error) {
-      this.handleError(error as AxiosError);
+      this.handleApiError(error);
     }
   }
 
@@ -300,7 +349,7 @@ export class WrikeClient {
         logger.error(`Response status: ${(error as AxiosError).response?.status}`);
         logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
       }
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -311,7 +360,7 @@ export class WrikeClient {
       const response = await this.client.get('/comments', { params });
       return this.handleResponse<WrikeComment[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -321,7 +370,7 @@ export class WrikeClient {
       const response = await this.client.get(`/tasks/${taskId}/comments`, { params });
       return this.handleResponse<WrikeComment[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -331,7 +380,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${folderId}/comments`, { params });
       return this.handleResponse<WrikeComment[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -349,7 +398,7 @@ export class WrikeClient {
       const response = await this.client.get(`/comments/${commentIds.join(',')}`, { params });
       return this.handleResponse<WrikeComment[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -367,7 +416,7 @@ export class WrikeClient {
       const comments = this.handleResponse<WrikeComment[]>(response);
       return comments[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -377,7 +426,7 @@ export class WrikeClient {
       const response = await this.client.get('/contacts', { params });
       return this.handleResponse<WrikeContact[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -387,7 +436,7 @@ export class WrikeClient {
       const response = await this.client.get('/timelogs', { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -396,7 +445,7 @@ export class WrikeClient {
       const response = await this.client.get(`/tasks/${taskId}/timelogs`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -405,7 +454,7 @@ export class WrikeClient {
       const response = await this.client.get(`/contacts/${contactId}/timelogs`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -414,7 +463,7 @@ export class WrikeClient {
       const response = await this.client.get(`/folders/${folderId}/timelogs`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -423,7 +472,7 @@ export class WrikeClient {
       const response = await this.client.get(`/timelog_categories/${categoryId}/timelogs`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -444,7 +493,7 @@ export class WrikeClient {
         logger.error(`Response status: ${(error as AxiosError).response?.status}`);
         logger.error(`Response data: ${JSON.stringify((error as AxiosError).response?.data)}`);
       }
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -454,7 +503,7 @@ export class WrikeClient {
       const response = await this.client.get(`/timelogs/${ids}`, { params });
       return this.handleResponse<WrikeTimelog[]>(response);
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -464,7 +513,7 @@ export class WrikeClient {
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -474,7 +523,7 @@ export class WrikeClient {
       const timelogs = this.handleResponse<WrikeTimelog[]>(response);
       return timelogs[0];
     } catch (error) {
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
@@ -483,7 +532,7 @@ export class WrikeClient {
       const response = await this.client.delete(`/timelogs/${timelogId}`);
       this.handleResponse(response);
     } catch (error) {
-      this.handleError(error as AxiosError);
+      this.handleApiError(error);
     }
   }
 
@@ -533,7 +582,7 @@ export class WrikeClient {
       return conversions[0].id;
     } catch (error) {
       logger.error(`Error converting ${type} ID: ${(error as Error).message}`);
-      return this.handleError(error as AxiosError);
+      return this.handleApiError(error);
     }
   }
 
