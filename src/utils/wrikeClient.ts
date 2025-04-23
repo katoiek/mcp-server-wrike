@@ -16,7 +16,9 @@ import {
   WrikeFolderData,
   WrikeCommentData,
   WrikeTimelogData,
-  WrikeIdConversion
+  WrikeIdConversion,
+  WrikeFolderBlueprint,
+  WrikeFolderBlueprintLaunchData
 } from '../types/wrike.js';
 
 export class WrikeClient {
@@ -593,5 +595,105 @@ export class WrikeClient {
     if (!optFields) return {};
     const fields = optFields.split(',').map(field => field.trim());
     return { fields: fields.join(',') };
+  }
+
+  /**
+   * Get all folder blueprints
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeFolderBlueprint objects
+   */
+  async getFolderBlueprints(params: WrikeRequestParams = {}): Promise<WrikeFolderBlueprint[]> {
+    try {
+      const response = await this.client.get('/folder_blueprints', { params });
+      return this.handleResponse<WrikeFolderBlueprint[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Get folder blueprints in a specific space
+   * @param spaceId ID of the space
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeFolderBlueprint objects
+   */
+  async getFolderBlueprintsBySpace(spaceId: string, params: WrikeRequestParams = {}): Promise<WrikeFolderBlueprint[]> {
+    try {
+      if (!spaceId) {
+        throw new Error('Space ID is required');
+      }
+
+      const response = await this.client.get(`/spaces/${spaceId}/folder_blueprints`, { params });
+      return this.handleResponse<WrikeFolderBlueprint[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Launch a folder blueprint asynchronously
+   * @param folderBlueprintId ID of the folder blueprint to launch
+   * @param data Launch configuration data
+   * @returns Promise resolving to the async job ID
+   */
+  async launchFolderBlueprintAsync(folderBlueprintId: string, data: WrikeFolderBlueprintLaunchData): Promise<string> {
+    try {
+      if (!folderBlueprintId) {
+        throw new Error('Folder blueprint ID is required');
+      }
+
+      // Convert data to query parameters instead of request body
+      const params: Record<string, any> = {};
+
+      // Add all properties from data to params
+      if (data.title) params.title = data.title;
+      if (data.parent) params.parent = data.parent;
+      if (data.description) params.description = data.description;
+
+      // Handle project properties if present
+      if (data.project) {
+        if (data.project.ownerIds) params['project.ownerIds'] = data.project.ownerIds.join(',');
+        if (data.project.status) params['project.status'] = data.project.status;
+        if (data.project.startDate) params['project.startDate'] = data.project.startDate;
+        if (data.project.endDate) params['project.endDate'] = data.project.endDate;
+      }
+
+      // Handle arrays
+      if (data.shareds) params.shareds = data.shareds.join(',');
+
+      // Handle custom fields
+      if (data.customFields && data.customFields.length > 0) {
+        data.customFields.forEach((field, index) => {
+          params[`customFields[${index}].id`] = field.id;
+          params[`customFields[${index}].value`] = field.value;
+        });
+      }
+
+      // Handle boolean flags
+      if (data.follow !== undefined) params.follow = data.follow;
+      if (data.copyDescriptions !== undefined) params.copyDescriptions = data.copyDescriptions;
+      if (data.copyResponsibles !== undefined) params.copyResponsibles = data.copyResponsibles;
+      if (data.copyCustomFields !== undefined) params.copyCustomFields = data.copyCustomFields;
+      if (data.copyCustomStatuses !== undefined) params.copyCustomStatuses = data.copyCustomStatuses;
+
+      // Log the request data for debugging
+      logger.debug(`Launching folder blueprint ${folderBlueprintId} with params:`, params);
+
+      // Send request with empty body and parameters in query string
+      const response = await this.client.post(`/folder_blueprints/${folderBlueprintId}/launch_async`, null, { params });
+
+      // Log the response for debugging
+      logger.debug(`Launch response status: ${response.status}`);
+
+      const result = this.handleResponse<{ asyncJobId: string }>(response);
+      return result.asyncJobId;
+    } catch (error) {
+      logger.error(`Error launching folder blueprint: ${(error as Error).message}`);
+      if ((error as any).response) {
+        logger.error(`Response status: ${(error as any).response.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as any).response.data)}`);
+      }
+      return this.handleApiError(error);
+    }
   }
 }

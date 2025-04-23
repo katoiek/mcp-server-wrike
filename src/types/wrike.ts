@@ -230,3 +230,35 @@ export interface WrikeIdConversion {
   type: string;
   [key: string]: any;
 }
+
+// Folder Blueprint Types
+export interface WrikeFolderBlueprint {
+  id: string;
+  title: string;
+  childIds?: string[];
+  scope?: string;
+  description?: string;
+  briefDescription?: string;
+  color?: string;
+  [key: string]: any;
+}
+
+export interface WrikeFolderBlueprintLaunchData {
+  title: string;
+  parent?: string;  // Changed from object to string
+  description?: string;
+  project?: {
+    ownerIds?: string[];
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  };
+  shareds?: string[];
+  customFields?: WrikeCustomField[];
+  follow?: boolean;
+  copyDescriptions?: boolean;
+  copyResponsibles?: boolean;
+  copyCustomFields?: boolean;
+  copyCustomStatuses?: boolean;
+  [key: string]: any;
+}

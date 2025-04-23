@@ -9,6 +9,7 @@ import { registerWrikeGetContactsTool } from './wrike_get_contacts.js';
 import { registerWrikeGetTimelogsTool } from './wrike_get_timelogs.js';
 import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categories.js';
 import { registerWrikeGetCustomItemTypesTool } from './wrike_get_custom_item_types.js';
+import { registerWrikeGetFolderBlueprintsTool } from './wrike_get_folder_blueprints.js';
 // 更新系（create, update, delete）
 import { registerWrikeCreateFolderProjectTool } from './wrike_create_folder_project.js';
 import { registerWrikeCreateTaskTool } from './wrike_create_task.js';
@@ -18,6 +19,7 @@ import { registerWrikeCreateTimelogTool } from './wrike_create_timelog.js';
 import { registerWrikeUpdateTimelogTool } from './wrike_update_timelog.js';
 import { registerWrikeDeleteTimelogTool } from './wrike_delete_timelog.js';
 import { registerWrikeCreateWorkFromCustomItemTool } from './wrike_create_work_from_custom_item.js';
+import { registerWrikeCreateWorkFromBlueprintTool } from './wrike_create_work_from_blueprint.js';
 
 /**
  * Register all Wrike-related tools to the MCP server
@@ -34,6 +36,7 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeGetTimelogsTool(server);
   registerWrikeGetTimelogCategoriesTool(server);
   registerWrikeGetCustomItemTypesTool(server);
+  registerWrikeGetFolderBlueprintsTool(server);
 
   // 更新系（create, update, delete）ツールの登録
   registerWrikeCreateFolderProjectTool(server);
@@ -44,6 +47,7 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeUpdateTimelogTool(server);
   registerWrikeDeleteTimelogTool(server);
   registerWrikeCreateWorkFromCustomItemTool(server);
+  registerWrikeCreateWorkFromBlueprintTool(server);
 }
 
 // Export individual tool modules
@@ -57,6 +61,7 @@ export * from './wrike_get_contacts.js';
 export * from './wrike_get_timelogs.js';
 export * from './wrike_get_timelog_categories.js';
 export * from './wrike_get_custom_item_types.js';
+export * from './wrike_get_folder_blueprints.js';
 // 更新系（create, update, delete）
 export * from './wrike_create_folder_project.js';
 export * from './wrike_create_task.js';
@@ -66,5 +71,6 @@ export * from './wrike_create_timelog.js';
 export * from './wrike_update_timelog.js';
 export * from './wrike_delete_timelog.js';
 export * from './wrike_create_work_from_custom_item.js';
+export * from './wrike_create_work_from_blueprint.js';
 // その他
 export * from './client.js';
