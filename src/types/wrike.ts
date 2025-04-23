@@ -108,6 +108,29 @@ export interface WrikeTimelogCategory {
   [key: string]: any;
 }
 
+export interface WrikeCustomItemType {
+  id: string;
+  title: string;
+  hidden: boolean;
+  avatarUrl?: string;
+  settings?: {
+    workflow?: {
+      id: string;
+      name: string;
+    };
+    inheritanceType?: string;
+    customStatuses?: {
+      id: string;
+      name: string;
+      standardId?: string;
+      hidden?: boolean;
+      color?: string;
+      group?: string;
+    }[];
+  };
+  [key: string]: any;
+}
+
 export interface WrikeCustomField {
   id: string;
   value: string | number | boolean | null;
@@ -177,6 +200,26 @@ export interface WrikeTimelogData {
   hours: number;
   trackedDate: string;
   categoryId?: string;
+  [key: string]: any;
+}
+
+export interface WrikeCustomItemTypeData {
+  title?: string;
+  hidden?: boolean;
+  settings?: {
+    workflow?: {
+      id: string;
+    };
+    inheritanceType?: string;
+    customStatuses?: {
+      id?: string;
+      name?: string;
+      standardId?: string;
+      hidden?: boolean;
+      color?: string;
+      group?: string;
+    }[];
+  };
   [key: string]: any;
 }
 

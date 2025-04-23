@@ -113,9 +113,16 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of timelog categories
 
+9. `wrike_get_custom_item_types`
+   - Get custom item types from Wrike
+   - Optional input:
+     - `id` (string): Custom item type ID (if specified, retrieves a specific custom item type)
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of custom item types or a specific custom item type
+
 #### Write Operations (Create, Update, Delete)
 
-9. `wrike_create_folder_project`
+10. `wrike_create_folder_project`
    - Create a new folder or project in Wrike
    - Required input:
      - `parent_folder_id` (string): ID of the parent folder
@@ -194,6 +201,22 @@ Examples:
     - Required input:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
+
+16. `wrike_create_work_from_custom_item`
+    - Create a task from a custom item type
+    - Required input:
+      - `custom_item_type_id` (string): ID of the custom item type to create work from
+      - `folder_id` (string): ID of the folder/project where the task will be created
+      - `title` (string): Title of the task to create
+    - Optional input:
+      - `description` (string): Description of the task
+      - `status` (string): Status of the task
+      - `importance` (string): Importance of the task (High, Normal, Low)
+      - `dates` (object): Task dates with properties like start, due, type, duration
+      - `assignees` (array of strings): Array of user IDs to assign to the task
+      - `followers` (array of strings): Array of user IDs to add as followers
+      - `custom_fields` (array): Array of custom fields with id and value properties
+    - Returns: Created task information
 
 ### Setup
 
