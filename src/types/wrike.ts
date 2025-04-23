@@ -246,19 +246,15 @@ export interface WrikeFolderBlueprint {
 export interface WrikeFolderBlueprintLaunchData {
   title: string;
   parent?: string;  // Changed from object to string
+  titlePrefix?: string;
   description?: string;
-  project?: {
-    ownerIds?: string[];
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-  };
-  shareds?: string[];
-  customFields?: WrikeCustomField[];
-  follow?: boolean;
   copyDescriptions?: boolean;
+  notifyResponsibles?: boolean;
   copyResponsibles?: boolean;
   copyCustomFields?: boolean;
-  copyCustomStatuses?: boolean;
+  copyAttachments?: boolean;
+  rescheduleDate?: string;  // 日付の再スケジュール（YYYY-MM-DD形式）
+  rescheduleMode?: 'Start' | 'End' | 'start' | 'end';  // 再スケジュールモード（Start/start または End/end）
+  entryLimit?: number;  // 1..250
   [key: string]: any;
 }

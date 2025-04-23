@@ -14,29 +14,26 @@ const customFieldSchema = z.object({
  * Tool to create work from a folder blueprint in Wrike
  * @param server McpServer instance
  */
-export function registerWrikeCreateWorkFromBlueprintTool(server: McpServer): void {
+export function registerWrikeCreateWorkFromFolderBlueprintTool(server: McpServer): void {
   server.tool(
-    'wrike_create_work_from_blueprint',
+    'wrike_create_work_from_folder_blueprint',
     {
       folder_blueprint_id: z.string().describe('ID of the folder blueprint to launch'),
       parent_id: z.string().describe('ID of the parent folder where the blueprint will be created'),
       title: z.string().describe('Title for the created work'),
+      title_prefix: z.string().optional().describe('Title prefix for all copied tasks'),
       description: z.string().optional().describe('Description for the created work'),
-      project: z.object({
-        ownerIds: z.array(z.string()).optional().describe('Array of user IDs who will be project owners'),
-        status: z.string().optional().describe('Project status'),
-        startDate: z.string().optional().describe('Project start date in ISO format (YYYY-MM-DD)'),
-        endDate: z.string().optional().describe('Project end date in ISO format (YYYY-MM-DD)')
-      }).optional().describe('Project specific settings'),
-      shareds: z.array(z.string()).optional().describe('Array of user IDs to share the folder with'),
+      copy_descriptions: z.boolean().optional().describe('Copy descriptions or leave empty (default: true)'),
+      notify_responsibles: z.boolean().optional().describe('Notify those responsible (default: true)'),
+      copy_responsibles: z.boolean().optional().describe('Copy those responsible (default: true)'),
+      copy_custom_fields: z.boolean().optional().describe('Copy custom fields (default: true)'),
+      copy_attachments: z.boolean().optional().describe('Copy attachments (default: false)'),
       custom_fields: z.array(customFieldSchema).optional().describe('Array of custom fields'),
-      follow: z.boolean().optional().describe('Whether the current user should follow the created work'),
-      copy_descriptions: z.boolean().optional().describe('Whether to copy descriptions from the blueprint'),
-      copy_responsibles: z.boolean().optional().describe('Whether to copy responsibles from the blueprint'),
-      copy_custom_fields: z.boolean().optional().describe('Whether to copy custom fields from the blueprint'),
-      copy_custom_statuses: z.boolean().optional().describe('Whether to copy custom statuses from the blueprint')
+      reschedule_date: z.string().optional().describe('Date to use in task rescheduling (format: YYYY-MM-DD)'),
+      reschedule_mode: z.enum(['Start', 'End', 'start', 'end']).optional().describe('Mode for rescheduling: Start/start (tasks start from reschedule date) or End/end (tasks end with reschedule date)'),
+      entry_limit: z.number().min(1).max(250).optional().describe('Maximum number of tasks/folders in tree for copy (1-250, default: 250)')
     },
-    async ({ folder_blueprint_id, parent_id, title, description, project, shareds, custom_fields, follow, copy_descriptions, copy_responsibles, copy_custom_fields, copy_custom_statuses }) => {
+    async ({ folder_blueprint_id, parent_id, title, title_prefix, description, copy_descriptions, notify_responsibles, copy_responsibles, copy_custom_fields, copy_attachments, custom_fields, reschedule_date, reschedule_mode, entry_limit }) => {
       try {
         const wrikeClient = createWrikeClient();
 
@@ -49,32 +46,20 @@ export function registerWrikeCreateWorkFromBlueprintTool(server: McpServer): voi
         };
 
         // Add optional parameters if provided
+        if (title_prefix) {
+          launchData.titlePrefix = title_prefix;
+        }
+
         if (description) {
           launchData.description = description;
         }
 
-        if (project) {
-          launchData.project = {};
-          if (project.ownerIds) launchData.project.ownerIds = project.ownerIds;
-          if (project.status) launchData.project.status = project.status;
-          if (project.startDate) launchData.project.startDate = project.startDate;
-          if (project.endDate) launchData.project.endDate = project.endDate;
-        }
-
-        if (shareds && shareds.length > 0) {
-          launchData.shareds = shareds;
-        }
-
-        if (custom_fields && custom_fields.length > 0) {
-          launchData.customFields = custom_fields as WrikeCustomField[];
-        }
-
-        if (follow !== undefined) {
-          launchData.follow = follow;
-        }
-
         if (copy_descriptions !== undefined) {
           launchData.copyDescriptions = copy_descriptions;
+        }
+
+        if (notify_responsibles !== undefined) {
+          launchData.notifyResponsibles = notify_responsibles;
         }
 
         if (copy_responsibles !== undefined) {
@@ -85,8 +70,25 @@ export function registerWrikeCreateWorkFromBlueprintTool(server: McpServer): voi
           launchData.copyCustomFields = copy_custom_fields;
         }
 
-        if (copy_custom_statuses !== undefined) {
-          launchData.copyCustomStatuses = copy_custom_statuses;
+        if (copy_attachments !== undefined) {
+          launchData.copyAttachments = copy_attachments;
+        }
+
+        if (custom_fields && custom_fields.length > 0) {
+          launchData.customFields = custom_fields as WrikeCustomField[];
+        }
+
+        // Add reschedule parameters if provided
+        if (reschedule_date) {
+          launchData.rescheduleDate = reschedule_date;
+        }
+
+        if (reschedule_mode) {
+          launchData.rescheduleMode = reschedule_mode;
+        }
+
+        if (entry_limit !== undefined) {
+          launchData.entryLimit = entry_limit;
         }
 
         logger.debug('Launch data:', launchData);

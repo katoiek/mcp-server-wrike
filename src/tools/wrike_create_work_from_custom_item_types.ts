@@ -8,9 +8,9 @@ import { logger } from '../utils/logger.js';
  * Tool to create work (task) from a custom item type
  * @param server McpServer instance
  */
-export function registerWrikeCreateWorkFromCustomItemTool(server: McpServer): void {
+export function registerWrikeCreateWorkFromCustomItemTypesTool(server: McpServer): void {
   server.tool(
-    'wrike_create_work_from_custom_item',
+    'wrike_create_work_from_custom_item_types',
     {
       custom_item_type_id: z.string().describe('ID of the custom item type to create work from'),
       parent_id: z.string().optional().describe('ID of parent folder or project. Either this parameter or super_task_id is required.'),

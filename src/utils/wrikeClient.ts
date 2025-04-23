@@ -676,6 +676,20 @@ export class WrikeClient {
       if (data.copyCustomFields !== undefined) params.copyCustomFields = data.copyCustomFields;
       if (data.copyCustomStatuses !== undefined) params.copyCustomStatuses = data.copyCustomStatuses;
 
+      // Handle reschedule parameters
+      if (data.rescheduleDate) params.rescheduleDate = data.rescheduleDate;
+      if (data.rescheduleMode) {
+        // 大文字小文字の違いを処理
+        // APIは 'start' と 'end' を期待しているようなので、小文字に変換
+        if (data.rescheduleMode.toLowerCase() === 'start') {
+          params.rescheduleMode = 'start';
+        } else if (data.rescheduleMode.toLowerCase() === 'end') {
+          params.rescheduleMode = 'end';
+        } else {
+          params.rescheduleMode = data.rescheduleMode;
+        }
+      }
+
       // Log the request data for debugging
       logger.debug(`Launching folder blueprint ${folderBlueprintId} with params:`, params);
 

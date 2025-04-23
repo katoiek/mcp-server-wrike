@@ -202,11 +202,12 @@ Examples:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
 
-16. `wrike_create_work_from_custom_item`
+16. `wrike_create_work_from_custom_item_types`
     - Create a task from a custom item type
     - Required input:
       - `custom_item_type_id` (string): ID of the custom item type to create work from
-      - `folder_id` (string): ID of the folder/project where the task will be created
+      - `parent_id` (string): ID of parent folder or project (Either this parameter or super_task_id is required)
+      - `super_task_id` (string): ID of parent task to add work as a subtask (Either this parameter or parent_id is required)
       - `title` (string): Title of the task to create
     - Optional input:
       - `description` (string): Description of the task
@@ -217,6 +218,26 @@ Examples:
       - `followers` (array of strings): Array of user IDs to add as followers
       - `custom_fields` (array): Array of custom fields with id and value properties
     - Returns: Created task information
+
+17. `wrike_create_work_from_folder_blueprint`
+    - Create work from a folder blueprint in Wrike
+    - Required input:
+      - `folder_blueprint_id` (string): ID of the folder blueprint to launch
+      - `parent_id` (string): ID of the parent folder where the blueprint will be created
+      - `title` (string): Title for the created work
+    - Optional input:
+      - `title_prefix` (string): Title prefix for all copied tasks
+      - `description` (string): Description for the created work
+      - `copy_descriptions` (boolean): Copy descriptions or leave empty (default: true)
+      - `notify_responsibles` (boolean): Notify those responsible (default: true)
+      - `copy_responsibles` (boolean): Copy those responsible (default: true)
+      - `copy_custom_fields` (boolean): Copy custom fields (default: true)
+      - `copy_attachments` (boolean): Copy attachments (default: false)
+      - `custom_fields` (array): Array of custom fields
+      - `reschedule_date` (string): Date to use in task rescheduling (format: YYYY-MM-DD)
+      - `reschedule_mode` (enum): Mode for rescheduling: Start/start or End/end
+      - `entry_limit` (number): Maximum number of tasks/folders in tree for copy (1-250, default: 250)
+    - Returns: Async job ID for the launched blueprint
 
 ### Setup
 
@@ -562,6 +583,43 @@ MCPの詳細はこちら：
     - 必須入力：
       - `timelog_id`（文字列）：削除するタイムログのID
     - 戻り値：成功ステータス
+
+16. `wrike_create_work_from_custom_item_types`
+    - カスタムアイテムタイプからタスクを作成
+    - 必須入力：
+      - `custom_item_type_id`（文字列）：作業を作成するカスタムアイテムタイプのID
+      - `parent_id`（文字列）：親フォルダまたはプロジェクトのID（このパラメータまたはsuper_task_idのいずれかが必要）
+      - `super_task_id`（文字列）：サブタスクとして作業を追加する親タスクのID（このパラメータまたはparent_idのいずれかが必要）
+      - `title`（文字列）：作成するタスクのタイトル
+    - オプション入力：
+      - `description`（文字列）：タスクの説明
+      - `status`（文字列）：タスクのステータス
+      - `importance`（文字列）：タスクの重要度（High、Normal、Low）
+      - `dates`（オブジェクト）：start、due、type、durationなどのプロパティを持つタスク日付
+      - `assignees`（文字列の配列）：タスクに割り当てるユーザーIDの配列
+      - `followers`（文字列の配列）：フォロワーとして追加するユーザーIDの配列
+      - `custom_fields`（配列）：idとvalueプロパティを持つカスタムフィールドの配列
+    - 戻り値：作成されたタスク情報
+
+17. `wrike_create_work_from_folder_blueprint`
+    - Wrikeでフォルダブループリントから作業を作成
+    - 必須入力：
+      - `folder_blueprint_id`（文字列）：起動するフォルダブループリントのID
+      - `parent_id`（文字列）：ブループリントが作成される親フォルダのID
+      - `title`（文字列）：作成される作業のタイトル
+    - オプション入力：
+      - `title_prefix`（文字列）：コピーされるすべてのタスクのタイトルプレフィックス
+      - `description`（文字列）：作成される作業の説明
+      - `copy_descriptions`（ブール値）：説明をコピーするか空のままにするか（デフォルト：true）
+      - `notify_responsibles`（ブール値）：担当者に通知するか（デフォルト：true）
+      - `copy_responsibles`（ブール値）：担当者をコピーするか（デフォルト：true）
+      - `copy_custom_fields`（ブール値）：カスタムフィールドをコピーするか（デフォルト：true）
+      - `copy_attachments`（ブール値）：添付ファイルをコピーするか（デフォルト：false）
+      - `custom_fields`（配列）：カスタムフィールドの配列
+      - `reschedule_date`（文字列）：タスクの再スケジュールに使用する日付（形式：YYYY-MM-DD）
+      - `reschedule_mode`（列挙型）：再スケジュールモード：Start/startまたはEnd/end
+      - `entry_limit`（数値）：コピーするタスク/フォルダのツリーの最大数（1-250、デフォルト：250）
+    - 戻り値：起動されたブループリントの非同期ジョブID
 
 ### セットアップ
 

@@ -18,8 +18,8 @@ import { registerWrikeCreateCommentTool } from './wrike_create_comment.js';
 import { registerWrikeCreateTimelogTool } from './wrike_create_timelog.js';
 import { registerWrikeUpdateTimelogTool } from './wrike_update_timelog.js';
 import { registerWrikeDeleteTimelogTool } from './wrike_delete_timelog.js';
-import { registerWrikeCreateWorkFromCustomItemTool } from './wrike_create_work_from_custom_item.js';
-import { registerWrikeCreateWorkFromBlueprintTool } from './wrike_create_work_from_blueprint.js';
+import { registerWrikeCreateWorkFromCustomItemTypesTool } from './wrike_create_work_from_custom_item_types.js';
+import { registerWrikeCreateWorkFromFolderBlueprintTool } from './wrike_create_work_from_folder_blueprint.js';
 
 /**
  * Register all Wrike-related tools to the MCP server
@@ -46,8 +46,8 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeCreateTimelogTool(server);
   registerWrikeUpdateTimelogTool(server);
   registerWrikeDeleteTimelogTool(server);
-  registerWrikeCreateWorkFromCustomItemTool(server);
-  registerWrikeCreateWorkFromBlueprintTool(server);
+  registerWrikeCreateWorkFromCustomItemTypesTool(server);
+  registerWrikeCreateWorkFromFolderBlueprintTool(server);
 }
 
 // Export individual tool modules
@@ -70,7 +70,7 @@ export * from './wrike_create_comment.js';
 export * from './wrike_create_timelog.js';
 export * from './wrike_update_timelog.js';
 export * from './wrike_delete_timelog.js';
-export * from './wrike_create_work_from_custom_item.js';
-export * from './wrike_create_work_from_blueprint.js';
+export * from './wrike_create_work_from_custom_item_types.js';
+export * from './wrike_create_work_from_folder_blueprint.js';
 // その他
 export * from './client.js';
