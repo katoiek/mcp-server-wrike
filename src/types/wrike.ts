@@ -157,7 +157,7 @@ export interface WrikeFolderData {
   description?: string;
   shareds?: string[];
   project?: {
-    ownerIds: string[];
+    ownerIds?: string[];
     status?: string;
     startDate?: string;
     endDate?: string;

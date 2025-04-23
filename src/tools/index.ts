@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerWrikeListSpacesTool } from './wrike_list_spaces.js';
-import { registerWrikeCreateFolderTool } from './wrike_create_folder.js';
+import { registerWrikeCreateFolderProjectTool } from './wrike_create_folder_project.js';
 import { registerWrikeGetTimelogsTool } from './wrike_get_timelogs.js';
 import { registerWrikeGetFolderProjectTool } from './wrike_get_folder_project.js';
 import { registerWrikeGetTaskTool } from './wrike_get_task.js';
@@ -22,7 +22,7 @@ import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categ
 export function registerAllWrikeTools(server: McpServer): void {
   // Register individual tools
   registerWrikeListSpacesTool(server);
-  registerWrikeCreateFolderTool(server);
+  registerWrikeCreateFolderProjectTool(server);
   registerWrikeGetTimelogsTool(server);
   registerWrikeGetFolderProjectTool(server);
   registerWrikeGetTaskTool(server);
@@ -40,7 +40,7 @@ export function registerAllWrikeTools(server: McpServer): void {
 
 // Export individual tool modules
 export * from './wrike_list_spaces.js';
-export * from './wrike_create_folder.js';
+export * from './wrike_create_folder_project.js';
 export * from './wrike_get_timelogs.js';
 export * from './wrike_get_folder_project.js';
 export * from './wrike_get_task.js';

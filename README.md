@@ -36,16 +36,20 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of spaces
 
-2. `wrike_create_folder`
-   - Create a new folder in Wrike
+2. `wrike_create_folder_project`
+   - Create a new folder or project in Wrike
    - Required input:
-     - `parent_id` (string): ID of the parent folder
-     - `title` (string): Title of the folder
+     - `parent_folder_id` (string): ID of the parent folder
+     - `title` (string): Title of the folder/project
    - Optional input:
-     - `description` (string): Description of the folder
-     - `shareds` (array of strings): Array of user IDs to share the folder with
-     - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Created folder information
+     - `description` (string): Description of the folder/project
+     - `is_project` (boolean): Whether to create as a project (default: false)
+     - `project_owner_ids_str` (string): Comma-separated list of project owner IDs
+     - `project_status` (string): Project status (Green, Yellow, Red, Completed, OnHold, Cancelled)
+     - `project_start_date` (string): Project start date (ISO format: YYYY-MM-DD)
+     - `project_end_date` (string): Project end date (ISO format: YYYY-MM-DD)
+     - `custom_fields` (array): Array of custom fields
+   - Returns: Created folder/project information
 
 3. `wrike_get_folder_project`
    - Unified tool for working with Wrike folders, projects, and spaces
@@ -373,16 +377,20 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：スペースのリスト
 
-2. `wrike_create_folder`
-   - Wrikeに新しいフォルダを作成
+2. `wrike_create_folder_project`
+   - Wrikeに新しいフォルダまたはプロジェクトを作成
    - 必須入力：
-     - `parent_id`（文字列）：親フォルダのID
-     - `title`（文字列）：フォルダのタイトル
+     - `parent_folder_id`（文字列）：親フォルダのID
+     - `title`（文字列）：フォルダ/プロジェクトのタイトル
    - オプション入力：
-     - `description`（文字列）：フォルダの説明
-     - `shareds`（文字列の配列）：フォルダを共有するユーザーIDの配列
-     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：作成されたフォルダの情報
+     - `description`（文字列）：フォルダ/プロジェクトの説明
+     - `is_project`（ブール値）：プロジェクトとして作成するかどうか（デフォルト：false）
+     - `project_owner_ids_str`（文字列）：プロジェクトオーナーIDのカンマ区切りリスト
+     - `project_status`（文字列）：プロジェクトステータス（Green、Yellow、Red、Completed、OnHold、Cancelled）
+     - `project_start_date`（文字列）：プロジェクト開始日（ISO形式：YYYY-MM-DD）
+     - `project_end_date`（文字列）：プロジェクト終了日（ISO形式：YYYY-MM-DD）
+     - `custom_fields`（配列）：カスタムフィールドの配列
+   - 戻り値：作成されたフォルダ/プロジェクトの情報
 
 3. `wrike_get_folder_project`
    - Wrikeのフォルダ、プロジェクト、スペースを操作するための統合ツール
