@@ -30,28 +30,15 @@ Examples:
 
 ### Available Functions
 
+#### Read Operations (List & Get)
+
 1. `wrike_list_spaces`
    - List all available spaces in Wrike
    - Optional input:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of spaces
 
-2. `wrike_create_folder_project`
-   - Create a new folder or project in Wrike
-   - Required input:
-     - `parent_folder_id` (string): ID of the parent folder
-     - `title` (string): Title of the folder/project
-   - Optional input:
-     - `description` (string): Description of the folder/project
-     - `is_project` (boolean): Whether to create as a project (default: false)
-     - `project_owner_ids_str` (string): Comma-separated list of project owner IDs
-     - `project_status` (string): Project status (Green, Yellow, Red, Completed, OnHold, Cancelled)
-     - `project_start_date` (string): Project start date (ISO format: YYYY-MM-DD)
-     - `project_end_date` (string): Project end date (ISO format: YYYY-MM-DD)
-     - `custom_fields` (array): Array of custom fields
-   - Returns: Created folder/project information
-
-3. `wrike_get_folder_project`
+2. `wrike_get_folder_project`
    - Unified tool for working with Wrike folders, projects, and spaces
    - Optional input (at least one is recommended):
      - `space_id` (string): The space to search in
@@ -65,7 +52,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of matching folders/projects or a single folder/project/space
 
-4. `wrike_get_task`
+3. `wrike_get_task`
    - Unified tool for working with Wrike tasks
    - Optional input:
      - `task_id` (string): ID of a specific task to retrieve
@@ -82,35 +69,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: Detailed task information or list of matching tasks
 
-5. `wrike_create_task`
-   - Create a new task in a project
-   - Required input:
-     - `folder_id` (string): The folder/project to create the task in
-     - `title` (string): Title of the task
-   - Optional input:
-     - `description` (string): Description of the task
-     - `status` (string): Status of the task
-     - `importance` (string): Importance of the task
-     - `dates` (object): Due dates for the task
-     - `assignees` (array of strings): Array of user IDs to assign to the task
-     - `followers` (array of strings): Array of user IDs to add as followers
-     - `parent_id` (string): The parent task ID to set this task under
-   - Returns: Created task information
-
-6. `wrike_update_task`
-   - Update an existing task's details
-   - Required input:
-     - `task_id` (string): The task ID to update
-   - Optional input:
-     - `title` (string): New title for the task
-     - `description` (string): New description for the task
-     - `status` (string): New status for the task
-     - `importance` (string): New importance for the task
-     - `dates` (object): New due dates for the task
-     - `completed` (boolean): Mark task as completed or not
-   - Returns: Updated task information
-
-7. `wrike_get_comments`
+4. `wrike_get_comments`
    - Get comments from Wrike with various filtering options
    - Optional input (at least one is required):
      - `task_id` (string): Get comments for a specific task ID
@@ -120,7 +79,7 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of comments
 
-8. `wrike_get_task_comments`
+5. `wrike_get_task_comments`
    - Get comments for a specific task
    - Required input:
      - `task_id` (string): The task ID to get comments for
@@ -128,36 +87,87 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of comments for the specified task
 
-9. `wrike_create_comment`
-   - Create a comment on a task
-   - Required input:
-     - `task_id` (string): The task ID to add the comment to
-     - `text` (string): The text content of the comment
+6. `wrike_get_contacts`
+   - Get information about Wrike contacts/users
+   - Optional input:
+     - `me` (boolean): Return only the current user's information
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of contacts
+
+7. `wrike_get_timelogs`
+   - Get timelogs from Wrike with filtering options
+   - Optional input:
+     - `task_id` (string): Filter timelogs by task ID
+     - `contact_id` (string): Filter timelogs by contact/user ID
+     - `folder_id` (string): Filter timelogs by folder ID
+     - `category_id` (string): Filter timelogs by timelog category ID
+     - `timelog_ids` (string): Comma-separated list of timelog IDs to retrieve (up to 100)
+     - `start_date` (string): Filter timelogs by start date (YYYY-MM-DD)
+     - `end_date` (string): Filter timelogs by end date (YYYY-MM-DD)
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of timelogs
+
+8. `wrike_get_timelog_categories`
+   - Get all timelog categories from Wrike
    - Optional input:
      - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: Created comment information
+   - Returns: List of timelog categories
 
-10. `wrike_get_contacts`
-    - Get information about Wrike contacts/users
+#### Write Operations (Create, Update, Delete)
+
+9. `wrike_create_folder_project`
+   - Create a new folder or project in Wrike
+   - Required input:
+     - `parent_folder_id` (string): ID of the parent folder
+     - `title` (string): Title of the folder/project
+   - Optional input:
+     - `description` (string): Description of the folder/project
+     - `is_project` (boolean): Whether to create as a project (default: false)
+     - `project_owner_ids_str` (string): Comma-separated list of project owner IDs
+     - `project_status` (string): Project status (Green, Yellow, Red, Completed, OnHold, Cancelled)
+     - `project_start_date` (string): Project start date (ISO format: YYYY-MM-DD)
+     - `project_end_date` (string): Project end date (ISO format: YYYY-MM-DD)
+     - `custom_fields` (array): Array of custom fields
+   - Returns: Created folder/project information
+
+10. `wrike_create_task`
+    - Create a new task in a project
+    - Required input:
+      - `folder_id` (string): The folder/project to create the task in
+      - `title` (string): Title of the task
     - Optional input:
-      - `me` (boolean): Return only the current user's information
-      - `opt_fields` (string): Comma-separated list of optional fields to include
-    - Returns: List of contacts
+      - `description` (string): Description of the task
+      - `status` (string): Status of the task
+      - `importance` (string): Importance of the task
+      - `dates` (object): Due dates for the task
+      - `assignees` (array of strings): Array of user IDs to assign to the task
+      - `followers` (array of strings): Array of user IDs to add as followers
+      - `parent_id` (string): The parent task ID to set this task under
+    - Returns: Created task information
 
-11. `wrike_get_timelogs`
-    - Get timelogs from Wrike with filtering options
+11. `wrike_update_task`
+    - Update an existing task's details
+    - Required input:
+      - `task_id` (string): The task ID to update
     - Optional input:
-      - `task_id` (string): Filter timelogs by task ID
-      - `contact_id` (string): Filter timelogs by contact/user ID
-      - `folder_id` (string): Filter timelogs by folder ID
-      - `category_id` (string): Filter timelogs by timelog category ID
-      - `timelog_ids` (string): Comma-separated list of timelog IDs to retrieve (up to 100)
-      - `start_date` (string): Filter timelogs by start date (YYYY-MM-DD)
-      - `end_date` (string): Filter timelogs by end date (YYYY-MM-DD)
-      - `opt_fields` (string): Comma-separated list of optional fields to include
-    - Returns: List of timelogs
+      - `title` (string): New title for the task
+      - `description` (string): New description for the task
+      - `status` (string): New status for the task
+      - `importance` (string): New importance for the task
+      - `dates` (object): New due dates for the task
+      - `completed` (boolean): Mark task as completed or not
+    - Returns: Updated task information
 
-12. `wrike_create_timelog`
+12. `wrike_create_comment`
+    - Create a comment on a task
+    - Required input:
+      - `task_id` (string): The task ID to add the comment to
+      - `text` (string): The text content of the comment
+    - Optional input:
+      - `opt_fields` (string): Comma-separated list of optional fields to include
+    - Returns: Created comment information
+
+13. `wrike_create_timelog`
     - Create a new timelog entry for a task
     - Required input:
       - `task_id` (string): ID of the task to add the timelog to
@@ -168,7 +178,7 @@ Examples:
       - `category_id` (string): ID of the timelog category
     - Returns: Created timelog information
 
-13. `wrike_update_timelog`
+14. `wrike_update_timelog`
     - Update an existing timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to update
@@ -179,17 +189,11 @@ Examples:
       - `category_id` (string): New ID of the timelog category
     - Returns: Updated timelog information
 
-14. `wrike_delete_timelog`
+15. `wrike_delete_timelog`
     - Delete a timelog entry
     - Required input:
       - `timelog_id` (string): ID of the timelog to delete
     - Returns: Success status
-
-15. `wrike_get_timelog_categories`
-    - Get all timelog categories from Wrike
-    - Optional input:
-      - `opt_fields` (string): Comma-separated list of optional fields to include
-    - Returns: List of timelog categories
 
 ### Setup
 
@@ -371,28 +375,15 @@ MCPの詳細はこちら：
 
 ### 利用可能な関数
 
+#### 参照系操作（一覧取得・情報取得）
+
 1. `wrike_list_spaces`
    - Wrikeで利用可能なすべてのスペースをリスト表示
    - オプション入力：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：スペースのリスト
 
-2. `wrike_create_folder_project`
-   - Wrikeに新しいフォルダまたはプロジェクトを作成
-   - 必須入力：
-     - `parent_folder_id`（文字列）：親フォルダのID
-     - `title`（文字列）：フォルダ/プロジェクトのタイトル
-   - オプション入力：
-     - `description`（文字列）：フォルダ/プロジェクトの説明
-     - `is_project`（ブール値）：プロジェクトとして作成するかどうか（デフォルト：false）
-     - `project_owner_ids_str`（文字列）：プロジェクトオーナーIDのカンマ区切りリスト
-     - `project_status`（文字列）：プロジェクトステータス（Green、Yellow、Red、Completed、OnHold、Cancelled）
-     - `project_start_date`（文字列）：プロジェクト開始日（ISO形式：YYYY-MM-DD）
-     - `project_end_date`（文字列）：プロジェクト終了日（ISO形式：YYYY-MM-DD）
-     - `custom_fields`（配列）：カスタムフィールドの配列
-   - 戻り値：作成されたフォルダ/プロジェクトの情報
-
-3. `wrike_get_folder_project`
+2. `wrike_get_folder_project`
    - Wrikeのフォルダ、プロジェクト、スペースを操作するための統合ツール
    - オプション入力（少なくとも1つは推奨）：
      - `space_id`（文字列）：検索対象のスペース
@@ -406,7 +397,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：一致するフォルダ/プロジェクトのリスト、または特定のフォルダ/プロジェクト/スペースの詳細
 
-4. `wrike_get_task`
+3. `wrike_get_task`
    - Wrikeタスクを操作するための統合ツール
    - オプション入力：
      - `task_id`（文字列）：取得する特定のタスクのID
@@ -423,35 +414,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タスクの詳細情報または一致するタスクのリスト
 
-5. `wrike_create_task`
-   - プロジェクトに新しいタスクを作成
-   - 必須入力：
-     - `folder_id`（文字列）：タスクを作成するフォルダ/プロジェクト
-     - `title`（文字列）：タスクのタイトル
-   - オプション入力：
-     - `description`（文字列）：タスクの説明
-     - `status`（文字列）：タスクのステータス
-     - `importance`（文字列）：タスクの重要度
-     - `dates`（オブジェクト）：タスクの期日
-     - `assignees`（文字列の配列）：タスクに割り当てるユーザーIDの配列
-     - `followers`（文字列の配列）：フォロワーとして追加するユーザーIDの配列
-     - `parent_id`（文字列）：このタスクを配置する親タスクID
-   - 戻り値：作成されたタスクの情報
-
-6. `wrike_update_task`
-   - 既存のタスクの詳細を更新
-   - 必須入力：
-     - `task_id`（文字列）：更新するタスクID
-   - オプション入力：
-     - `title`（文字列）：タスクの新しいタイトル
-     - `description`（文字列）：タスクの新しい説明
-     - `status`（文字列）：タスクの新しいステータス
-     - `importance`（文字列）：タスクの新しい重要度
-     - `dates`（オブジェクト）：タスクの新しい期日
-     - `completed`（ブール値）：タスクを完了としてマークするかどうか
-   - 戻り値：更新されたタスクの情報
-
-7. `wrike_get_comments`
+4. `wrike_get_comments`
    - 様々なフィルタリングオプションでWrikeからコメントを取得
    - オプション入力（少なくとも1つは必須）：
      - `task_id`（文字列）：特定のタスクIDのコメントを取得
@@ -461,7 +424,7 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：コメントのリスト
 
-8. `wrike_get_task_comments`
+5. `wrike_get_task_comments`
    - 特定のタスクのコメントを取得
    - 必須入力：
      - `task_id`（文字列）：コメントを取得するタスクID
@@ -469,36 +432,87 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：指定されたタスクのコメントリスト
 
-9. `wrike_create_comment`
-   - タスクにコメントを作成
-   - 必須入力：
-     - `task_id`（文字列）：コメントを追加するタスクID
-     - `text`（文字列）：コメントのテキスト内容
+6. `wrike_get_contacts`
+   - Wrikeの連絡先/ユーザーに関する情報を取得
+   - オプション入力：
+     - `me`（ブール値）：現在のユーザーの情報のみを返す
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：連絡先のリスト
+
+7. `wrike_get_timelogs`
+   - フィルタリングオプション付きでWrikeからタイムログを取得
+   - オプション入力：
+     - `task_id`（文字列）：タスクIDでタイムログをフィルタリング
+     - `contact_id`（文字列）：連絡先/ユーザーIDでタイムログをフィルタリング
+     - `folder_id`（文字列）：フォルダIDでタイムログをフィルタリング
+     - `category_id`（文字列）：タイムログカテゴリIDでタイムログをフィルタリング
+     - `timelog_ids`（文字列）：取得するタイムログIDのカンマ区切りリスト（最大100件）
+     - `start_date`（文字列）：開始日でタイムログをフィルタリング（YYYY-MM-DD形式）
+     - `end_date`（文字列）：終了日でタイムログをフィルタリング（YYYY-MM-DD形式）
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：タイムログのリスト
+
+8. `wrike_get_timelog_categories`
+   - Wrikeからすべてのタイムログカテゴリを取得
    - オプション入力：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：作成されたコメントの情報
+   - 戻り値：タイムログカテゴリのリスト
 
-10. `wrike_get_contacts`
-    - Wrikeの連絡先/ユーザーに関する情報を取得
+#### 更新系操作（作成・更新・削除）
+
+9. `wrike_create_folder_project`
+   - Wrikeに新しいフォルダまたはプロジェクトを作成
+   - 必須入力：
+     - `parent_folder_id`（文字列）：親フォルダのID
+     - `title`（文字列）：フォルダ/プロジェクトのタイトル
+   - オプション入力：
+     - `description`（文字列）：フォルダ/プロジェクトの説明
+     - `is_project`（ブール値）：プロジェクトとして作成するかどうか（デフォルト：false）
+     - `project_owner_ids_str`（文字列）：プロジェクトオーナーIDのカンマ区切りリスト
+     - `project_status`（文字列）：プロジェクトステータス（Green、Yellow、Red、Completed、OnHold、Cancelled）
+     - `project_start_date`（文字列）：プロジェクト開始日（ISO形式：YYYY-MM-DD）
+     - `project_end_date`（文字列）：プロジェクト終了日（ISO形式：YYYY-MM-DD）
+     - `custom_fields`（配列）：カスタムフィールドの配列
+   - 戻り値：作成されたフォルダ/プロジェクトの情報
+
+10. `wrike_create_task`
+    - プロジェクトに新しいタスクを作成
+    - 必須入力：
+      - `folder_id`（文字列）：タスクを作成するフォルダ/プロジェクト
+      - `title`（文字列）：タスクのタイトル
     - オプション入力：
-      - `me`（ブール値）：現在のユーザーの情報のみを返す
-      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-    - 戻り値：連絡先のリスト
+      - `description`（文字列）：タスクの説明
+      - `status`（文字列）：タスクのステータス
+      - `importance`（文字列）：タスクの重要度
+      - `dates`（オブジェクト）：タスクの期日
+      - `assignees`（文字列の配列）：タスクに割り当てるユーザーIDの配列
+      - `followers`（文字列の配列）：フォロワーとして追加するユーザーIDの配列
+      - `parent_id`（文字列）：このタスクを配置する親タスクID
+    - 戻り値：作成されたタスクの情報
 
-11. `wrike_get_timelogs`
-    - フィルタリングオプション付きでWrikeからタイムログを取得
+11. `wrike_update_task`
+    - 既存のタスクの詳細を更新
+    - 必須入力：
+      - `task_id`（文字列）：更新するタスクID
     - オプション入力：
-      - `task_id`（文字列）：タスクIDでタイムログをフィルタリング
-      - `contact_id`（文字列）：連絡先/ユーザーIDでタイムログをフィルタリング
-      - `folder_id`（文字列）：フォルダIDでタイムログをフィルタリング
-      - `category_id`（文字列）：タイムログカテゴリIDでタイムログをフィルタリング
-      - `timelog_ids`（文字列）：取得するタイムログIDのカンマ区切りリスト（最大100件）
-      - `start_date`（文字列）：開始日でタイムログをフィルタリング（YYYY-MM-DD形式）
-      - `end_date`（文字列）：終了日でタイムログをフィルタリング（YYYY-MM-DD形式）
-      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-    - 戻り値：タイムログのリスト
+      - `title`（文字列）：タスクの新しいタイトル
+      - `description`（文字列）：タスクの新しい説明
+      - `status`（文字列）：タスクの新しいステータス
+      - `importance`（文字列）：タスクの新しい重要度
+      - `dates`（オブジェクト）：タスクの新しい期日
+      - `completed`（ブール値）：タスクを完了としてマークするかどうか
+    - 戻り値：更新されたタスクの情報
 
-12. `wrike_create_timelog`
+12. `wrike_create_comment`
+    - タスクにコメントを作成
+    - 必須入力：
+      - `task_id`（文字列）：コメントを追加するタスクID
+      - `text`（文字列）：コメントのテキスト内容
+    - オプション入力：
+      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+    - 戻り値：作成されたコメントの情報
+
+13. `wrike_create_timelog`
     - タスクに新しいタイムログエントリを作成
     - 必須入力：
       - `task_id`（文字列）：タイムログを追加するタスクのID
@@ -509,7 +523,7 @@ MCPの詳細はこちら：
       - `category_id`（文字列）：タイムログカテゴリのID
     - 戻り値：作成されたタイムログ情報
 
-13. `wrike_update_timelog`
+14. `wrike_update_timelog`
     - 既存のタイムログエントリを更新
     - 必須入力：
       - `timelog_id`（文字列）：更新するタイムログのID
@@ -520,17 +534,11 @@ MCPの詳細はこちら：
       - `category_id`（文字列）：タイムログカテゴリの新しいID
     - 戻り値：更新されたタイムログ情報
 
-14. `wrike_delete_timelog`
+15. `wrike_delete_timelog`
     - タイムログエントリを削除
     - 必須入力：
       - `timelog_id`（文字列）：削除するタイムログのID
     - 戻り値：成功ステータス
-
-15. `wrike_get_timelog_categories`
-    - Wrikeからすべてのタイムログカテゴリを取得
-    - オプション入力：
-      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-    - 戻り値：タイムログカテゴリのリスト
 
 ### セットアップ
 
