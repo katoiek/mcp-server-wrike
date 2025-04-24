@@ -120,6 +120,18 @@ Examples:
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of custom item types or a specific custom item type
 
+10. `wrike_get_folder_blueprints`
+   - Get folder blueprints from Wrike
+   - Optional input:
+     - `space_id` (string): Space ID (if specified, retrieves folder blueprints from this space)
+   - Returns: List of folder blueprints
+
+11. `wrike_get_task_blueprints`
+   - Get task blueprints from Wrike
+   - Optional input:
+     - `space_id` (string): Space ID (if specified, retrieves task blueprints from this space)
+   - Returns: List of task blueprints
+
 #### Write Operations (Create, Update, Delete)
 
 10. `wrike_create_folder_project`
@@ -238,6 +250,23 @@ Examples:
       - `reschedule_mode` (enum): Mode for rescheduling: Start/start or End/end
       - `entry_limit` (number): Maximum number of tasks/folders in tree for copy (1-250, default: 250)
     - Returns: Async job ID for the launched blueprint
+
+18. `wrike_create_work_from_task_blueprint`
+    - Create a task from a task blueprint in Wrike
+    - Required input:
+      - `task_blueprint_id` (string): ID of the task blueprint to launch
+      - `title` (string): Title for the created task
+      - `parent_id` (string): ID of parent folder or project (Either this parameter or super_task_id is required)
+      - `super_task_id` (string): ID of parent task to add work as a subtask (Either this parameter or parent_id is required)
+    - Optional input:
+      - `description` (string): Description of the task
+      - `status` (string): Status of the task
+      - `importance` (string): Importance of the task (High, Normal, Low)
+      - `dates` (object): Task dates with properties like start, due, type, duration
+      - `responsibles` (array of strings): Array of user IDs to assign to the task
+      - `followers` (array of strings): Array of user IDs to add as followers
+      - `custom_fields` (array): Array of custom fields with id and value properties
+    - Returns: Created task information
 
 ### Setup
 
@@ -502,9 +531,28 @@ MCPの詳細はこちら：
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タイムログカテゴリのリスト
 
+9. `wrike_get_custom_item_types`
+   - カスタムアイテムタイプを取得
+   - オプション入力：
+     - `id`（文字列）：カスタムアイテムタイプID（指定すると、特定のカスタムアイテムタイプを取得）
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：カスタムアイテムタイプのリストまたは特定のカスタムアイテムタイプ
+
+10. `wrike_get_folder_blueprints`
+   - フォルダブループリントを取得
+   - オプション入力：
+     - `space_id`（文字列）：スペースID（指定すると、このスペース内のフォルダブループリントを取得）
+   - 戻り値：フォルダブループリントのリスト
+
+11. `wrike_get_task_blueprints`
+   - タスクブループリントを取得
+   - オプション入力：
+     - `space_id`（文字列）：スペースID（指定すると、このスペース内のタスクブループリントを取得）
+   - 戻り値：タスクブループリントのリスト
+
 #### 更新系操作（作成・更新・削除）
 
-9. `wrike_create_folder_project`
+12. `wrike_create_folder_project`
    - Wrikeに新しいフォルダまたはプロジェクトを作成
    - 必須入力：
      - `parent_folder_id`（文字列）：親フォルダのID

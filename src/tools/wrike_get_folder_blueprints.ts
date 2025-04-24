@@ -13,13 +13,12 @@ export function registerWrikeGetFolderBlueprintsTool(server: McpServer): void {
   server.tool(
     'wrike_get_folder_blueprints',
     {
-      space_id: z.string().optional().describe('Space ID to get folder blueprints from (optional)'),
-      opt_fields: z.string().optional().describe('Optional fields to include in the response (comma-separated)')
+      space_id: z.string().optional().describe('Space ID to get folder blueprints from (optional)')
     },
-    async ({ space_id, opt_fields }) => {
+    async ({ space_id }) => {
       try {
         const wrikeClient = createWrikeClient();
-        const params = parseOptFields(opt_fields);
+        const params = {}; // Empty params as API doesn't support query parameters
 
         let blueprints: WrikeFolderBlueprint[];
 

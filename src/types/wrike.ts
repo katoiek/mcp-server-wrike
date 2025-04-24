@@ -243,6 +243,18 @@ export interface WrikeFolderBlueprint {
   [key: string]: any;
 }
 
+// Task Blueprint Types
+export interface WrikeTaskBlueprint {
+  id: string;
+  title: string;
+  description?: string;
+  briefDescription?: string;
+  createdDate?: string;
+  updatedDate?: string;
+  scope?: string;
+  [key: string]: any;
+}
+
 export interface WrikeFolderBlueprintLaunchData {
   title: string;
   parent?: string;  // Changed from object to string
@@ -256,5 +268,24 @@ export interface WrikeFolderBlueprintLaunchData {
   rescheduleDate?: string;  // 日付の再スケジュール（YYYY-MM-DD形式）
   rescheduleMode?: 'Start' | 'End' | 'start' | 'end';  // 再スケジュールモード（Start/start または End/end）
   entryLimit?: number;  // 1..250
+  [key: string]: any;
+}
+
+export interface WrikeTaskBlueprintLaunchData {
+  title: string;
+  parent?: string;  // ID of parent folder
+  superTask?: string;  // ID of parent task
+  description?: string;
+  status?: string;
+  importance?: string;
+  dates?: {
+    type?: string;
+    duration?: number;
+    start?: string;
+    due?: string;
+  };
+  responsibles?: string[];
+  followers?: string[];
+  customFields?: WrikeCustomField[];
   [key: string]: any;
 }

@@ -18,6 +18,8 @@ import {
   WrikeTimelogData,
   WrikeIdConversion,
   WrikeFolderBlueprint,
+  WrikeTaskBlueprint,
+  WrikeTaskBlueprintLaunchData,
   WrikeFolderBlueprintLaunchData
 } from '../types/wrike.js';
 
@@ -612,6 +614,39 @@ export class WrikeClient {
   }
 
   /**
+   * Get all task blueprints
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeTaskBlueprint objects
+   */
+  async getTaskBlueprints(params: WrikeRequestParams = {}): Promise<WrikeTaskBlueprint[]> {
+    try {
+      const response = await this.client.get('/task_blueprints', { params });
+      return this.handleResponse<WrikeTaskBlueprint[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Get task blueprints in a specific space
+   * @param spaceId ID of the space
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeTaskBlueprint objects
+   */
+  async getTaskBlueprintsBySpace(spaceId: string, params: WrikeRequestParams = {}): Promise<WrikeTaskBlueprint[]> {
+    try {
+      if (!spaceId) {
+        throw new Error('Space ID is required');
+      }
+
+      const response = await this.client.get(`/spaces/${spaceId}/task_blueprints`, { params });
+      return this.handleResponse<WrikeTaskBlueprint[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
    * Get folder blueprints in a specific space
    * @param spaceId ID of the space
    * @param params Optional request parameters
@@ -703,6 +738,75 @@ export class WrikeClient {
       return result.asyncJobId;
     } catch (error) {
       logger.error(`Error launching folder blueprint: ${(error as Error).message}`);
+      if ((error as any).response) {
+        logger.error(`Response status: ${(error as any).response.status}`);
+        logger.error(`Response data: ${JSON.stringify((error as any).response.data)}`);
+      }
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Launch a task blueprint
+   * @param taskBlueprintId ID of the task blueprint to launch
+   * @param data Launch configuration data
+   * @returns Promise resolving to the created task
+   */
+  async launchTaskBlueprint(taskBlueprintId: string, data: WrikeTaskBlueprintLaunchData): Promise<WrikeTask> {
+    try {
+      if (!taskBlueprintId) {
+        throw new Error('Task blueprint ID is required');
+      }
+
+      // Convert data to query parameters
+      const params: Record<string, any> = {};
+
+      // Add basic properties
+      if (data.title) params.title = data.title;
+      if (data.parent) params.parent = data.parent;
+      if (data.superTask) params.superTask = data.superTask;
+      if (data.description) params.description = data.description;
+      if (data.status) params.status = data.status;
+      if (data.importance) params.importance = data.importance;
+
+      // Handle dates if present
+      if (data.dates) {
+        if (data.dates.type) params['dates.type'] = data.dates.type;
+        if (data.dates.duration !== undefined) params['dates.duration'] = data.dates.duration;
+        if (data.dates.start) params['dates.start'] = data.dates.start;
+        if (data.dates.due) params['dates.due'] = data.dates.due;
+      }
+
+      // Handle arrays
+      if (data.responsibles && data.responsibles.length > 0) {
+        params.responsibles = data.responsibles.join(',');
+      }
+
+      if (data.followers && data.followers.length > 0) {
+        params.followers = data.followers.join(',');
+      }
+
+      // Handle custom fields
+      if (data.customFields && data.customFields.length > 0) {
+        data.customFields.forEach((field, index) => {
+          params[`customFields[${index}].id`] = field.id;
+          params[`customFields[${index}].value`] = field.value;
+        });
+      }
+
+      // Log the request data for debugging
+      logger.debug(`Launching task blueprint ${taskBlueprintId} with params:`, params);
+
+      // Send request with empty body and parameters in query string
+      const response = await this.client.post(`/task_blueprints/${taskBlueprintId}/launch`, null, { params });
+
+      // Log the response for debugging
+      logger.debug(`Launch response status: ${response.status}`);
+
+      // Extract the created task from the response
+      return this.handleResponse<WrikeTask>(response);
+    } catch (error) {
+      logger.error(`Error launching task blueprint: ${(error as Error).message}`);
       if ((error as any).response) {
         logger.error(`Response status: ${(error as any).response.status}`);
         logger.error(`Response data: ${JSON.stringify((error as any).response.data)}`);
