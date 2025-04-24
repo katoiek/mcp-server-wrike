@@ -16,12 +16,13 @@ export function registerWrikeGetTimelogsTool(server: McpServer): void {
       contact_id: z.string().optional().describe('Contact ID (retrieves timelogs for the contact if specified)'),
       folder_id: z.string().optional().describe('Folder ID (retrieves timelogs for the folder if specified)'),
       category_id: z.string().optional().describe('Category ID (retrieves timelogs for the category if specified)'),
-      start_date: z.string().optional().describe('開始日（YYYY-MM-DD）'),
-      end_date: z.string().optional().describe('終了日（YYYY-MM-DD）'),
+      timelog_ids: z.array(z.string()).optional().describe('Array of timelog IDs to retrieve (up to 100)'),
+      start_date: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      end_date: z.string().optional().describe('End date (YYYY-MM-DD)'),
       me: z.boolean().optional().describe('Whether to retrieve only your own timelogs'),
       opt_fields: z.string().optional().describe('Comma-separated list of field names to include')
     },
-    async ({ task_id, contact_id, folder_id, category_id, start_date, end_date, me, opt_fields }) => {
+    async ({ task_id, contact_id, folder_id, category_id, timelog_ids, start_date, end_date, me, opt_fields }) => {
       try {
         const wrikeClient = createWrikeClient();
         const params = parseOptFields(opt_fields);
@@ -32,8 +33,18 @@ export function registerWrikeGetTimelogsTool(server: McpServer): void {
         if (end_date) params.endDate = end_date;
         if (me !== undefined) params.me = me;
 
-        // 優先順位: task_id > contact_id > folder_id > category_id > 全体
-        if (task_id) {
+        // 優先順位: timelog_ids > task_id > contact_id > folder_id > category_id > 全体
+        if (timelog_ids && timelog_ids.length > 0) {
+          if (timelog_ids.length > 100) {
+            throw new Error('Maximum 100 timelog IDs can be requested at once');
+          }
+
+          logger.debug(`Getting timelogs by IDs: ${timelog_ids.join(',')}`);
+          const response = await wrikeClient.client.get(`/timelogs/${timelog_ids.join(',')}`, { params });
+          timelogs = wrikeClient.handleResponse<WrikeTimelog[]>(response);
+          responseText = `Timelogs by IDs: ${timelog_ids.join(',')}`;
+        }
+        else if (task_id) {
           logger.debug(`Getting timelogs for task: ${task_id}`);
           const response = await wrikeClient.client.get(`/tasks/${task_id}/timelogs`, { params });
           timelogs = wrikeClient.handleResponse<WrikeTimelog[]>(response);

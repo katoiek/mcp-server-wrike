@@ -9,7 +9,8 @@ import {
   WrikeComment,
   WrikeContact,
   WrikeTimelog,
-  WrikeTimelogCategory
+  WrikeTimelogCategory,
+  WrikeCustomField
 } from './types/wrike.js';
 import { parseOptFields, createWrikeClient, createTimelogData } from './utils/helpers.js';
 import { logger } from './utils/logger.js';
@@ -291,9 +292,10 @@ export const functions = {
     status,
     importance,
     dates,
-    assignees,
+    responsibles,
     followers,
-    parent_id
+    parent_id,
+    custom_fields
   }: {
     folder_id: string;
     title: string;
@@ -304,10 +306,12 @@ export const functions = {
       start?: string;
       due?: string;
       type?: string;
+      duration?: number;
     };
-    assignees?: string[];
+    responsibles?: string[];
     followers?: string[];
-    parent_id?: string
+    parent_id?: string;
+    custom_fields?: WrikeCustomField[];
   }): Promise<WrikeTask> => {
     // Initialize Wrike client for each request
     const accessToken = process.env.WRIKE_ACCESS_TOKEN as string;
@@ -326,9 +330,10 @@ export const functions = {
     if (status) data.status = status;
     if (importance) data.importance = importance;
     if (dates) data.dates = dates;
-    if (assignees) data.responsibles = assignees;
+    if (responsibles) data.responsibles = responsibles;
     if (followers) data.followers = followers;
     if (parent_id) data.superTaskIds = [parent_id];
+    if (custom_fields) data.customFields = custom_fields;
 
     const task = await wrikeClient.createTask(folder_id, data, {});
     return task;
@@ -521,9 +526,11 @@ export const functions = {
 
   // Get contacts
   wrike_get_contacts: async ({
+    contact_ids,
     me = false,
     opt_fields
   }: {
+    contact_ids?: string[];
     me?: boolean;
     opt_fields?: string
   }): Promise<WrikeContact[]> => {
@@ -535,6 +542,15 @@ export const functions = {
     const params: WrikeRequestParams = parseOptFields(opt_fields);
     if (me) params.me = true;
 
+    // If contact_ids are provided, get specific contacts
+    if (contact_ids && contact_ids.length > 0) {
+      if (contact_ids.length > 100) {
+        throw new Error('Maximum of 100 contact IDs allowed');
+      }
+      return await wrikeClient.getContactsByIds(contact_ids, params);
+    }
+
+    // Otherwise, get all contacts
     const contacts = await wrikeClient.getContacts(params);
     return contacts;
   }

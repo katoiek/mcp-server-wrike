@@ -90,20 +90,22 @@ Examples:
 6. `wrike_get_contacts`
    - Get information about Wrike contacts/users
    - Optional input:
+     - `contact_ids` (array of strings): Array of contact IDs to retrieve (up to 100)
      - `me` (boolean): Return only the current user's information
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of contacts
 
 7. `wrike_get_timelogs`
    - Get timelogs from Wrike with filtering options
-   - Optional input:
+   - Optional input (at least one is recommended):
      - `task_id` (string): Filter timelogs by task ID
      - `contact_id` (string): Filter timelogs by contact/user ID
      - `folder_id` (string): Filter timelogs by folder ID
      - `category_id` (string): Filter timelogs by timelog category ID
-     - `timelog_ids` (string): Comma-separated list of timelog IDs to retrieve (up to 100)
+     - `timelog_ids` (array of strings): Array of timelog IDs to retrieve (up to 100)
      - `start_date` (string): Filter timelogs by start date (YYYY-MM-DD)
      - `end_date` (string): Filter timelogs by end date (YYYY-MM-DD)
+     - `me` (boolean): Whether to retrieve only your own timelogs
      - `opt_fields` (string): Comma-separated list of optional fields to include
    - Returns: List of timelogs
 
@@ -156,12 +158,13 @@ Examples:
       - `title` (string): Title of the task
     - Optional input:
       - `description` (string): Description of the task
-      - `status` (string): Status of the task
-      - `importance` (string): Importance of the task
-      - `dates` (object): Due dates for the task
-      - `assignees` (array of strings): Array of user IDs to assign to the task
+      - `status` (string): Status of the task (Active, Completed, Deferred, Cancelled)
+      - `importance` (string): Importance of the task (High, Normal, Low)
+      - `dates` (object): Due dates for the task with start, due, type, and duration properties
+      - `responsibles` (array of strings): Array of user IDs to assign to the task
       - `followers` (array of strings): Array of user IDs to add as followers
-      - `parent_id` (string): The parent task ID to set this task under
+      - `parent_id` (string): The parent task ID to set this task under (creates a subtask)
+      - `custom_fields` (array): Array of custom fields with id and value properties
     - Returns: Created task information
 
 11. `wrike_update_task`
@@ -183,7 +186,7 @@ Examples:
       - `task_id` (string): The task ID to add the comment to
       - `text` (string): The text content of the comment
     - Optional input:
-      - `opt_fields` (string): Comma-separated list of optional fields to include
+      - `plain_text` (boolean): Whether to treat the comment as plain text
     - Returns: Created comment information
 
 13. `wrike_create_timelog`
@@ -509,20 +512,22 @@ MCPの詳細はこちら：
 6. `wrike_get_contacts`
    - Wrikeの連絡先/ユーザーに関する情報を取得
    - オプション入力：
+     - `contact_ids`（文字列の配列）：取得するコンタクトIDの配列（最大100件）
      - `me`（ブール値）：現在のユーザーの情報のみを返す
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：連絡先のリスト
 
 7. `wrike_get_timelogs`
    - フィルタリングオプション付きでWrikeからタイムログを取得
-   - オプション入力：
+   - オプション入力（少なくとも1つは推奨）：
      - `task_id`（文字列）：タスクIDでタイムログをフィルタリング
      - `contact_id`（文字列）：連絡先/ユーザーIDでタイムログをフィルタリング
      - `folder_id`（文字列）：フォルダIDでタイムログをフィルタリング
      - `category_id`（文字列）：タイムログカテゴリIDでタイムログをフィルタリング
-     - `timelog_ids`（文字列）：取得するタイムログIDのカンマ区切りリスト（最大100件）
+     - `timelog_ids`（文字列の配列）：取得するタイムログIDの配列（最大100件）
      - `start_date`（文字列）：開始日でタイムログをフィルタリング（YYYY-MM-DD形式）
      - `end_date`（文字列）：終了日でタイムログをフィルタリング（YYYY-MM-DD形式）
+     - `me`（ブール値）：自分のタイムログのみを取得するかどうか
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
    - 戻り値：タイムログのリスト
 
@@ -575,12 +580,13 @@ MCPの詳細はこちら：
       - `title`（文字列）：タスクのタイトル
     - オプション入力：
       - `description`（文字列）：タスクの説明
-      - `status`（文字列）：タスクのステータス
-      - `importance`（文字列）：タスクの重要度
-      - `dates`（オブジェクト）：タスクの期日
-      - `assignees`（文字列の配列）：タスクに割り当てるユーザーIDの配列
+      - `status`（文字列）：タスクのステータス（Active、Completed、Deferred、Cancelled）
+      - `importance`（文字列）：タスクの重要度（High、Normal、Low）
+      - `dates`（オブジェクト）：タスクの期日（start、due、type、durationプロパティを含む）
+      - `responsibles`（文字列の配列）：タスクに割り当てるユーザーIDの配列
       - `followers`（文字列の配列）：フォロワーとして追加するユーザーIDの配列
-      - `parent_id`（文字列）：このタスクを配置する親タスクID
+      - `parent_id`（文字列）：このタスクを配置する親タスクID（サブタスクとして作成）
+      - `custom_fields`（配列）：idとvalueプロパティを持つカスタムフィールドの配列
     - 戻り値：作成されたタスクの情報
 
 11. `wrike_update_task`

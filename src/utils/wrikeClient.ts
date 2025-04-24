@@ -434,6 +434,23 @@ export class WrikeClient {
     }
   }
 
+  async getContactsByIds(contactIds: string[], params: WrikeRequestParams = {}): Promise<WrikeContact[]> {
+    try {
+      if (!contactIds || contactIds.length === 0) {
+        throw new Error('Contact IDs are required');
+      }
+
+      if (contactIds.length > 100) {
+        throw new Error('Maximum of 100 contact IDs allowed');
+      }
+
+      const response = await this.client.get(`/contacts/${contactIds.join(',')}`, { params });
+      return this.handleResponse<WrikeContact[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
   // Timelogs
   async getTimelogs(params: WrikeRequestParams = {}): Promise<WrikeTimelog[]> {
     try {

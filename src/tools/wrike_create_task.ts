@@ -32,10 +32,12 @@ export function registerWrikeCreateTaskTool(server: McpServer): void {
       status: z.string().optional().describe('Status of the task (Active, Completed, Deferred, Cancelled)'),
       importance: z.string().optional().describe('Importance of the task (High, Normal, Low)'),
       dates: datesSchema,
-      responsible_ids: z.array(z.string()).optional().describe('Array of user IDs to assign as responsibles'),
+      responsibles: z.array(z.string()).optional().describe('Array of user IDs to assign as responsibles'),
+      followers: z.array(z.string()).optional().describe('Array of user IDs to add as followers'),
+      parent_id: z.string().optional().describe('The parent task ID to set this task under (creates a subtask)'),
       custom_fields: z.array(customFieldSchema).optional().describe('Array of custom fields to set on the task')
     },
-    async ({ folder_id, title, description, status, importance, dates, responsible_ids, custom_fields }) => {
+    async ({ folder_id, title, description, status, importance, dates, responsibles, followers, parent_id, custom_fields }) => {
       try {
         logger.debug(`Creating task in folder: ${folder_id}`);
         const wrikeClient = createWrikeClient();
@@ -46,11 +48,21 @@ export function registerWrikeCreateTaskTool(server: McpServer): void {
           status,
           importance,
           dates,
-          responsibles: responsible_ids
+          responsibles
         };
 
+        // フォロワーを設定
+        if (followers && followers.length > 0) {
+          data.followers = followers;
+        }
+
+        // 親タスクを設定（サブタスクとして作成）
+        if (parent_id) {
+          data.superTaskIds = [parent_id];
+        }
+
         // カスタムフィールドを設定
-        if (custom_fields) {
+        if (custom_fields && custom_fields.length > 0) {
           data.customFields = custom_fields as WrikeCustomField[];
         }
 
