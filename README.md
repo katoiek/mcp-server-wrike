@@ -297,31 +297,19 @@ Examples:
    # Install dependencies
    npm install
 
-   # Configure the Server - IMPORTANT: Do this BEFORE building
-   # Copy the .env.sample file to .env in the project root:
-   cp .env.sample .env
-
-   # Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
-   # Then build the project
+   # Build the project
    npm run build
    ```
 
-#### 4. Configure the Server
-   - Copy the `.env.sample` file to `.env` in the project root:
-     ```bash
-     cp .env.sample .env
-     ```
-   - Edit the `.env` file and update the `WRIKE_ACCESS_TOKEN` with your permanent token
-
-#### 5. Configure Claude Desktop
-   Add the following to your `claude_desktop_config.json`
+#### 4. Configure Claude Desktop
+   Add the following to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "Wrike": {
-      "command": "node",
-      "args": ["C:/installed-path/mcp-server-wrike/dist/server.js"],
+    "wrike": {
+      "command": "npx",
+      "args": ["-y", "@katoiek/mcp-server-wrike"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
@@ -333,8 +321,7 @@ Examples:
 }
 ```
 
-> **Note**: Replace `C:/path/to/mcp-server-wrike/dist/server.js` with the actual path to the server.js file on your system. Make sure to use forward slashes (/) or escaped backslashes (\\\\) in the path.
-```
+> **Note**: This server is designed to be run directly from Claude Desktop, which passes environment variables directly. No `.env` file is needed or used.
 
 ### Installation
 
@@ -346,12 +333,7 @@ cd mcp-server-wrike
 # Install dependencies
 npm install
 
-# Configure the Server - IMPORTANT: Do this BEFORE building
-# Copy the .env.sample file to .env in the project root:
-cp .env.sample .env
-
-# Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
-# Then build the project
+# Build the project
 npm run build
 ```
 
@@ -360,14 +342,13 @@ npm run build
 If you encounter permission errors:
 1. Ensure your Wrike plan allows API access
 2. Confirm the access token is correctly set in `claude_desktop_config.json`
-3. Verify that you've copied `.env.sample` to `.env` and updated it with your permanent token
-4. Check the logs in `%APPDATA%\Claude\logs` on Windows
+3. Check the logs in `%APPDATA%\Claude\logs` on Windows
 
 If tools are not showing up in Claude Desktop:
 1. Restart Claude Desktop
 2. Ensure the server is properly built with `npm run build`
 3. Check that the path to the server.js file is correct in your configuration
-4. Verify that both `.env` file and Claude Desktop configuration have the same access token
+
 
 If you experience performance issues:
 1. Set `LOG_LEVEL` to `warn` or `error` in your configuration to reduce logging
@@ -384,11 +365,7 @@ git clone https://github.com/katoiek/mcp-server-wrike.git
 cd mcp-server-wrike
 npm install
 
-# Configure the Server - IMPORTANT: Do this BEFORE building
-# Copy the .env.sample file to .env in the project root:
-cp .env.sample .env
 
-# Edit the .env file and update the WRIKE_ACCESS_TOKEN with your permanent token
 ```
 
 #### Recent Improvements
@@ -719,31 +696,19 @@ MCPの詳細はこちら：
    # 依存関係をインストール
    npm install
 
-   # サーバーを構成 - 重要: ビルド前にこれを行ってください
-   # プロジェクトのルートにある.env.sampleファイルを.envにコピー：
-   cp .env.sample .env
-
-   # .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
-   # その後、プロジェクトをビルド
+   # プロジェクトをビルド
    npm run build
    ```
 
-#### 4. サーバーを構成
-   - プロジェクトのルートにある`.env.sample`ファイルを`.env`にコピー：
-     ```bash
-     cp .env.sample .env
-     ```
-   - `.env`ファイルを編集し、`WRIKE_ACCESS_TOKEN`を永続トークンで更新
-
-#### 5. Claude Desktopを構成
+#### 4. Claude Desktopを構成
    `claude_desktop_config.json` に以下を追加：
 
 ```json
 {
   "mcpServers": {
-    "Wrike": {
-      "command": "node",
-      "args": ["C:/インストールパス/mcp-server-wrike/dist/server.js"],
+    "wrike": {
+      "command": "npx",
+      "args": ["-y", "@katoiek/mcp-server-wrike"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
@@ -755,8 +720,7 @@ MCPの詳細はこちら：
 }
 ```
 
-> **注意**: `C:/path/to/mcp-server-wrike/dist/server.js` は、システム上の server.js ファイルの実際のパスに置き換えてください。パスにはフォワードスラッシュ (/) またはエスケープされたバックスラッシュ (\\\\) を使用してください。
-```
+> **注意**: このサーバーはClaude Desktopから直接実行されるように設計されており、環境変数が直接渡されます。`.env`ファイルは必要なく、使用されません。
 
 ### インストール
 
@@ -768,12 +732,7 @@ cd mcp-server-wrike
 # 依存関係をインストール
 npm install
 
-# サーバーを構成 - 重要: ビルド前にこれを行ってください
-# プロジェクトのルートにある.env.sampleファイルを.envにコピー：
-cp .env.sample .env
-
-# .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
-# その後、プロジェクトをビルド
+# プロジェクトをビルド
 npm run build
 ```
 
@@ -782,14 +741,12 @@ npm run build
 権限エラーが発生した場合：
 1. WrikeプランがAPIアクセスを許可していることを確認
 2. アクセストークンが`claude_desktop_config.json`で正しく設定されていることを確認
-3. `.env.sample`を`.env`にコピーし、永続トークンを更新したことを確認
-4. Windowsの場合は`%APPDATA%\Claude\logs`のログを確認
+3. Windowsの場合は`%APPDATA%\Claude\logs`のログを確認
 
 ツールがClaude Desktopに表示されない場合：
 1. Claude Desktopを再起動
 2. サーバーが`npm run build`で適切にビルドされていることを確認
-3. 設定内のserver.jsファイルへのパスが正しいことを確認
-4. `.env`ファイルとClaude Desktop設定の両方に同じアクセストークンが設定されていることを確認
+3. Claude Desktop設定内のアクセストークンが正しいことを確認
 
 パフォーマンスの問題が発生した場合：
 1. 設定で`LOG_LEVEL`を`warn`または`error`に設定してログ出力を減らす
@@ -806,11 +763,7 @@ git clone https://github.com/katoiek/mcp-server-wrike.git
 cd mcp-server-wrike
 npm install
 
-# サーバーを構成 - 重要: ビルド前にこれを行ってください
-# プロジェクトのルートにある.env.sampleファイルを.envにコピー：
-cp .env.sample .env
 
-# .envファイルを編集し、WRIKE_ACCESS_TOKENを永続トークンで更新
 ```
 
 #### 最近の改善点

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import dotenv from 'dotenv';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { WrikeClient } from './utils/wrikeClient.js';
@@ -18,7 +17,6 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 // Initialize environment variables
-dotenv.config();
 
 // Check for required environment variables
 if (!process.env.WRIKE_ACCESS_TOKEN) {

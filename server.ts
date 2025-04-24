@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import dotenv from 'dotenv';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -34,38 +33,23 @@ import { fileURLToPath } from 'url';
 
 /**
  * Initialize environment configuration
+ *
+ * Note: This server is designed to be run from Claude Desktop, which passes
+ * environment variables directly. No .env file is needed or used.
  */
 function initializeEnvironment() {
   // Get the directory name in ESM
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  // Try to load from multiple possible locations
-  const envPaths = [
-    path.join(__dirname, '.env'),
-    path.join(process.cwd(), '.env'),
-    path.join(path.dirname(process.execPath), '.env')
-  ];
-
-  let envLoaded = false;
-  for (const envPath of envPaths) {
-    if (fs.existsSync(envPath)) {
-      logger.info(`Loading environment from: ${envPath}`);
-      dotenv.config({ path: envPath });
-      envLoaded = true;
-      break;
-    }
-  }
-
-  if (!envLoaded) {
-    logger.warn('No .env file found. Using environment variables directly.');
-  }
-
   // Configure log level from environment
   configureLogLevel();
 
   // Validate required environment variables
   validateRequiredEnvVars();
+
+  // Log environment status
+  logger.info('Using environment variables from Claude Desktop configuration');
 }
 
 /**
@@ -97,7 +81,20 @@ function configureLogLevel() {
 function validateRequiredEnvVars() {
   if (!process.env.WRIKE_ACCESS_TOKEN) {
     logger.error('WRIKE_ACCESS_TOKEN environment variable is required');
-    logger.error('Please set it in .env file or in the Claude Desktop configuration');
+    logger.error('Please set it in the Claude Desktop configuration');
+    logger.error('Example configuration in claude_desktop_config.json:');
+    logger.error(`{
+  "mcpServers": {
+    "wrike": {
+      "command": "npx",
+      "args": ["-y", "@katoiek/mcp-server-wrike"],
+      "env": {
+        "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
+        "WRIKE_HOST": "www.wrike.com"
+      }
+    }
+  }
+}`);
     logger.debug('Current environment variables:', Object.keys(process.env));
     process.exit(1);
   }
