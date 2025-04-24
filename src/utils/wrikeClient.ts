@@ -747,12 +747,12 @@ export class WrikeClient {
   }
 
   /**
-   * Launch a task blueprint
+   * Launch a task blueprint asynchronously
    * @param taskBlueprintId ID of the task blueprint to launch
    * @param data Launch configuration data
-   * @returns Promise resolving to the created task
+   * @returns Promise resolving to the async job ID
    */
-  async launchTaskBlueprint(taskBlueprintId: string, data: WrikeTaskBlueprintLaunchData): Promise<WrikeTask> {
+  async launchTaskBlueprint(taskBlueprintId: string, data: WrikeTaskBlueprintLaunchData): Promise<string> {
     try {
       if (!taskBlueprintId) {
         throw new Error('Task blueprint ID is required');
@@ -761,50 +761,47 @@ export class WrikeClient {
       // Convert data to query parameters
       const params: Record<string, any> = {};
 
-      // Add basic properties
+      // Add required properties
       if (data.title) params.title = data.title;
-      if (data.parent) params.parent = data.parent;
-      if (data.superTask) params.superTask = data.superTask;
-      if (data.description) params.description = data.description;
-      if (data.status) params.status = data.status;
-      if (data.importance) params.importance = data.importance;
 
-      // Handle dates if present
-      if (data.dates) {
-        if (data.dates.type) params['dates.type'] = data.dates.type;
-        if (data.dates.duration !== undefined) params['dates.duration'] = data.dates.duration;
-        if (data.dates.start) params['dates.start'] = data.dates.start;
-        if (data.dates.due) params['dates.due'] = data.dates.due;
-      }
+      // Add parent ID or super task ID (one is required)
+      if (data.parent) params.parentId = data.parent;
+      if (data.superTask) params.superTaskId = data.superTask;
 
-      // Handle arrays
-      if (data.responsibles && data.responsibles.length > 0) {
-        params.responsibles = data.responsibles.join(',');
-      }
+      // Add optional parameters
+      if (data.titlePrefix) params.titlePrefix = data.titlePrefix;
+      if (data.copyDescriptions !== undefined) params.copyDescriptions = data.copyDescriptions;
+      if (data.notifyResponsibles !== undefined) params.notifyResponsibles = data.notifyResponsibles;
+      if (data.copyResponsibles !== undefined) params.copyResponsibles = data.copyResponsibles;
+      if (data.copyCustomFields !== undefined) params.copyCustomFields = data.copyCustomFields;
+      if (data.copyAttachments !== undefined) params.copyAttachments = data.copyAttachments;
+      if (data.entryLimit) params.entryLimit = data.entryLimit;
 
-      if (data.followers && data.followers.length > 0) {
-        params.followers = data.followers.join(',');
-      }
-
-      // Handle custom fields
-      if (data.customFields && data.customFields.length > 0) {
-        data.customFields.forEach((field, index) => {
-          params[`customFields[${index}].id`] = field.id;
-          params[`customFields[${index}].value`] = field.value;
-        });
+      // Handle reschedule parameters
+      if (data.rescheduleDate) params.rescheduleDate = data.rescheduleDate;
+      if (data.rescheduleMode) {
+        // Handle case sensitivity for rescheduleMode
+        if (data.rescheduleMode.toLowerCase() === 'start') {
+          params.rescheduleMode = 'Start';
+        } else if (data.rescheduleMode.toLowerCase() === 'end') {
+          params.rescheduleMode = 'End';
+        } else {
+          params.rescheduleMode = data.rescheduleMode;
+        }
       }
 
       // Log the request data for debugging
       logger.debug(`Launching task blueprint ${taskBlueprintId} with params:`, params);
 
       // Send request with empty body and parameters in query string
-      const response = await this.client.post(`/task_blueprints/${taskBlueprintId}/launch`, null, { params });
+      const response = await this.client.post(`/task_blueprints/${taskBlueprintId}/launch_async`, null, { params });
 
       // Log the response for debugging
       logger.debug(`Launch response status: ${response.status}`);
 
-      // Extract the created task from the response
-      return this.handleResponse<WrikeTask>(response);
+      // Extract the async job ID from the response
+      const result = this.handleResponse<{ asyncJobId: string }>(response);
+      return result.asyncJobId;
     } catch (error) {
       logger.error(`Error launching task blueprint: ${(error as Error).message}`);
       if ((error as any).response) {

@@ -245,28 +245,29 @@ Examples:
       - `copy_responsibles` (boolean): Copy those responsible (default: true)
       - `copy_custom_fields` (boolean): Copy custom fields (default: true)
       - `copy_attachments` (boolean): Copy attachments (default: false)
-      - `custom_fields` (array): Array of custom fields
       - `reschedule_date` (string): Date to use in task rescheduling (format: YYYY-MM-DD)
       - `reschedule_mode` (enum): Mode for rescheduling: Start/start or End/end
       - `entry_limit` (number): Maximum number of tasks/folders in tree for copy (1-250, default: 250)
     - Returns: Async job ID for the launched blueprint
 
 18. `wrike_create_work_from_task_blueprint`
-    - Create a task from a task blueprint in Wrike
+    - Create work from a task blueprint in Wrike
     - Required input:
       - `task_blueprint_id` (string): ID of the task blueprint to launch
       - `title` (string): Title for the created task
       - `parent_id` (string): ID of parent folder or project (Either this parameter or super_task_id is required)
       - `super_task_id` (string): ID of parent task to add work as a subtask (Either this parameter or parent_id is required)
     - Optional input:
-      - `description` (string): Description of the task
-      - `status` (string): Status of the task
-      - `importance` (string): Importance of the task (High, Normal, Low)
-      - `dates` (object): Task dates with properties like start, due, type, duration
-      - `responsibles` (array of strings): Array of user IDs to assign to the task
-      - `followers` (array of strings): Array of user IDs to add as followers
-      - `custom_fields` (array): Array of custom fields with id and value properties
-    - Returns: Created task information
+      - `title_prefix` (string): Title prefix for all copied tasks
+      - `copy_descriptions` (boolean): Copy descriptions or leave empty (default: true)
+      - `notify_responsibles` (boolean): Notify those responsible (default: true)
+      - `copy_responsibles` (boolean): Copy those responsible (default: true)
+      - `copy_custom_fields` (boolean): Copy custom fields (default: true)
+      - `copy_attachments` (boolean): Copy attachments (default: false)
+      - `reschedule_date` (string): Date to use in task rescheduling (format: YYYY-MM-DD)
+      - `reschedule_mode` (enum): Mode for rescheduling: Start/start or End/end
+      - `entry_limit` (number): Maximum number of tasks/folders in tree for copy (1-250, default: 250)
+    - Returns: Async job ID for the launched blueprint
 
 ### Setup
 
@@ -663,7 +664,25 @@ MCPの詳細はこちら：
       - `copy_responsibles`（ブール値）：担当者をコピーするか（デフォルト：true）
       - `copy_custom_fields`（ブール値）：カスタムフィールドをコピーするか（デフォルト：true）
       - `copy_attachments`（ブール値）：添付ファイルをコピーするか（デフォルト：false）
-      - `custom_fields`（配列）：カスタムフィールドの配列
+      - `reschedule_date`（文字列）：タスクの再スケジュールに使用する日付（形式：YYYY-MM-DD）
+      - `reschedule_mode`（列挙型）：再スケジュールモード：Start/startまたはEnd/end
+      - `entry_limit`（数値）：コピーするタスク/フォルダのツリーの最大数（1-250、デフォルト：250）
+    - 戻り値：起動されたブループリントの非同期ジョブID
+
+18. `wrike_create_work_from_task_blueprint`
+    - Wrikeでタスクブループリントから作業を作成
+    - 必須入力：
+      - `task_blueprint_id`（文字列）：起動するタスクブループリントのID
+      - `title`（文字列）：作成されるタスクのタイトル
+      - `parent_id`（文字列）：親フォルダまたはプロジェクトのID（このパラメータまたはsuper_task_idのいずれかが必要）
+      - `super_task_id`（文字列）：サブタスクとして作業を追加する親タスクのID（このパラメータまたはparent_idのいずれかが必要）
+    - オプション入力：
+      - `title_prefix`（文字列）：コピーされるすべてのタスクのタイトルプレフィックス
+      - `copy_descriptions`（ブール値）：説明をコピーするか空のままにするか（デフォルト：true）
+      - `notify_responsibles`（ブール値）：担当者に通知するか（デフォルト：true）
+      - `copy_responsibles`（ブール値）：担当者をコピーするか（デフォルト：true）
+      - `copy_custom_fields`（ブール値）：カスタムフィールドをコピーするか（デフォルト：true）
+      - `copy_attachments`（ブール値）：添付ファイルをコピーするか（デフォルト：false）
       - `reschedule_date`（文字列）：タスクの再スケジュールに使用する日付（形式：YYYY-MM-DD）
       - `reschedule_mode`（列挙型）：再スケジュールモード：Start/startまたはEnd/end
       - `entry_limit`（数値）：コピーするタスク/フォルダのツリーの最大数（1-250、デフォルト：250）

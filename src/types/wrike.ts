@@ -273,19 +273,16 @@ export interface WrikeFolderBlueprintLaunchData {
 
 export interface WrikeTaskBlueprintLaunchData {
   title: string;
-  parent?: string;  // ID of parent folder
-  superTask?: string;  // ID of parent task
-  description?: string;
-  status?: string;
-  importance?: string;
-  dates?: {
-    type?: string;
-    duration?: number;
-    start?: string;
-    due?: string;
-  };
-  responsibles?: string[];
-  followers?: string[];
-  customFields?: WrikeCustomField[];
+  parent?: string;  // ID of parent folder (parentId in API)
+  superTask?: string;  // ID of parent task (superTaskId in API)
+  titlePrefix?: string;
+  copyDescriptions?: boolean;
+  notifyResponsibles?: boolean;
+  copyResponsibles?: boolean;
+  copyCustomFields?: boolean;
+  copyAttachments?: boolean;
+  rescheduleDate?: string;  // Format: YYYY-MM-DD
+  rescheduleMode?: string;  // 'Start' or 'End'
+  entryLimit?: number;
   [key: string]: any;
 }
