@@ -134,6 +134,13 @@ Examples:
      - `space_id` (string): Space ID (if specified, retrieves task blueprints from this space)
    - Returns: List of task blueprints
 
+12. `wrike_get_customfields`
+   - Get custom fields from Wrike
+   - Optional input:
+     - `customfield_ids` (array of strings): Array of custom field IDs to retrieve (up to 100)
+     - `opt_fields` (string): Comma-separated list of optional fields to include
+   - Returns: List of custom fields or specific custom fields by IDs
+
 #### Write Operations (Create, Update, Delete)
 
 10. `wrike_create_folder_project`
@@ -532,6 +539,13 @@ MCPの詳細はこちら：
    - オプション入力：
      - `space_id`（文字列）：スペースID（指定すると、このスペース内のタスクブループリントを取得）
    - 戻り値：タスクブループリントのリスト
+
+12. `wrike_get_customfields`
+   - カスタムフィールドを取得
+   - オプション入力：
+     - `customfield_ids`（文字列の配列）：取得するカスタムフィールドIDの配列（最大100個）
+     - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
+   - 戻り値：カスタムフィールドのリスト、または指定したIDのカスタムフィールド
 
 #### 更新系操作（作成・更新・削除）
 

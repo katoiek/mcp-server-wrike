@@ -137,6 +137,28 @@ export interface WrikeCustomField {
   [key: string]: any;
 }
 
+export interface WrikeCustomFieldDefinition {
+  id: string;
+  accountId: string;
+  title: string;
+  type: string;
+  sharedIds?: string[];
+  settings?: {
+    inheritanceType?: string;
+    values?: {
+      id: string;
+      value: string;
+      color?: string;
+    }[];
+    decimalPlaces?: number;
+    useThousandsSeparator?: boolean;
+    aggregation?: string;
+    currency?: string;
+    allowOtherValues?: boolean;
+  };
+  [key: string]: any;
+}
+
 // Request Types
 export interface WrikeRequestParams {
   [key: string]: any;

@@ -118,6 +118,10 @@ export const deleteTimelogSchema = z.object({
 
 export const getTimelogCategoriesSchema = optionalFieldsSchema.extend({});
 
+export const getCustomFieldsSchema = optionalFieldsSchema.extend({
+  customfield_ids: z.array(z.string()).optional().describe('Array of custom field IDs to retrieve (up to 100)')
+});
+
 // Tool types
 export type EchoInput = z.infer<typeof echoSchema>;
 export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
@@ -136,6 +140,7 @@ export type CreateTimelogInput = z.infer<typeof createTimelogSchema>;
 export type UpdateTimelogInput = z.infer<typeof updateTimelogSchema>;
 export type DeleteTimelogInput = z.infer<typeof deleteTimelogSchema>;
 export type GetTimelogCategoriesInput = z.infer<typeof getTimelogCategoriesSchema>;
+export type GetCustomFieldsInput = z.infer<typeof getCustomFieldsSchema>;
 
 // Tool interface
 export interface Tool {
@@ -229,5 +234,10 @@ export const tools: Tool[] = [
     name: 'echo',
     description: 'Echo a message back',
     schema: echoSchema
+  },
+  {
+    name: 'wrike_get_customfields',
+    description: 'Get custom fields from Wrike',
+    schema: getCustomFieldsSchema
   }
 ];

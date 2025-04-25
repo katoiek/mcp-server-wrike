@@ -20,7 +20,8 @@ import {
   WrikeFolderBlueprint,
   WrikeTaskBlueprint,
   WrikeTaskBlueprintLaunchData,
-  WrikeFolderBlueprintLaunchData
+  WrikeFolderBlueprintLaunchData,
+  WrikeCustomFieldDefinition
 } from '../types/wrike.js';
 
 export class WrikeClient {
@@ -825,6 +826,47 @@ export class WrikeClient {
         logger.error(`Response status: ${(error as any).response.status}`);
         logger.error(`Response data: ${JSON.stringify((error as any).response.data)}`);
       }
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Get all custom fields
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeCustomFieldDefinition objects
+   */
+  async getCustomFields(params: WrikeRequestParams = {}): Promise<WrikeCustomFieldDefinition[]> {
+    try {
+      const response = await this.client.get('/customfields', {
+        params: removeUndefinedValues(params)
+      });
+      return this.handleResponse<WrikeCustomFieldDefinition[]>(response);
+    } catch (error) {
+      return this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Get custom fields by IDs
+   * @param customFieldIds Array of custom field IDs (up to 100)
+   * @param params Optional request parameters
+   * @returns Promise resolving to array of WrikeCustomFieldDefinition objects
+   */
+  async getCustomFieldsByIds(customFieldIds: string[], params: WrikeRequestParams = {}): Promise<WrikeCustomFieldDefinition[]> {
+    try {
+      if (!customFieldIds || customFieldIds.length === 0) {
+        throw new Error('Custom field IDs are required');
+      }
+
+      if (customFieldIds.length > 100) {
+        throw new Error('Maximum of 100 custom field IDs allowed');
+      }
+
+      const response = await this.client.get(`/customfields/${customFieldIds.join(',')}`, {
+        params: removeUndefinedValues(params)
+      });
+      return this.handleResponse<WrikeCustomFieldDefinition[]>(response);
+    } catch (error) {
       return this.handleApiError(error);
     }
   }

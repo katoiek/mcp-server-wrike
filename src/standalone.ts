@@ -110,6 +110,21 @@ function toolHandler(wrikeClient: WrikeClient) {
           } as any;
         }
 
+        case 'wrike_get_customfields': {
+          const { customfield_ids, opt_fields } = args as { customfield_ids?: string[]; opt_fields?: string };
+          let response;
+
+          if (customfield_ids && customfield_ids.length > 0) {
+            response = await wrikeClient.getCustomFieldsByIds(customfield_ids, parseOptFields(opt_fields));
+          } else {
+            response = await wrikeClient.getCustomFields(parseOptFields(opt_fields));
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify(response, null, 2) }]
+          } as any;
+        }
+
         // Add other tool handlers here...
 
         default:

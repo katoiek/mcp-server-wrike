@@ -11,6 +11,7 @@ import { registerWrikeGetTimelogCategoriesTool } from './wrike_get_timelog_categ
 import { registerWrikeGetCustomItemTypesTool } from './wrike_get_custom_item_types.js';
 import { registerWrikeGetFolderBlueprintsTool } from './wrike_get_folder_blueprints.js';
 import { registerWrikeGetTaskBlueprintsTool } from './wrike_get_task_blueprints.js';
+import { registerWrikeGetCustomfieldsTool } from './wrike_get_customfields.js';
 // 更新系（create, update, delete）
 import { registerWrikeCreateFolderProjectTool } from './wrike_create_folder_project.js';
 import { registerWrikeCreateTaskTool } from './wrike_create_task.js';
@@ -40,6 +41,7 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeGetCustomItemTypesTool(server);
   registerWrikeGetFolderBlueprintsTool(server);
   registerWrikeGetTaskBlueprintsTool(server);
+  registerWrikeGetCustomfieldsTool(server);
 
   // 更新系（create, update, delete）ツールの登録
   registerWrikeCreateFolderProjectTool(server);
@@ -67,6 +69,7 @@ export * from './wrike_get_timelog_categories.js';
 export * from './wrike_get_custom_item_types.js';
 export * from './wrike_get_folder_blueprints.js';
 export * from './wrike_get_task_blueprints.js';
+export * from './wrike_get_customfields.js';
 // 更新系（create, update, delete）
 export * from './wrike_create_folder_project.js';
 export * from './wrike_create_task.js';
