@@ -23,6 +23,8 @@ In your AI tool of choice (e.g., Claude Desktop), ask something about Wrike task
 
 Examples:
 > Please list all spaces in Wrike.
+>
+> Can you get information about a specific space with ID "ABCDE123" in Wrike?
 
 > Can you tell me the details of a task named "Website Redesign" in Wrike?
 
@@ -32,11 +34,12 @@ Examples:
 
 #### Read Operations (List & Get)
 
-1. `wrike_list_spaces`
-   - List all available spaces in Wrike
+1. `wrike_get_space`
+   - Get spaces information from Wrike
    - Optional input:
+     - `space_id` (string): Space ID to get specific space. If not provided, all spaces will be returned
      - `opt_fields` (string): Comma-separated list of optional fields to include
-   - Returns: List of spaces
+   - Returns: List of spaces or a specific space
 
 2. `wrike_get_folder_project`
    - Unified tool for working with Wrike folders, projects, and spaces
@@ -429,6 +432,8 @@ MCPの詳細はこちら：
 
 例：
 > Wrikeでスペースの一覧をリストで作ってください。
+>
+> WrikeでID「ABCDE123」の特定のスペース情報を取得してください。
 
 > Wrikeでタスク名「ウェブサイトリニューアル」の詳細を教えて下さい。
 
@@ -438,11 +443,12 @@ MCPの詳細はこちら：
 
 #### 参照系操作（一覧取得・情報取得）
 
-1. `wrike_list_spaces`
-   - Wrikeで利用可能なすべてのスペースをリスト表示
+1. `wrike_get_space`
+   - Wrikeからスペース情報を取得
    - オプション入力：
+     - `space_id`（文字列）：特定のスペースを取得するためのスペースID。指定しない場合は全スペースが返されます
      - `opt_fields`（文字列）：含める追加フィールドのカンマ区切りリスト
-   - 戻り値：スペースのリスト
+   - 戻り値：スペースのリストまたは特定のスペース情報
 
 2. `wrike_get_folder_project`
    - Wrikeのフォルダ、プロジェクト、スペースを操作するための統合ツール

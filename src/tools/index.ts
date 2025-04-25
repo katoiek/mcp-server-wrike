@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 // 参照系（list & get）
-import { registerWrikeListSpacesTool } from './wrike_list_spaces.js';
+import { registerWrikeGetSpaceTool } from './wrike_get_space.js';
 import { registerWrikeGetFolderProjectTool } from './wrike_get_folder_project.js';
 import { registerWrikeGetTaskTool } from './wrike_get_task.js';
 import { registerWrikeGetCommentsTool } from './wrike_get_comments.js';
@@ -30,7 +30,7 @@ import { registerWrikeCreateWorkFromTaskBlueprintTool } from './wrike_create_wor
  */
 export function registerAllWrikeTools(server: McpServer): void {
   // 参照系（list & get）ツールの登録
-  registerWrikeListSpacesTool(server);
+  registerWrikeGetSpaceTool(server);
   registerWrikeGetFolderProjectTool(server);
   registerWrikeGetTaskTool(server);
   registerWrikeGetCommentsTool(server);
@@ -58,7 +58,7 @@ export function registerAllWrikeTools(server: McpServer): void {
 
 // Export individual tool modules
 // 参照系（list & get）
-export * from './wrike_list_spaces.js';
+export * from './wrike_get_space.js';
 export * from './wrike_get_folder_project.js';
 export * from './wrike_get_task.js';
 export * from './wrike_get_comments.js';
