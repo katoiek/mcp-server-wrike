@@ -314,12 +314,31 @@ Examples:
 #### 4. Configure Claude Desktop
    Add the following to your `claude_desktop_config.json`:
 
+##### Option 1: Using npx (recommended for global installation)
 ```json
 {
   "mcpServers": {
     "wrike": {
-      "command": "npx",
-      "args": ["-y", "@katoiek/mcp-server-wrike"],
+      "command": "node",
+      "args": ["-y", "your-mcp-server-path/server.js"],
+      "env": {
+        "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
+        "WRIKE_HOST": "www.wrike.com",
+        "NODE_ENV": "production",
+        "LOG_LEVEL": "warn"
+      }
+    }
+  }
+}
+```
+
+##### Option 2: Using node (for local installation)
+```json
+{
+  "mcpServers": {
+    "wrike-mcp-server": {
+      "command": "node",
+      "args": ["/path/to/mcp-server-wrike/dist/server.js"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
@@ -727,8 +746,8 @@ MCPの詳細はこちら：
 {
   "mcpServers": {
     "wrike": {
-      "command": "npx",
-      "args": ["-y", "@katoiek/mcp-server-wrike"],
+      "command": "node",
+      "args": ["-y", "your-mcp-server-path/server.js"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
