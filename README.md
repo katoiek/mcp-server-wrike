@@ -397,35 +397,6 @@ npm install
 
 ```
 
-#### Recent Improvements
-
-##### v1.1.0 (2025-04-07)
-- Fixed timelog functionality
-  - Implemented proper API endpoints for creating, updating, and deleting timelogs
-  - Added missing type definitions and schemas
-  - Fixed issues with timelog data formatting
-  - Improved error handling and logging for timelog operations
-
-If you want to test your changes, you can use the MCP Inspector:
-
-```bash
-npm run inspector
-```
-
-This will expose the client to port `5173` and server to port `3000`.
-
-If those ports are already used by something else, you can use:
-
-```bash
-CLIENT_PORT=5009 SERVER_PORT=3009 npm run inspector
-```
-
-Alternatively, you can run the inspector directly:
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
 ### License
 
 This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software, subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project repository.
@@ -802,36 +773,6 @@ git clone https://github.com/katoiek/mcp-server-wrike.git
 cd mcp-server-wrike
 npm install
 
-
-```
-
-#### 最近の改善点
-
-##### v1.1.0 (2025-04-07)
-- タイムログ機能の修正
-  - タイムログの作成、更新、削除のための適切なAPIエンドポイントを実装
-  - 不足していた型定義とスキーマを追加
-  - タイムログデータのフォーマットに関する問題を修正
-  - タイムログ操作のエラーハンドリングとログ記録を改善
-
-変更をテストしたい場合は、MCP Inspectorを使用できます：
-
-```bash
-npm run inspector
-```
-
-これにより、クライアントはポート`5173`、サーバーはポート`3000`で公開されます。
-
-これらのポートが他のプロセスで使用されている場合は、以下のように指定できます：
-
-```bash
-CLIENT_PORT=5009 SERVER_PORT=3009 npm run inspector
-```
-
-または、インスペクターを直接実行することもできます：
-
-```bash
-npx @modelcontextprotocol/inspector
 ```
 
 ### ライセンス
