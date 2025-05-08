@@ -320,7 +320,7 @@ Examples:
   "mcpServers": {
     "wrike": {
       "command": "node",
-      "args": ["-y", "your-mcp-server-path/server.js"],
+      "args": ["your-mcp-server-path/server.js"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
@@ -747,7 +747,7 @@ MCPの詳細はこちら：
   "mcpServers": {
     "wrike": {
       "command": "node",
-      "args": ["-y", "your-mcp-server-path/server.js"],
+      "args": ["your-mcp-server-path/server.js"],
       "env": {
         "WRIKE_ACCESS_TOKEN": "your-wrike-access-token",
         "WRIKE_HOST": "www.wrike.com",
