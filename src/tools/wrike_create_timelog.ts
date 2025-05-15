@@ -14,23 +14,23 @@ export function registerWrikeCreateTimelogTool(server: McpServer): void {
     {
       task_id: z.string().describe('Task ID'),
       hours: z.number().describe('Number of hours'),
-      tracked_date: z.string().describe('Tracked date (YYYY-MM-DD) - Required'),
+      trackedDate: z.string().describe('Date for which timelog was recorded. Format: yyyy-MM-dd'),
       comment: z.string().optional().describe('Comment'),
       category_id: z.string().optional().describe('Timelog category ID')
     },
-    async ({ task_id, hours, tracked_date, comment, category_id }) => {
+    async ({ task_id, hours, trackedDate, comment, category_id }) => {
       try {
         logger.debug(`Creating timelog for task: ${task_id}`);
         const wrikeClient = createWrikeClient();
 
         // Validate required fields
-        if (!tracked_date) {
-          throw new Error('tracked_date is required (format: YYYY-MM-DD)');
+        if (!trackedDate) {
+          throw new Error('trackedDate is required (format: yyyy-MM-dd)');
         }
 
         const data: WrikeTimelogData = {
           hours,
-          trackedDate: tracked_date,
+          trackedDate,
           comment,
           categoryId: category_id
         };

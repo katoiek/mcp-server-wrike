@@ -204,7 +204,7 @@ Examples:
     - Required input:
       - `task_id` (string): ID of the task to add the timelog to
       - `hours` (number): Number of hours to log (positive number)
-      - `tracked_date` (string): Date when the time was spent (YYYY-MM-DD)
+      - `trackedDate` (string): Date for which timelog was recorded. Format: yyyy-MM-dd
     - Optional input:
       - `comment` (string): Comment for the timelog
       - `category_id` (string): ID of the timelog category
@@ -216,7 +216,7 @@ Examples:
       - `timelog_id` (string): ID of the timelog to update
     - Optional input:
       - `hours` (number): New number of hours (positive number)
-      - `tracked_date` (string): New date when the time was spent (YYYY-MM-DD)
+      - `trackedDate` (string): Date for which timelog was recorded. Format: yyyy-MM-dd
       - `comment` (string): New comment for the timelog
       - `category_id` (string): New ID of the timelog category
     - Returns: Updated timelog information
@@ -603,7 +603,7 @@ MCPの詳細はこちら：
     - 必須入力：
       - `task_id`（文字列）：タイムログを追加するタスクのID
       - `hours`（数値）：記録する時間数（正の数）
-      - `tracked_date`（文字列）：時間が費やされた日付（YYYY-MM-DD形式）
+      - `trackedDate`（文字列）：タイムログが記録された日付（yyyy-MM-dd形式）
     - オプション入力：
       - `comment`（文字列）：タイムログのコメント
       - `category_id`（文字列）：タイムログカテゴリのID
@@ -615,7 +615,7 @@ MCPの詳細はこちら：
       - `timelog_id`（文字列）：更新するタイムログのID
     - オプション入力：
       - `hours`（数値）：新しい時間数（正の数）
-      - `tracked_date`（文字列）：時間が費やされた新しい日付（YYYY-MM-DD形式）
+      - `trackedDate`（文字列）：タイムログが記録された日付（yyyy-MM-dd形式）
       - `comment`（文字列）：タイムログの新しいコメント
       - `category_id`（文字列）：タイムログカテゴリの新しいID
     - 戻り値：更新されたタイムログ情報
