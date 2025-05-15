@@ -1037,26 +1037,22 @@ async function startMcpServer(): Promise<void> {
 
     // Start the server using standard input/output
     // Only log to file, not to standard output
-    // 標準入出力を使用してサーバーを起動
-    // ファイルにのみログを記録し、標準出力には書き込まない
     logger.info('Starting Wrike MCP Server...');
 
     // Use StdioServerTransport for JSON-RPC communication
-    // StdioServerTransportを使用してJSON-RPC通信を行う
     const transport = new StdioServerTransport();
 
-    // Connect the server / サーバーを接続
+    // Connect the server
     await server.connect(transport);
 
     // Log successful connection (do not write to standard output)
-    // 接続成功をログに記録（標準出力には書き込まない）
     logger.info('Wrike MCP Server started successfully');
   } catch (error) {
-    // エラーをログファイルに記録（標準エラー出力には書き込まない）
+    // Log error to file (do not write to standard error output)
     logger.error('Error starting Wrike MCP Server:', error);
 
-    // 標準エラー出力にJSON形式でエラーを出力
-    // これによりMCPクライアントがエラーを適切に処理できる
+    // Output error in JSON format to standard error output
+    // This allows the MCP client to properly handle the error
     const errorMessage = {
       jsonrpc: '2.0',
       error: {
@@ -1066,8 +1062,8 @@ async function startMcpServer(): Promise<void> {
       id: null
     };
 
-    // 標準エラー出力にJSON形式でエラーを書き込む
-    // ファイルディスクリプタ2は標準エラー出力
+    // Write error in JSON format to standard error output
+    // File descriptor 2 is standard error output
     fs.writeSync(2, JSON.stringify(errorMessage) + '\n');
 
     process.exit(1);

@@ -4,7 +4,7 @@ import { WrikeTask, WrikeTaskData, WrikeCustomField } from '../types/wrike.js';
 import { createWrikeClient } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 
-// カスタムフィールドのZodスキーマを定義
+// Define Zod schema for custom fields
 const customFieldSchema = z.object({
   id: z.string().describe('Custom field ID'),
   value: z.union([z.string(), z.number(), z.boolean(), z.null()]).describe('Custom field value')

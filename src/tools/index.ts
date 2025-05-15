@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-// 参照系（list & get）
+// Reference tools (list & get)
 import { registerWrikeGetSpaceTool } from './wrike_get_space.js';
 import { registerWrikeGetFolderProjectTool } from './wrike_get_folder_project.js';
 import { registerWrikeGetTaskTool } from './wrike_get_task.js';
@@ -12,7 +12,7 @@ import { registerWrikeGetCustomItemTypesTool } from './wrike_get_custom_item_typ
 import { registerWrikeGetFolderBlueprintsTool } from './wrike_get_folder_blueprints.js';
 import { registerWrikeGetTaskBlueprintsTool } from './wrike_get_task_blueprints.js';
 import { registerWrikeGetCustomfieldsTool } from './wrike_get_customfields.js';
-// 更新系（create, update, delete）
+// Modification tools (create, update, delete)
 import { registerWrikeCreateFolderProjectTool } from './wrike_create_folder_project.js';
 import { registerWrikeCreateTaskTool } from './wrike_create_task.js';
 import { registerWrikeUpdateTaskTool } from './wrike_update_task.js';
@@ -29,7 +29,7 @@ import { registerWrikeCreateWorkFromTaskBlueprintTool } from './wrike_create_wor
  * @param server McpServer instance
  */
 export function registerAllWrikeTools(server: McpServer): void {
-  // 参照系（list & get）ツールの登録
+  // Register reference tools (list & get)
   registerWrikeGetSpaceTool(server);
   registerWrikeGetFolderProjectTool(server);
   registerWrikeGetTaskTool(server);
@@ -43,7 +43,7 @@ export function registerAllWrikeTools(server: McpServer): void {
   registerWrikeGetTaskBlueprintsTool(server);
   registerWrikeGetCustomfieldsTool(server);
 
-  // 更新系（create, update, delete）ツールの登録
+  // Register modification tools (create, update, delete)
   registerWrikeCreateFolderProjectTool(server);
   registerWrikeCreateTaskTool(server);
   registerWrikeUpdateTaskTool(server);
@@ -57,7 +57,7 @@ export function registerAllWrikeTools(server: McpServer): void {
 }
 
 // Export individual tool modules
-// 参照系（list & get）
+// Reference tools (list & get)
 export * from './wrike_get_space.js';
 export * from './wrike_get_folder_project.js';
 export * from './wrike_get_task.js';
@@ -70,7 +70,7 @@ export * from './wrike_get_custom_item_types.js';
 export * from './wrike_get_folder_blueprints.js';
 export * from './wrike_get_task_blueprints.js';
 export * from './wrike_get_customfields.js';
-// 更新系（create, update, delete）
+// Modification tools (create, update, delete)
 export * from './wrike_create_folder_project.js';
 export * from './wrike_create_task.js';
 export * from './wrike_update_task.js';
@@ -81,5 +81,5 @@ export * from './wrike_delete_timelog.js';
 export * from './wrike_create_work_from_custom_item_types.js';
 export * from './wrike_create_work_from_folder_blueprint.js';
 export * from './wrike_create_work_from_task_blueprint.js';
-// その他
+// Others
 export * from './client.js';
