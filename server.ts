@@ -818,7 +818,6 @@ function toolHandler(wrikeClient: WrikeClient) {
           // Use a map of handlers for better maintainability and performance
           const handlers: Record<string, (client: WrikeClient, args: any) => Promise<ToolResponse>> = {
             'echo': handleEchoTool,
-            // 'wrike_list_spaces' has been removed
             'wrike_create_folder': handleCreateFolderTool,
             'wrike_get_folder_project': handleSearchFoldersProjectsTool,
             'wrike_get_task': handleGetTaskTool,
