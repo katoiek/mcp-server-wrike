@@ -10,8 +10,6 @@ export const echoSchema = z.object({
   message: z.string().describe('Message to echo back')
 });
 
-export const listSpacesSchema = optionalFieldsSchema.extend({});
-
 export const createFolderSchema = optionalFieldsSchema.extend({
   parent_id: z.string().describe('ID of the parent folder'),
   title: z.string().describe('Title of the folder'),
@@ -124,7 +122,7 @@ export const getCustomFieldsSchema = optionalFieldsSchema.extend({
 
 // Tool types
 export type EchoInput = z.infer<typeof echoSchema>;
-export type ListSpacesInput = z.infer<typeof listSpacesSchema>;
+// ListSpacesInput has been removed
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;
 export type SearchFoldersProjectsInput = z.infer<typeof searchFoldersProjectsSchema>;
 // SearchTasksInput is now integrated into GetTaskInput
@@ -151,11 +149,7 @@ export interface Tool {
 
 // Tool definitions
 export const tools: Tool[] = [
-  {
-    name: 'wrike_list_spaces',
-    description: 'List all available spaces in Wrike',
-    schema: listSpacesSchema
-  },
+  // wrike_list_spaces tool has been removed
   {
     name: 'wrike_create_folder',
     description: 'Create a new folder in Wrike',

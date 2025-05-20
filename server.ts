@@ -117,16 +117,6 @@ async function handleEchoTool(_wrikeClient: WrikeClient, args: any): Promise<Too
 }
 
 /**
- * Handle wrike_list_spaces tool request
- */
-async function handleListSpacesTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
-  const response = await wrikeClient.getSpaces(parseOptFields(args.opt_fields));
-  return {
-    content: [{ type: 'text', text: JSON.stringify(response, null, 2) }]
-  };
-}
-
-/**
  * Handle wrike_create_folder tool request
  */
 async function handleCreateFolderTool(wrikeClient: WrikeClient, args: any): Promise<ToolResponse> {
@@ -828,7 +818,7 @@ function toolHandler(wrikeClient: WrikeClient) {
           // Use a map of handlers for better maintainability and performance
           const handlers: Record<string, (client: WrikeClient, args: any) => Promise<ToolResponse>> = {
             'echo': handleEchoTool,
-            'wrike_list_spaces': handleListSpacesTool,
+            // 'wrike_list_spaces' has been removed
             'wrike_create_folder': handleCreateFolderTool,
             'wrike_get_folder_project': handleSearchFoldersProjectsTool,
             'wrike_get_task': handleGetTaskTool,
